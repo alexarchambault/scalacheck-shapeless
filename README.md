@@ -2,6 +2,9 @@
 
 Generation of arbitrary case classes / ADTs with scalacheck and shapeless
 
+Have a look at the shapeless-scalacheck project in https://github.com/typelevel/shapeless-contrib. Most of the additions in this one should be submitted there
+at some point.
+
 ## Usage
 
 Add to your `build.sbt`

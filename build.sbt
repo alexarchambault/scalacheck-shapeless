@@ -4,14 +4,11 @@ name := "scalacheck-shapeless"
 
 version := "1.12.1-SNAPSHOT" // Following scalacheck versions here
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.5"
 
-crossScalaVersions := Seq("2.10.4", "2.11.4")
+crossScalaVersions := Seq("2.10.4", "2.11.5")
 
-resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases"),
-  Resolver.sonatypeRepo("snapshots")
-)
+resolvers += Resolver.sonatypeRepo("releases")
 
 libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.12.1"
@@ -20,14 +17,12 @@ libraryDependencies ++= Seq(
 libraryDependencies ++= {
   if (scalaVersion.value startsWith "2.10.")
     Seq(
-      "com.chuusai" %% "shapeless" % "2.1.0-SNAPSHOT" cross CrossVersion.full,
-      // For shapeless LabelledGeneric to work, you may need to add it
-      // to your own project too...
+      "com.chuusai" %% "shapeless" % "2.1.0-RC1" cross CrossVersion.full,
       compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
     )
   else
     Seq(
-      "com.chuusai" %% "shapeless" % "2.1.0-SNAPSHOT"
+      "com.chuusai" %% "shapeless" % "2.1.0-RC1"
     )
 }
 

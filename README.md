@@ -44,4 +44,4 @@ property("some property about Foo") {
 ```
 without having to define yourself an `Arbitrary` for `Foo`.
 
-Available for scala 2.10 and 2.11. Uses scalacheck 1.12.1 and shapeless 2.1-SNAPSHOT.
+Available for scala 2.10 and 2.11. Uses scalacheck 1.12.1 and shapeless 2.1.0-RC1.

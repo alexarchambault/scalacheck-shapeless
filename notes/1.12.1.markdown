@@ -1,0 +1,3 @@
+Initial release:
+
+* Allows to derive instances of `Arbitrary` for any case class / sealed hierarchy

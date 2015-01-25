@@ -6,10 +6,8 @@ Generation of arbitrary case classes / ADTs with [scalacheck](https://github.com
 
 Add to your `build.sbt`
 ```scala
-resolvers += Resolver.sonatypeRepo("snapshots")
-
 libraryDependencies +=
-  "com.github.alexarchambault" %% "scalacheck-shapeless" % "1.12.1-SNAPSHOT"
+  "com.github.alexarchambault" %% "scalacheck-shapeless" % "1.12.1"
 ```
 
 Import the content of `org.scalacheck.Shapeless` close to where you want

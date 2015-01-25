@@ -2,7 +2,7 @@ organization := "com.github.alexarchambault"
 
 name := "scalacheck-shapeless"
 
-version := "1.12.1-SNAPSHOT" // Following scalacheck versions here
+version := "1.12.1" // Following scalacheck versions here
 
 scalaVersion := "2.11.5"
 

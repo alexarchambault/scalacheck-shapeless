@@ -10,6 +10,13 @@ libraryDependencies +=
   "com.github.alexarchambault" %% "scalacheck-shapeless" % "1.12.1"
 ```
 
+If you are using scala 2.10.x, also add the macro paradise plugin to your build,
+```scala
+libraryDependencies +=
+  compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+```
+
+
 Import the content of `org.scalacheck.Shapeless` close to where you want
 `Arbitrary` type classes to be automatically available for case classes
 / sealed hierarchies,

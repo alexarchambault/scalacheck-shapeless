@@ -49,6 +49,16 @@ property("some property about Foo") {
 ```
 without having to define yourself an `Arbitrary` for `Foo`.
 
+For the development version (new versioning), add instead to your `build.sbt`
+```scala
+resolvers += Resolver.sonatypeRepo("snapshots")
+
+libraryDependencies +=
+  "com.github.alexarchambault" %% "scalacheck-shapeless_1.12" % "0.1.0-SNAPSHOT"
+```
+
+(Macro paradise plugin also necessary with scala 2.10, see above.)
+
 Available for scala 2.10 and 2.11. Uses scalacheck 1.12.1 and shapeless 2.1.0-RC1.
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/alexarchambault/scalacheck-shapeless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

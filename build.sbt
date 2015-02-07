@@ -1,8 +1,13 @@
 organization := "com.github.alexarchambault"
 
-name := "scalacheck-shapeless"
+val _name = "scalacheck-shapeless_1.12"
 
-version := "1.12.1.1-SNAPSHOT" // Versioning should evolve soon
+// See https://groups.google.com/forum/#!msg/simple-build-tool/-AempE1a358/z-sUFFV-cdgJ
+moduleName := _name
+
+name := _name
+
+version := "0.1.0-SNAPSHOT"
 
 scalaVersion := "2.11.5"
 
@@ -11,7 +16,7 @@ crossScalaVersions := Seq("2.10.4", "2.11.5")
 resolvers += Resolver.sonatypeRepo("releases")
 
 libraryDependencies ++= Seq(
-  "org.scalacheck" %% "scalacheck" % "1.12.1"
+  "org.scalacheck" %% "scalacheck" % "1.12.2"
 )
 
 libraryDependencies ++= {

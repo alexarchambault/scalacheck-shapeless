@@ -7,7 +7,7 @@ moduleName := _name
 
 name := _name
 
-version := "0.1.0-SNAPSHOT"
+version := "0.1.0"
 
 scalaVersion := "2.11.5"
 
@@ -22,12 +22,12 @@ libraryDependencies ++= Seq(
 libraryDependencies ++= {
   if (scalaVersion.value startsWith "2.10.")
     Seq(
-      "com.chuusai" %% "shapeless" % "2.1.0-RC2" cross CrossVersion.full,
+      "com.chuusai" %% "shapeless" % "2.1.0" cross CrossVersion.full,
       compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
     )
   else
     Seq(
-      "com.chuusai" %% "shapeless" % "2.1.0-RC2"
+      "com.chuusai" %% "shapeless" % "2.1.0"
     )
 }
 

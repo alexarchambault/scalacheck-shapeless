@@ -2,6 +2,8 @@
 
 Generation of arbitrary case classes / ADTs with [scalacheck](https://github.com/rickynils/scalacheck) and [shapeless](https://github.com/milessabin/shapeless)
 
+[![Build Status](https://travis-ci.org/alexarchambault/scalacheck-shapeless.svg)](https://travis-ci.org/alexarchambault/scalacheck-shapeless)
+
 ## Usage
 
 Add to your `build.sbt`

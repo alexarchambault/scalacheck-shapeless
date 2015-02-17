@@ -7,13 +7,16 @@ moduleName := _name
 
 name := _name
 
-version := "0.1.0"
+version := "0.1.1-SNAPSHOT"
 
 scalaVersion := "2.11.5"
 
 crossScalaVersions := Seq("2.10.4", "2.11.5")
 
-resolvers += Resolver.sonatypeRepo("releases")
+resolvers ++= Seq(
+  Resolver.sonatypeRepo("releases"),
+  Resolver.sonatypeRepo("snapshots")
+)
 
 libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.12.2"

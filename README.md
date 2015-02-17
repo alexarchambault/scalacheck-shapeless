@@ -8,8 +8,10 @@ Generation of arbitrary case classes / ADTs with [scalacheck](https://github.com
 
 Add to your `build.sbt`
 ```scala
+resolvers += Resolver.sonatypeRepo("releases")
+
 libraryDependencies +=
-  "com.github.alexarchambault" %% "scalacheck-shapeless" % "1.12.1"
+  "com.github.alexarchambault" %% "scalacheck-shapeless_1.12" % "0.1.0"
 ```
 
 If you are using scala 2.10.x, also add the macro paradise plugin to your build,
@@ -51,12 +53,12 @@ property("some property about Foo") {
 ```
 without having to define yourself an `Arbitrary` for `Foo`.
 
-For the development version (new versioning), add instead to your `build.sbt`
+For the development version, add instead to your `build.sbt`
 ```scala
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies +=
-  "com.github.alexarchambault" %% "scalacheck-shapeless_1.12" % "0.1.0-SNAPSHOT"
+  "com.github.alexarchambault" %% "scalacheck-shapeless_1.12" % "0.1.1-SNAPSHOT"
 ```
 
 (Macro paradise plugin also necessary with scala 2.10, see above.)

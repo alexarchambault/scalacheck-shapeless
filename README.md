@@ -3,6 +3,7 @@
 Generation of arbitrary case classes / ADTs with [scalacheck](https://github.com/rickynils/scalacheck) and [shapeless](https://github.com/milessabin/shapeless)
 
 [![Build Status](https://travis-ci.org/alexarchambault/scalacheck-shapeless.svg)](https://travis-ci.org/alexarchambault/scalacheck-shapeless)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/alexarchambault/scalacheck-shapeless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Usage
 
@@ -66,5 +67,3 @@ libraryDependencies +=
 (Macro paradise plugin also necessary with scala 2.10, see above.)
 
 Available for scala 2.10 and 2.11. Uses scalacheck 1.12.2 and shapeless 2.1.0.
-
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/alexarchambault/scalacheck-shapeless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

@@ -10,8 +10,7 @@ Add to your `build.sbt`
 ```scala
 resolvers += Resolver.sonatypeRepo("releases")
 
-libraryDependencies +=
-  "com.github.alexarchambault" %% "scalacheck-shapeless_1.12" % "0.1.0"
+libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.12" % "0.1.1"
 ```
 
 If you are using scala 2.10.x, also add the macro paradise plugin to your build,
@@ -55,10 +54,13 @@ without having to define yourself an `Arbitrary` for `Foo`.
 
 For the development version, add instead to your `build.sbt`
 ```scala
-resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers ++= Seq(
+  Resolver.sonatypeRepo("releases"),
+  Resolver.sonatypeRepo("snapshots")
+)
 
 libraryDependencies +=
-  "com.github.alexarchambault" %% "scalacheck-shapeless_1.12" % "0.1.1-SNAPSHOT"
+  "com.github.alexarchambault" %% "scalacheck-shapeless_1.12" % "0.1.2-SNAPSHOT"
 ```
 
 (Macro paradise plugin also necessary with scala 2.10, see above.)

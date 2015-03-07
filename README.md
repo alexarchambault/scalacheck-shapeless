@@ -63,6 +63,6 @@ libraryDependencies +=
 
 (Macro paradise plugin also necessary with scala 2.10, see above.)
 
-Available for scala 2.10 and 2.11. Uses scalacheck 1.12.1 and shapeless 2.1.0-RC1.
+Available for scala 2.10 and 2.11. Uses scalacheck 1.12.2 and shapeless 2.1.0.
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/alexarchambault/scalacheck-shapeless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

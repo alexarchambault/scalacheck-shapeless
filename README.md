@@ -69,3 +69,8 @@ If you are using shapeless 2.2, change the version above to `0.2.0-SNAPSHOT`.
 (Macro paradise plugin also necessary with scala 2.10, see above.)
 
 Available for scala 2.10 and 2.11. Uses scalacheck 1.12.2 and shapeless >= 2.1.
+
+## See also
+
+[scalacheck-extensions](https://github.com/cvogt/scalacheck-extensions),
+a macro-based automatic `Arbitrary` generation

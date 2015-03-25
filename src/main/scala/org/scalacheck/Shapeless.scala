@@ -15,8 +15,8 @@ object Shapeless {
   ): Arbitrary[H :: T] =
     Arbitrary {
       for {
-        h <- headArbitrary.value.arbitrary
-        t <- tailArbitrary.value.arbitrary
+        h <- Gen.lzy(headArbitrary.value.arbitrary)
+        t <- Gen.lzy(tailArbitrary.value.arbitrary)
       } yield h :: t
     }
   
@@ -30,8 +30,8 @@ object Shapeless {
   ): Arbitrary[H :+: T] =
     Arbitrary {
       Gen.frequency(
-        1 -> headArbitrary.value.arbitrary.map(Inl(_)),
-        n() -> tailArbitrary.value.arbitrary.map(Inr(_))
+        1 -> Gen.lzy(headArbitrary.value.arbitrary).map(Inl(_)),
+        n() -> Gen.lzy(tailArbitrary.value.arbitrary).map(Inr(_))
       )
     }
 
@@ -39,6 +39,6 @@ object Shapeless {
     gen: Generic.Aux[F, G],
     arbitrary: Lazy[Arbitrary[G]]
   ): Arbitrary[F] =
-    Arbitrary(arbitrary.value.arbitrary.map(gen.from))
+    Arbitrary(Gen.lzy(arbitrary.value.arbitrary).map(gen.from))
   
 }

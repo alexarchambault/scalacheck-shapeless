@@ -1,6 +1,8 @@
 package org.scalacheck
 
-import Shapeless._
+import Definitions._
+import Instances._
+
 import shapeless.test.illTyped
 
 /*
@@ -15,48 +17,6 @@ import shapeless.test.illTyped
  *
  * Testing the probability distributions of the resulting Arbitrary could be nice too.
  */
-
-/*
- * We should have Arbitrary instances for these
- */
-case object Empty
-case class EmptyCC()
-case class Simple(i: Int, s: String, blah: Boolean)
-case class Composed(foo: Simple, other: String)
-case class TwiceComposed(foo: Simple, bar: Composed, v: Int)
-case class ComposedOptList(fooOpt: Option[Simple], other: String, l: List[TwiceComposed])
-
-sealed trait Base
-case class BaseIS(i: Int, s: String) extends Base
-case class BaseDB(d: Double, b: Boolean) extends Base
-case class BaseLast(c: Simple) extends Base
-
-
-/*
- * We should *not* have Arbitrary instances for these
- */
-trait NoArbitraryType
-case class ShouldHaveNoArb(n: NoArbitraryType, i: Int)
-case class ShouldHaveNoArbEither(s: String, i: Int, n: NoArbitraryType)
-
-sealed trait BaseNoArb
-case class BaseNoArbIS(i: Int, s: String) extends BaseNoArb
-case class BaseNoArbDB(d: Double, b: Boolean) extends BaseNoArb
-case class BaseNoArbN(n: NoArbitraryType) extends BaseNoArb
-
-
-// cvogt's hierarchy
-sealed trait A
-sealed case class B(i: Int, s: String) extends A
-case object C extends A
-sealed trait D extends A
-final case class E(a: Double, b: Option[Float]) extends D
-case object F extends D
-sealed abstract class Foo extends D
-case object Baz extends Foo
-/*final class Bar extends Foo
-final class Baz(i1: Int)(s1: String) extends Foo*/
-
 
 object Tests extends Properties("Tests") {
   private val ok = (_: Any) => true

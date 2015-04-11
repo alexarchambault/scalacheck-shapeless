@@ -61,5 +61,40 @@ object Shapeless {
     arbitrary: Lazy[Arbitrary[G]]
   ): Arbitrary[F] =
     Arbitrary(Gen.lzy(arbitrary.value.arbitrary).map(gen.from))
+
+
+  /*
+   * No need for specific shrinks for HNil/CNil
+   */
+
+  implicit def hconsShrink[H, T <: HList](implicit
+    headShrink: Lazy[Shrink[H]],
+    tailShrink: Lazy[Shrink[T]]
+  ): Shrink[H :: T] =
+    Shrink {
+      case h :: t => headShrink.value.shrink(h).map(_ :: t) #::: tailShrink.value.shrink(t).map(h :: _)
+    }
+
+  implicit def cconsShrink[H, T <: Coproduct](implicit
+    headShrink: Lazy[Shrink[H]],
+    tailShrink: Lazy[Shrink[T]]
+  ): Shrink[H :+: T] =
+    Shrink {
+      case Inl(h) => headShrink.value.shrink(h).map(Inl(_))
+      case Inr(t) => tailShrink.value.shrink(t).map(Inr(_))
+    }
+
+  implicit def instanceShrink[F, G](implicit
+    gen: Generic.Aux[F, G],
+    shrink: Lazy[Shrink[G]]
+  ): Shrink[F] =
+    Shrink.xmap(gen.from, gen.to)(shrink.value)
+
+  /*
+   * More specific Shrinks for List[T]/Option[T] are defined in scalacheck,
+   * forcing the use of these instead of the automatically generated ones
+   */
+  implicit def keepDefaultListShrink[T: Shrink]: Shrink[List[T]] = Shrink.shrinkContainer[List, T]
+  implicit def keepDefaultOptionShrink[T: Shrink]: Shrink[Option[T]] = Shrink.shrinkOption[T]
   
 }

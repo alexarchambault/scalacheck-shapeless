@@ -11,7 +11,7 @@ class ShrinkTests extends Properties("ShrinkTests") {
     }
   }
 
-  property("Options should shrink specifically, not as a coproduct") = {
+  property("Options should shrink as scalacheck does by default") = {
     val defaultShrink = implicitly[Shrink[Option[String]]]
     val shrink = { import Shapeless._; implicitly[Shrink[Option[String]]] }
 

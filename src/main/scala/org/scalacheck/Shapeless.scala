@@ -95,8 +95,17 @@ object Shapeless {
     Shrink.xmap(gen.from, gen.to)(shrink.value)
 
   /*
-   * Forcing List[T] to be shrinked as a container, rather than a coproduct
+   * Forcing Option[T] to be viewed as a container, rather than a coproduct
+   * For Shrink, the generated one is ok.
+   *
+   * It would be nice to generalize this kind of Arbitrary to any similar coproduct.
    */
+  implicit def keepDefaultOptionArbitrary[T: Arbitrary]: Arbitrary[Option[T]] = Arbitrary.arbOption[T]
+
+  /*
+   * Forcing List[T] to be viewed as a container, rather than a coproduct
+   */
+  implicit def keepDefaultListArbitrary[T: Arbitrary]: Arbitrary[List[T]] = Arbitrary.arbContainer[List, T]
   implicit def keepDefaultListShrink[T: Shrink]: Shrink[List[T]] = Shrink.shrinkContainer[List, T]
   
 }

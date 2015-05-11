@@ -81,4 +81,23 @@ object Tests extends Properties("Tests") {
       case _ => false
     }.flatMap { r => Prop(r.success) }
   } */
+
+  property("Lists should be generated as a container, not a coproduct") = {
+    val arb = { import Shapeless._; Arbitrary.arbitrary[List[String]] }
+
+    val n = 10000
+    val empty = Iterator.fill(n)(arb.sample).count(_.exists(_.isEmpty)).toDouble / n
+
+    Prop.propBoolean(empty > 0.001 && empty < 0.1)
+  }
+
+  property("Options should be generated as a container, not a coproduct") = {
+    val arb = { import Shapeless._; Arbitrary.arbitrary[Option[String]] }
+
+    val n = 10000
+    val empty = Iterator.fill(n)(arb.sample).count(_.exists(_.isEmpty)).toDouble / n
+
+    Prop.propBoolean(empty > 0.001 && empty < 0.1)
+  }
+
 }

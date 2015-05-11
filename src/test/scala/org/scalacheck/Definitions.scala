@@ -77,4 +77,18 @@ object Instances {
   implicit def baseArbitrary: Arbitrary[Base] = cachedImplicit
   implicit def aArbitrary: Arbitrary[A] = cachedImplicit
   implicit def dArbitrary: Arbitrary[D] = cachedImplicit
+
+  implicit def t1Shrink: Shrink[T1.Tree] = cachedImplicit
+  implicit def t2Shrink: Shrink[T2.Tree] = cachedImplicit
+
+  implicit def emptyShrink: Shrink[Empty.type] = cachedImplicit
+  implicit def emptyCCShrink: Shrink[EmptyCC] = cachedImplicit
+  implicit def simpleShrink: Shrink[Simple] = cachedImplicit
+  implicit def composedShrink: Shrink[Composed] = cachedImplicit
+  implicit def twiceComposedShrink: Shrink[TwiceComposed] = cachedImplicit
+  implicit def composedOptListShrink: Shrink[ComposedOptList] = cachedImplicit
+
+  implicit def baseShrink: Shrink[Base] = cachedImplicit
+  implicit def aShrink: Shrink[A] = cachedImplicit
+  implicit def dShrink: Shrink[D] = cachedImplicit
 }

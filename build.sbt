@@ -18,7 +18,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.12.2",
-  "com.chuusai" %% "shapeless" % "2.2.0-RC4"
+  "com.chuusai" %% "shapeless" % "2.2.0-RC6"
 )
 
 libraryDependencies ++= {

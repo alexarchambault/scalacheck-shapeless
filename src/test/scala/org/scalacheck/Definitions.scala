@@ -1,5 +1,7 @@
 package org.scalacheck
 
+import shapeless.cachedImplicit
+
 object Definitions {
 
   object T1 {
@@ -62,17 +64,17 @@ object Instances {
   import Definitions._
   import Shapeless._
 
-  implicit def t1Arbitrary = implicitly[Arbitrary[T1.Tree]]
-  implicit def t2Arbitrary = implicitly[Arbitrary[T2.Tree]]
+  implicit def t1Arbitrary: Arbitrary[T1.Tree] = cachedImplicit
+  implicit def t2Arbitrary: Arbitrary[T2.Tree] = cachedImplicit
 
-  implicit def emptyArbitrary = implicitly[Arbitrary[Empty.type]]
-  implicit def emptyCCArbitrary = implicitly[Arbitrary[EmptyCC]]
-  implicit def simpleArbitrary = implicitly[Arbitrary[Simple]]
-  implicit def composedArbitrary = implicitly[Arbitrary[Composed]]
-  implicit def twiceComposedArbitrary = implicitly[Arbitrary[TwiceComposed]]
-  implicit def composedOptListArbitrary = implicitly[Arbitrary[ComposedOptList]]
+  implicit def emptyArbitrary: Arbitrary[Empty.type] = cachedImplicit
+  implicit def emptyCCArbitrary: Arbitrary[EmptyCC] = cachedImplicit
+  implicit def simpleArbitrary: Arbitrary[Simple] = cachedImplicit
+  implicit def composedArbitrary: Arbitrary[Composed] = cachedImplicit
+  implicit def twiceComposedArbitrary: Arbitrary[TwiceComposed] = cachedImplicit
+  implicit def composedOptListArbitrary: Arbitrary[ComposedOptList] = cachedImplicit
 
-  implicit def baseArbitrary = implicitly[Arbitrary[Base]]
-  implicit def aArbitrary = implicitly[Arbitrary[A]]
-  implicit def dArbitrary = implicitly[Arbitrary[D]]
+  implicit def baseArbitrary: Arbitrary[Base] = cachedImplicit
+  implicit def aArbitrary: Arbitrary[A] = cachedImplicit
+  implicit def dArbitrary: Arbitrary[D] = cachedImplicit
 }

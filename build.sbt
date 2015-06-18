@@ -12,12 +12,11 @@ scalaVersion := "2.11.6"
 crossScalaVersions := Seq("2.10.5", "2.11.6")
 
 resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases"),
-  Resolver.sonatypeRepo("snapshots")
+  Resolver.sonatypeRepo("releases")
 )
 
 libraryDependencies ++= Seq(
-  "org.scalacheck" %% "scalacheck" % "1.12.3",
+  "org.scalacheck" %% "scalacheck" % "1.12.4",
   "com.chuusai" %% "shapeless" % "2.2.2"
 )
 

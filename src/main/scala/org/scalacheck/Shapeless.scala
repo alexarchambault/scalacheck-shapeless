@@ -7,6 +7,8 @@ import shapeless.ops.nat.ToInt
 
 object Shapeless {
 
+  object ArbitraryDeriver {
+
   implicit val hnilArbitrary: Arbitrary[HNil] =
     Arbitrary(Gen.const(HNil))
   
@@ -56,12 +58,19 @@ object Shapeless {
       }
     }
 
-  implicit def instanceArbitrary[F, G](implicit
+  implicit def genericInstanceArbitrary[F, G](implicit
     gen: Generic.Aux[F, G],
     arbitrary: Lazy[Arbitrary[G]]
   ): Arbitrary[F] =
     Arbitrary(Gen.lzy(arbitrary.value.arbitrary).map(gen.from))
 
+  } // ArbitraryDeriver
+
+  implicit def instanceArbitrary[T](implicit orphan: Orphan[Arbitrary, ArbitraryDeriver.type, T]): Arbitrary[T] =
+    orphan.instance
+
+
+  object ShrinkDeriver {
 
   /*
    * No need for specific shrinks for HNil/CNil
@@ -88,11 +97,17 @@ object Shapeless {
         headSingletons.value().toStream.map(Inl(_)) ++ tailShrink.value.shrink(t).map(Inr(_))
     }
 
-  implicit def instanceShrink[F, G](implicit
+  implicit def genericInstanceShrink[F, G](implicit
     gen: Generic.Aux[F, G],
     shrink: Lazy[Shrink[G]]
   ): Shrink[F] =
     Shrink.xmap(gen.from, gen.to)(shrink.value)
+
+  } // ShrinkDeriver
+
+  implicit def instanceShrink[T](implicit orphan: Orphan[Shrink, ShrinkDeriver.type, T]): Shrink[T] =
+    orphan.instance
+
 
   /*
    * Forcing Option[T] to be viewed as a container, rather than a coproduct

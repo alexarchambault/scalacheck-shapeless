@@ -12,12 +12,13 @@ scalaVersion := "2.11.6"
 crossScalaVersions := Seq("2.10.5", "2.11.6")
 
 resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases")
+  Resolver.sonatypeRepo("releases"),
+  Resolver.sonatypeRepo("snapshots")
 )
 
 libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.12.4",
-  "com.chuusai" %% "shapeless" % "2.2.3"
+  "com.chuusai" %% "shapeless" % "2.2.4-SNAPSHOT"
 )
 
 libraryDependencies ++= {
@@ -78,3 +79,11 @@ releaseSettings
 ReleaseKeys.versionBump := sbtrelease.Version.Bump.Bugfix
 
 sbtrelease.ReleasePlugin.ReleaseKeys.publishArtifactsAction := PgpKeys.publishSigned.value
+
+
+import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
+import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
+
+mimaDefaultSettings
+
+previousArtifact := Some(organization.value %% moduleName.value % "0.3.0")

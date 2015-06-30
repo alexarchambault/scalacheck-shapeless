@@ -79,3 +79,11 @@ releaseSettings
 ReleaseKeys.versionBump := sbtrelease.Version.Bump.Bugfix
 
 sbtrelease.ReleasePlugin.ReleaseKeys.publishArtifactsAction := PgpKeys.publishSigned.value
+
+
+import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
+import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
+
+mimaDefaultSettings
+
+previousArtifact := Some(organization.value %% moduleName.value % "0.3.0")

@@ -7,18 +7,17 @@ moduleName := _name
 
 name := _name
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
-crossScalaVersions := Seq("2.10.5", "2.11.6")
+crossScalaVersions := Seq("2.10.5", "2.11.7")
 
 resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases"),
-  Resolver.sonatypeRepo("snapshots")
+  Resolver.sonatypeRepo("releases")
 )
 
 libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.12.4",
-  "com.chuusai" %% "shapeless" % "2.2.4-SNAPSHOT"
+  "com.chuusai" %% "shapeless" % "2.2.4"
 )
 
 libraryDependencies ++= {

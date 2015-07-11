@@ -30,4 +30,15 @@ object Shapeless {
    ): Shrink[T] =
     priority.value.fold(identity)(impl => impl.value.unify.shrink)
 
+  implicit def mkCogen[T]
+   (implicit
+     priority: Lazy[Priority[
+       Cogen[T],
+       Implicit[
+         MkDefaultCogen[T] :+: CNil
+       ]
+     ]]
+   ): Cogen[T] =
+    priority.value.fold(identity)(impl => impl.value.unify.cogen)
+
 }

@@ -7,9 +7,10 @@ trait Singletons[T] {
 }
 
 trait LowPrioritySingletons {
-  implicit def hconsSingletonsNotFound[H, T <: HList](implicit
-    tailSingletons: Lazy[Singletons[T]]
-  ): Singletons[H :: T] =
+  implicit def hconsSingletonsNotFound[H, T <: HList]
+   (implicit
+     tailSingletons: Lazy[Singletons[T]]
+   ): Singletons[H :: T] =
     Singletons.empty
 }
 
@@ -27,10 +28,11 @@ object Singletons extends LowPrioritySingletons {
   implicit val hnilSingletons: Singletons[HNil] =
     singletons(Seq(HNil))
 
-  implicit def hconsSingletonsFound[H, T <: HList](implicit
-    headSingletons: Lazy[Singletons[H]],
-    tailSingletons: Lazy[Singletons[T]]
-  ): Singletons[H :: T] =
+  implicit def hconsSingletonsFound[H, T <: HList]
+   (implicit
+     headSingletons: Lazy[Singletons[H]],
+     tailSingletons: Lazy[Singletons[T]]
+   ): Singletons[H :: T] =
     singletons {
       for {
         h <- headSingletons.value()
@@ -41,15 +43,18 @@ object Singletons extends LowPrioritySingletons {
   implicit val cnilSingletons: Singletons[CNil] =
     empty
 
-  implicit def cconsSingletons[H, T <: Coproduct](implicit
-    headSingletons: Lazy[Singletons[H]],
-    tailSingletons: Lazy[Singletons[T]]
-  ): Singletons[H :+: T] =
+  implicit def cconsSingletons[H, T <: Coproduct]
+   (implicit
+     headSingletons: Lazy[Singletons[H]],
+     tailSingletons: Lazy[Singletons[T]]
+   ): Singletons[H :+: T] =
     singletons(headSingletons.value().map(Inl(_)) ++ tailSingletons.value().map(Inr(_)))
 
-  implicit def instanceSingletons[F, G](implicit
-    gen: Generic.Aux[F, G],
-    reprSingletons: Lazy[Singletons[G]]
-  ): Singletons[F] =
+  implicit def instanceSingletons[F, G]
+   (implicit
+     gen: Generic.Aux[F, G],
+     reprSingletons: Lazy[Singletons[G]]
+   ): Singletons[F] =
     singletons(reprSingletons.value().map(gen.from))
+
 }

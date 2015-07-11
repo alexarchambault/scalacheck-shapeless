@@ -2,15 +2,24 @@ package org.scalacheck
 
 import shapeless._
 
+/**
+ * Type class providing the instances of `T` that can be built out of
+ * singletons only.
+ */
 trait Singletons[T] {
+  /**
+   * Instances of `T` that can be built out of singletons, or
+   * an empty sequence if none were found.
+   */
   def apply(): Seq[T]
 }
 
 trait LowPrioritySingletons {
-  implicit def hconsSingletonsNotFound[H, T <: HList]
-   (implicit
-     tailSingletons: Lazy[Singletons[T]]
-   ): Singletons[H :: T] =
+  /**
+   * Fallback case if `H` cannot be built out of singletons - then
+   * `H :: T` can't either.
+   */
+  implicit def hconsSingletonsNotFound[H, T <: HList]: Singletons[H :: T] =
     Singletons.empty
 }
 

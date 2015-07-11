@@ -4,12 +4,21 @@ package derive
 import org.scalacheck.rng.Seed
 import shapeless._
 
-
+/** Base trait of `Cogen[T]` generating type classes. */
 trait MkCogen[T] {
+  /** `Cogen[T]` instance built by this `MkCogen[T]` */
   def cogen: Cogen[T]
 }
 
-
+/**
+ * Derives `Cogen[T]` instances for `T` an `HList`, a `Coproduct`,
+ * a case class or an ADT (or more generally, a type represented
+ * `Generic`ally as an `HList` or a `Coproduct`).
+ *
+ * Use like
+ *     val cogen: Cogen[T] = MkDefaultCogen[T].cogen
+ * or look up for an implicit `MkDefaultCogen[T]`.
+ */
 trait MkDefaultCogen[T] extends MkCogen[T]
 
 object MkDefaultCogen {
@@ -59,7 +68,13 @@ object MkDefaultCogen {
     of(cogen.value.cogen.contramap(gen.to))
 }
 
-
+/**
+ * Derives `Cogen[T]` instances for `T` a singleton type, like
+ * `Witness.``"str"``.T` or `Witness.``true``.T` for example.
+ *
+ * The generated `Cogen[T]` behaves like `Cogen[Unit]`, as like
+ * `Unit`, singleton types only have one instance.
+ */
 trait MkSingletonCogen[T] extends MkCogen[T]
 
 object MkSingletonCogen {

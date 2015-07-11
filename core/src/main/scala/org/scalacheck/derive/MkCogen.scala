@@ -58,3 +58,21 @@ object MkDefaultCogen {
    ): MkDefaultCogen[F] =
     of(cogen.value.cogen.contramap(gen.to))
 }
+
+
+trait MkSingletonCogen[T] extends MkCogen[T]
+
+object MkSingletonCogen {
+  def apply[T](implicit mkCogen: MkSingletonCogen[T]): MkSingletonCogen[T] = mkCogen
+
+  def of[T](cogen0: => Cogen[T]): MkSingletonCogen[T] =
+    new MkSingletonCogen[T] {
+      def cogen = cogen0
+    }
+
+  implicit def singletonCogen[S]
+   (implicit
+     w: Witness.Aux[S]
+   ): MkSingletonCogen[S] =
+    of(Cogen.cogenUnit.contramap(_ => ()))
+}

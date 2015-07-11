@@ -35,7 +35,8 @@ object Shapeless {
      priority: Lazy[Priority[
        Cogen[T],
        Implicit[
-         MkDefaultCogen[T] :+: CNil
+         MkSingletonCogen[T] :+:
+         MkDefaultCogen[T] :+:CNil
        ]
      ]]
    ): Cogen[T] =

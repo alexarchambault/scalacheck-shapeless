@@ -3,12 +3,24 @@ package derive
 
 import shapeless._
 
-
+/** Base trait of `Shrink[T]` generating type classes. */
 trait MkShrink[T] {
+  /** `Shrink[T]` instance built by this `MkShrink[T]` */
   def shrink: Shrink[T]
 }
 
-
+/**
+ * Derives `Shrink[T]` instances for `T` an `HList`, a `Coproduct`,
+ * a case class or an ADT (or more generally, a type represented
+ * `Generic`ally as an `HList` or a `Coproduct`).
+ *
+ * The instances derived here are more specific than the default ones
+ * derived for any type by `Shrink.shrinkAny`.
+ *
+ * Use like
+ *     val arbitrary: Arbitrary[T] = MkDefaultArbitrary[T].arbitrary
+ * or look up for an implicit `MkDefaultArbitrary[T]`.
+ */
 trait MkDefaultShrink[T] extends MkShrink[T]
 
 object MkDefaultShrink {
@@ -18,7 +30,6 @@ object MkDefaultShrink {
     new MkDefaultShrink[T] {
       def shrink = shrink0
     }
-
 
   implicit val hnilShrink: MkDefaultShrink[HNil] =
     of(Shrink.shrinkAny)

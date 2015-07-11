@@ -16,7 +16,8 @@ object ScalacheckShapelessBuild extends Build {
     scalaVersion := "2.11.7",
     crossScalaVersions := Seq("2.10.5", "2.11.7"),
     resolvers ++= Seq(
-      Resolver.sonatypeRepo("releases")
+      Resolver.sonatypeRepo("releases"),
+      Resolver.sonatypeRepo("snapshots")
     )
   )
 
@@ -86,7 +87,7 @@ object ScalacheckShapelessBuild extends Build {
       testFrameworks += new TestFramework("utest.runner.Framework"),
       libraryDependencies ++= Seq(
         "org.scalacheck" %%% "scalacheck" % "1.12.4",
-        "com.chuusai" %%% "shapeless" % "2.2.4",
+        "com.github.alexarchambault" %%% "shapeless" % "2.2.5-aa-SNAPSHOT",
         "com.lihaoyi" %%% "utest" % "0.3.0" % "test"
       ),
       libraryDependencies ++= {

@@ -3,12 +3,21 @@ package derive
 
 import shapeless._
 
-
+/** Base trait of `Arbitrary[T]` generating type classes. */
 trait MkArbitrary[T] {
+  /** `Arbitrary[T]` instance built by this `MkArbitrary[T]` */
   def arbitrary: Arbitrary[T]
 }
 
-
+/**
+ * Derives `Arbitrary[T]` instances for `T` an `HList`, a `Coproduct`,
+ * a case class or an ADT (or more generally, a type represented
+ * `Generic`ally as an `HList` or a `Coproduct`).
+ *
+ * Use like
+ *     val arbitrary: Arbitrary[T] = MkDefaultArbitrary[T].arbitrary
+ * or look up for an implicit `MkDefaultArbitrary[T]`.
+ */
 trait MkDefaultArbitrary[T] extends MkArbitrary[T]
 
 object MkDefaultArbitrary {

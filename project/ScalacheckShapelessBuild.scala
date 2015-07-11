@@ -72,7 +72,7 @@ object ScalacheckShapelessBuild extends Build {
       previousArtifact := Some(organization.value %% moduleName.value % "1.0.0")
     )
 
-  val name0 = "scalacheck-shapeless_1.12"
+  val name0 = "scalacheck-shapeless_1.13"
 
   val coreSettings =
     commonSettings ++
@@ -86,7 +86,7 @@ object ScalacheckShapelessBuild extends Build {
       unmanagedSourceDirectories in Test += (baseDirectory in LocalRootProject).value / "core" / "src" / "test" / "scala",
       testFrameworks += new TestFramework("utest.runner.Framework"),
       libraryDependencies ++= Seq(
-        "org.scalacheck" %%% "scalacheck" % "1.12.4",
+        "org.scalacheck" %%% "scalacheck" % "1.13.0-e5cb830-SNAPSHOT",
         "com.github.alexarchambault" %%% "shapeless" % "2.2.5-aa-SNAPSHOT",
         "com.lihaoyi" %%% "utest" % "0.3.0" % "test"
       ),

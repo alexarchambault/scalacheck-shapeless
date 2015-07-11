@@ -68,7 +68,7 @@ object ScalacheckShapelessBuild extends Build {
   val mimaSettings =
     mimaDefaultSettings ++
     Seq(
-      previousArtifact := Some(organization.value %% moduleName.value % "0.3.0")
+      previousArtifact := Some(organization.value %% moduleName.value % "1.0.0")
     )
 
   val name0 = "scalacheck-shapeless_1.12"
@@ -76,7 +76,8 @@ object ScalacheckShapelessBuild extends Build {
   val coreSettings =
     commonSettings ++
     publishingSettings ++
-    mimaSettings ++
+    // Uncomment once 1.0.0 is released
+    // mimaSettings ++
     Seq(
       moduleName := name0,
       name := name0,

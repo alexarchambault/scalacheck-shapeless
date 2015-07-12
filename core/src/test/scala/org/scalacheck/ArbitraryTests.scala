@@ -9,11 +9,10 @@ import shapeless.test.illTyped
 
 import utest._
 
-object ArbitraryTestsDefinitions {
+object ArbitraryTestsDefinitions extends CommonDefinitions {
 
   case object Empty
   case class EmptyCC()
-  case class Simple(i: Int, s: String, blah: Boolean)
   case class Composed(foo: Simple, other: String)
   case class TwiceComposed(foo: Simple, bar: Composed, v: Int)
   case class ComposedOptList(fooOpt: Option[Simple], other: String, l: List[TwiceComposed])

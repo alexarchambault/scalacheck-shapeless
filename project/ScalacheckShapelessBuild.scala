@@ -11,15 +11,21 @@ import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 
 object ScalacheckShapelessBuild extends Build {
 
-  private lazy val commonSettings = Seq[Setting[_]](
-    organization := "com.github.alexarchambault",
-    scalaVersion := "2.11.7",
-    crossScalaVersions := Seq("2.10.5", "2.11.7"),
-    resolvers ++= Seq(
-      Resolver.sonatypeRepo("releases"),
-      Resolver.sonatypeRepo("snapshots")
+  private lazy val commonSettings: Seq[Setting[_]] =
+    Seq(
+      organization := "com.github.alexarchambault",
+      scalaVersion := "2.11.7",
+      crossScalaVersions := Seq("2.10.5", "2.11.7"),
+      resolvers ++= Seq(
+        Resolver.sonatypeRepo("releases"),
+        Resolver.sonatypeRepo("snapshots")
+      )
+    ) ++
+    publishingSettings ++
+    Seq(
+      libraryDependencies += "com.lihaoyi" %%% "utest" % "0.3.0" % "test",
+      testFrameworks += new TestFramework("utest.runner.Framework")
     )
-  )
 
   private lazy val publishingSettings = Seq[Setting[_]](
     publishMavenStyle := true,
@@ -66,54 +72,52 @@ object ScalacheckShapelessBuild extends Build {
     sbtrelease.ReleasePlugin.ReleaseKeys.publishArtifactsAction := PgpKeys.publishSigned.value
   )
 
-  val mimaSettings =
+  private lazy val commonJsSettings = Seq[Setting[_]](
+    postLinkJSEnv := NodeJSEnv().value,
+    scalaJSStage in Global := FastOptStage
+  )
+
+  private lazy val mimaSettings =
     mimaDefaultSettings ++
     Seq(
       previousArtifact := Some(organization.value %% moduleName.value % "1.0.0")
     )
 
-  val name0 = "scalacheck-shapeless_1.13"
 
-  val coreSettings =
+  private val coreName = "scalacheck-shapeless_1.13"
+  private lazy val coreSettings =
     commonSettings ++
-    publishingSettings ++
     // Uncomment once 1.0.0 is released
     // mimaSettings ++
     Seq(
-      moduleName := name0,
-      name := name0,
+      moduleName := coreName,
+      name := coreName,
       unmanagedSourceDirectories in Compile += (baseDirectory in LocalRootProject).value / "core" / "src" / "main" / "scala",
       unmanagedSourceDirectories in Test += (baseDirectory in LocalRootProject).value / "core" / "src" / "test" / "scala",
-      testFrameworks += new TestFramework("utest.runner.Framework"),
       libraryDependencies ++= Seq(
         "org.scalacheck" %%% "scalacheck" % "1.13.0-e5cb830-SNAPSHOT",
-        "com.github.alexarchambault" %%% "shapeless" % "2.2.5-aa-SNAPSHOT",
-        "com.lihaoyi" %%% "utest" % "0.3.0" % "test"
+        "com.github.alexarchambault" %%% "shapeless" % "2.2.5-aa-SNAPSHOT"
       ),
       libraryDependencies ++= {
-        if (scalaVersion.value startsWith "2.10.")
-          Seq(
-            compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
-          )
+        if (scalaVersion.value.startsWith("2.10."))
+          Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full))
         else
           Seq()
       }
     )
 
+
   lazy val coreJvm = Project(id = "core-jvm", base = file("core-jvm"))
     .settings(coreSettings: _*)
 
   lazy val coreJs = Project(id = "core-js", base = file("core-js"))
-    .settings(coreSettings: _*)
-    .settings(
-      postLinkJSEnv := NodeJSEnv().value,
-      scalaJSStage in Global := FastOptStage
-    )
     .enablePlugins(ScalaJSPlugin)
+    .settings(coreSettings: _*)
+    .settings(commonJsSettings: _*)
 
   lazy val root = Project(id = "root", base = file("."))
     .aggregate(coreJvm, coreJs)
-    .settings(commonSettings ++ publishingSettings: _*)
+    .settings(commonSettings: _*)
     .settings(
       (unmanagedSourceDirectories in Compile) := Nil,
       (unmanagedSourceDirectories in Test) := Nil,

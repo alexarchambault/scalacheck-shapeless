@@ -46,7 +46,7 @@ object HListSingletons {
 
   implicit def hconsSingletonsFound[H, T <: HList]
    (implicit
-     headSingletons: Lazy[Singletons[H]],
+     headSingletons: Strict[Singletons[H]],
      tailSingletons: HListSingletons[T]
    ): HListSingletons[H :: T] =
     singletons {
@@ -70,7 +70,7 @@ object CoproductSingletons {
 
   implicit def cconsSingletons[H, T <: Coproduct]
    (implicit
-     headSingletons: Lazy[Singletons[H]],
+     headSingletons: Strict[Singletons[H]],
      tailSingletons: CoproductSingletons[T]
    ): CoproductSingletons[H :+: T] =
     singletons(headSingletons.value().map(Inl(_)) ++ tailSingletons().map(Inr(_)))

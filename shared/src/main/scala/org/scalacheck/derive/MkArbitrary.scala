@@ -37,7 +37,7 @@ object MkHListArbitrary {
 
   implicit def hconsMkArb[H, T <: HList, N <: Nat]
    (implicit
-     headArbitrary: Lazy[Arbitrary[H]],
+     headArbitrary: Strict[Arbitrary[H]],
      tailArbitrary: MkHListArbitrary[T],
      length: ops.hlist.Length.Aux[T, N],
      n: ops.nat.ToInt[N]
@@ -82,7 +82,7 @@ object MkCoproductArbitrary {
 
   implicit def cconsMkArb[H, T <: Coproduct, N <: Nat]
    (implicit
-     headArbitrary: Lazy[Arbitrary[H]],
+     headArbitrary: Strict[Arbitrary[H]],
      tailArbitrary: MkCoproductArbitrary[T],
      length: ops.coproduct.Length.Aux[T, N],
      n: ops.nat.ToInt[N]

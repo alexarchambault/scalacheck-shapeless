@@ -41,7 +41,7 @@ object MkHListCogen {
 
   implicit def hconsCogen[H, T <: HList]
    (implicit
-     headCogen: Lazy[Cogen[H]],
+     headCogen: Strict[Cogen[H]],
      tailCogen: MkHListCogen[T]
    ): MkHListCogen[H :: T] =
     of(
@@ -64,7 +64,7 @@ object MkCoproductCogen {
 
   implicit def cconsCogen[H, T <: Coproduct]
    (implicit
-     headCogen: Lazy[Cogen[H]],
+     headCogen: Strict[Cogen[H]],
      tailCogen: MkCoproductCogen[T]
    ): MkCoproductCogen[H :+: T] =
     of(

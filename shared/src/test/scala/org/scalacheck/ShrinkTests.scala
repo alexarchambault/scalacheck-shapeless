@@ -20,11 +20,11 @@ object ShrinkTests extends TestSuite {
     expectedIntStringBoolMkHListShrink.shrink
   lazy val expectedIntStringBoolMkHListShrink =
     MkHListShrink.hconsShrink(
-      Lazy(Shrink.shrinkInt),
+      Strict(Shrink.shrinkInt),
       MkHListShrink.hconsShrink(
-        Lazy(Shrink.shrinkString),
+        Strict(Shrink.shrinkString),
         MkHListShrink.hconsShrink(
-          Lazy(Shrink.shrinkAny[Boolean]),
+          Strict(Shrink.shrinkAny[Boolean]),
           MkHListShrink.hnilShrink
         )
       )
@@ -32,20 +32,20 @@ object ShrinkTests extends TestSuite {
 
   lazy val expectedIntStringBoolCoproductShrink =
     MkCoproductShrink.cconsShrink(
-      Lazy(Shrink.shrinkInt),
+      Strict(Shrink.shrinkInt),
       MkCoproductShrink.cconsShrink(
-        Lazy(Shrink.shrinkString),
+        Strict(Shrink.shrinkString),
         MkCoproductShrink.cconsShrink(
-          Lazy(Shrink.shrinkAny[Boolean]),
+          Strict(Shrink.shrinkAny[Boolean]),
           MkCoproductShrink.cnilShrink,
-          Lazy(Singletons[Boolean]),
-          Lazy(Singletons[CNil])
+          Strict(Singletons[Boolean]),
+          Strict(Singletons[CNil])
         ),
-        Lazy(Singletons[String]),
-        Lazy(Singletons[Boolean :+: CNil])
+        Strict(Singletons[String]),
+        Strict(Singletons[Boolean :+: CNil])
       ),
-      Lazy(Singletons[Int]),
-      Lazy(Singletons[String :+: Boolean :+: CNil])
+      Strict(Singletons[Int]),
+      Strict(Singletons[String :+: Boolean :+: CNil])
     ).shrink
 
   lazy val expectedSimpleShrink =

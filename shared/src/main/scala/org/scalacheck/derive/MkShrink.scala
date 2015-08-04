@@ -43,7 +43,7 @@ object MkHListShrink {
 
   implicit def hconsShrink[H, T <: HList]
    (implicit
-     headShrink: Lazy[Shrink[H]],
+     headShrink: Strict[Shrink[H]],
      tailShrink: MkHListShrink[T]
    ): MkHListShrink[H :: T] =
     of(
@@ -68,10 +68,10 @@ object MkCoproductShrink {
 
   implicit def cconsShrink[H, T <: Coproduct]
    (implicit
-     headShrink: Lazy[Shrink[H]],
+     headShrink: Strict[Shrink[H]],
      tailShrink: MkCoproductShrink[T],
-     headSingletons: Lazy[Singletons[H]],
-     tailSingletons: Lazy[Singletons[T]]
+     headSingletons: Strict[Singletons[H]],
+     tailSingletons: Strict[Singletons[T]]
    ): MkCoproductShrink[H :+: T] =
     of(
       Shrink {

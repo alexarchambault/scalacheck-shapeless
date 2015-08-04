@@ -1,6 +1,6 @@
 package org.scalacheck
 
-import org.scalacheck.derive.MkShrink
+import org.scalacheck.derive.{MkHListShrink, MkShrink}
 import shapeless._
 import utest._
 import Util._
@@ -17,19 +17,19 @@ object ShrinkTests extends TestSuite {
     Shrink.shrinkOption(Shrink.shrinkInt)
 
   lazy val expectedSimpleShrink =
-    MkShrink.genericShrink(
+    MkShrink.genericProductShrink(
       Generic[Simple],
       Lazy(
-        MkShrink.hconsShrink(
+        MkHListShrink.hconsShrink(
           Lazy(Shrink.shrinkInt),
           Lazy(
-            MkShrink.hconsShrink(
+            MkHListShrink.hconsShrink(
               Lazy(Shrink.shrinkString),
               Lazy(
-                MkShrink.hconsShrink(
+                MkHListShrink.hconsShrink(
                   Lazy(Shrink.shrinkAny[Boolean]),
                   Lazy(
-                    MkShrink.hnilShrink
+                    MkHListShrink.hnilShrink
                   )
                 )
               )

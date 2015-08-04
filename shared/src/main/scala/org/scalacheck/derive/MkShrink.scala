@@ -20,21 +20,32 @@ trait MkShrink[T] {
   def shrink: Shrink[T]
 }
 
-object MkShrink {
-  def apply[T](implicit mkShrink: MkShrink[T]): MkShrink[T] = mkShrink
+trait MkHListShrink[L <: HList] {
+  /** `Shrink[T]` instance built by this `MkHListShrink[T]` */
+  def shrink: Shrink[L]
+}
 
-  def of[T](shrink0: => Shrink[T]): MkShrink[T] =
-    new MkShrink[T] {
+trait MkCoproductShrink[C <: Coproduct] {
+  /** `Shrink[T]` instance built by this `MkCoproductShrink[T]` */
+  def shrink: Shrink[C]
+}
+
+object MkHListShrink {
+  def apply[T <: HList](implicit mkShrink: MkHListShrink[T]): MkHListShrink[T] = mkShrink
+
+  def of[T <: HList](shrink0: => Shrink[T]): MkHListShrink[T] =
+    new MkHListShrink[T] {
       def shrink = shrink0
     }
 
-  implicit val hnilShrink: MkShrink[HNil] =
+  implicit val hnilShrink: MkHListShrink[HNil] =
     of(Shrink.shrinkAny)
+
   implicit def hconsShrink[H, T <: HList]
    (implicit
      headShrink: Lazy[Shrink[H]],
-     tailShrink: Lazy[MkShrink[T]]
-   ): MkShrink[H :: T] =
+     tailShrink: Lazy[MkHListShrink[T]]
+   ): MkHListShrink[H :: T] =
     of(
       Shrink {
         case h :: t =>
@@ -42,16 +53,26 @@ object MkShrink {
             tailShrink.value.shrink.shrink(t).map(h :: _)
       }
     )
+}
 
-  implicit val cnilShrink: MkShrink[CNil] =
+object MkCoproductShrink {
+  def apply[T <: Coproduct](implicit mkShrink: MkCoproductShrink[T]): MkCoproductShrink[T] = mkShrink
+
+  def of[T <: Coproduct](shrink0: => Shrink[T]): MkCoproductShrink[T] =
+    new MkCoproductShrink[T] {
+      def shrink = shrink0
+    }
+
+  implicit val cnilShrink: MkCoproductShrink[CNil] =
     of(Shrink.shrinkAny)
+
   implicit def cconsShrink[H, T <: Coproduct]
    (implicit
      headShrink: Lazy[Shrink[H]],
-     tailShrink: Lazy[MkShrink[T]],
+     tailShrink: Lazy[MkCoproductShrink[T]],
      headSingletons: Lazy[Singletons[H]],
      tailSingletons: Lazy[Singletons[T]]
-   ): MkShrink[H :+: T] =
+   ): MkCoproductShrink[H :+: T] =
     of(
       Shrink {
         case Inl(h) =>
@@ -60,12 +81,30 @@ object MkShrink {
           headSingletons.value().toStream.map(Inl(_)) ++ tailShrink.value.shrink.shrink(t).map(Inr(_))
       }
     )
+}
 
-  implicit def genericShrink[F, G]
+object MkShrink {
+  def apply[T](implicit mkShrink: MkShrink[T]): MkShrink[T] = mkShrink
+
+  def of[T](shrink0: => Shrink[T]): MkShrink[T] =
+    new MkShrink[T] {
+      def shrink = shrink0
+    }
+
+  implicit def genericProductShrink[P, L <: HList]
    (implicit
-     gen: Generic.Aux[F, G],
-     shrink: Lazy[MkShrink[G]]
-   ): MkShrink[F] =
+     gen: Generic.Aux[P, L],
+     shrink: Lazy[MkHListShrink[L]]
+   ): MkShrink[P] =
+    of(
+      Shrink.xmap(gen.from, gen.to)(shrink.value.shrink)
+    )
+
+  implicit def genericCoproductShrink[S, C <: Coproduct]
+   (implicit
+     gen: Generic.Aux[S, C],
+     shrink: Lazy[MkCoproductShrink[C]]
+   ): MkShrink[S] =
     of(
       Shrink.xmap(gen.from, gen.to)(shrink.value.shrink)
     )

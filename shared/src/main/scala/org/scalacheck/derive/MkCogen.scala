@@ -18,36 +18,55 @@ trait MkCogen[T] {
   def cogen: Cogen[T]
 }
 
-object MkCogen {
-  def apply[T](implicit mkCogen: MkCogen[T]): MkCogen[T] = mkCogen
+trait MkHListCogen[L <: HList] {
+  /** `Cogen[T]` instance built by this `MkCogen[T]` */
+  def cogen: Cogen[L]
+}
 
-  def of[T](cogen0: => Cogen[T]): MkCogen[T] =
-    new MkCogen[T] {
+trait MkCoproductCogen[C <: Coproduct] {
+  /** `Cogen[T]` instance built by this `MkCogen[T]` */
+  def cogen: Cogen[C]
+}
+
+object MkHListCogen {
+  def apply[L <: HList](implicit mkCogen: MkHListCogen[L]): MkHListCogen[L] = mkCogen
+
+  def of[L <: HList](cogen0: => Cogen[L]): MkHListCogen[L] =
+    new MkHListCogen[L] {
       def cogen = cogen0
     }
 
-  implicit lazy val hnilCogen: MkCogen[HNil] =
+  implicit lazy val hnilCogen: MkHListCogen[HNil] =
     of(Cogen.cogenUnit.contramap(_ => ()))
 
   implicit def hconsCogen[H, T <: HList]
    (implicit
      headCogen: Lazy[Cogen[H]],
-     tailCogen: Lazy[MkCogen[T]]
-   ): MkCogen[H :: T] =
+     tailCogen: Lazy[MkHListCogen[T]]
+   ): MkHListCogen[H :: T] =
     of(
       Cogen({case (seed, h :: t) =>
         tailCogen.value.cogen.perturb(headCogen.value.perturb(seed, h), t)
       }: (Seed, H :: T) => Seed)
     )
+}
 
-  implicit lazy val cnilCogen: MkCogen[CNil] =
+object MkCoproductCogen {
+  def apply[C <: Coproduct](implicit mkCogen: MkCoproductCogen[C]): MkCoproductCogen[C] = mkCogen
+
+  def of[C <: Coproduct](cogen0: => Cogen[C]): MkCoproductCogen[C] =
+    new MkCoproductCogen[C] {
+      def cogen = cogen0
+    }
+
+  implicit lazy val cnilCogen: MkCoproductCogen[CNil] =
     of(Cogen.cogenUnit.contramap(_ => ()))
 
   implicit def cconsCogen[H, T <: Coproduct]
    (implicit
      headCogen: Lazy[Cogen[H]],
-     tailCogen: Lazy[MkCogen[T]]
-   ): MkCogen[H :+: T] =
+     tailCogen: Lazy[MkCoproductCogen[T]]
+   ): MkCoproductCogen[H :+: T] =
     of(
       Cogen({
         case (seed, Inl(h)) =>
@@ -56,11 +75,27 @@ object MkCogen {
           tailCogen.value.cogen.perturb(seed.next, t)
       }: (Seed, H :+: T) => Seed)
     )
+}
 
-  implicit def genericCogen[F, G]
+object MkCogen {
+  def apply[T](implicit mkCogen: MkCogen[T]): MkCogen[T] = mkCogen
+
+  def of[T](cogen0: => Cogen[T]): MkCogen[T] =
+    new MkCogen[T] {
+      def cogen = cogen0
+    }
+
+  implicit def genericProductCogen[P, L <: HList]
    (implicit
-     gen: Generic.Aux[F, G],
-     cogen: Lazy[MkCogen[G]]
-   ): MkCogen[F] =
+     gen: Generic.Aux[P, L],
+     cogen: Lazy[MkHListCogen[L]]
+   ): MkCogen[P] =
+    of(cogen.value.cogen.contramap(gen.to))
+
+  implicit def genericCoproductCogen[S, C <: Coproduct]
+   (implicit
+     gen: Generic.Aux[S, C],
+     cogen: Lazy[MkCoproductCogen[C]]
+   ): MkCogen[S] =
     of(cogen.value.cogen.contramap(gen.to))
 }

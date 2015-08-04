@@ -652,9 +652,6 @@ object ArbitraryTests extends TestSuite {
     }
 
     'composedOptList - {
-      // Workaround for some Lazy / Priority crash
-      implicit val simpleArb = implicitly[Arbitrary[Simple]]
-
       val gen = Arbitrary.arbitrary[ComposedOptList]
       compare(expectedComposedOptListArb.arbitrary, gen)
     }

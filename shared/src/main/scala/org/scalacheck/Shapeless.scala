@@ -44,6 +44,12 @@ trait HListInstances {
    ): Cogen[L] =
     arb.cogen
 
+  implicit def mkHListShrink[L <: HList]
+   (implicit
+     arb: MkHListShrink[L]
+   ): Shrink[L] =
+    arb.shrink
+
 }
 
 trait CoproductInstances {

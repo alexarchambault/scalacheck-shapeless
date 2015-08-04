@@ -16,26 +16,31 @@ object ShrinkTests extends TestSuite {
   lazy val expectedOptionIntShrink =
     Shrink.shrinkOption(Shrink.shrinkInt)
 
-  lazy val expectedSimpleShrink =
-    MkShrink.genericProductShrink(
-      Generic[Simple],
+  lazy val expectedIntStringBoolShrink =
+    expectedIntStringBoolMkHListShrink.shrink
+  lazy val expectedIntStringBoolMkHListShrink =
+    MkHListShrink.hconsShrink(
+      Lazy(Shrink.shrinkInt),
       Lazy(
         MkHListShrink.hconsShrink(
-          Lazy(Shrink.shrinkInt),
+          Lazy(Shrink.shrinkString),
           Lazy(
             MkHListShrink.hconsShrink(
-              Lazy(Shrink.shrinkString),
+              Lazy(Shrink.shrinkAny[Boolean]),
               Lazy(
-                MkHListShrink.hconsShrink(
-                  Lazy(Shrink.shrinkAny[Boolean]),
-                  Lazy(
-                    MkHListShrink.hnilShrink
-                  )
-                )
+                MkHListShrink.hnilShrink
               )
             )
           )
         )
+      )
+    )
+
+  lazy val expectedSimpleShrink =
+    MkShrink.genericProductShrink(
+      Generic[Simple],
+      Lazy(
+        expectedIntStringBoolMkHListShrink
       )
     ).shrink
 
@@ -60,6 +65,11 @@ object ShrinkTests extends TestSuite {
     'simple - {
        val shrink = implicitly[Shrink[Simple]]
        compare(shrink, expectedSimpleShrink)
+    }
+
+    'simpleHList - {
+      val shrink = implicitly[Shrink[Int :: String :: Boolean :: HNil]]
+      compare(shrink, expectedIntStringBoolShrink)
     }
 
   }

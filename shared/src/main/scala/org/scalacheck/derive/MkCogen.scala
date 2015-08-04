@@ -4,90 +4,98 @@ package derive
 import org.scalacheck.rng.Seed
 import shapeless._
 
-/** Base trait of `Cogen[T]` generating type classes. */
-trait MkCogen[T] {
-  /** `Cogen[T]` instance built by this `MkCogen[T]` */
-  def cogen: Cogen[T]
-}
-
 /**
  * Derives `Cogen[T]` instances for `T` an `HList`, a `Coproduct`,
  * a case class or an ADT (or more generally, a type represented
  * `Generic`ally as an `HList` or a `Coproduct`).
  *
  * Use like
- *     val cogen: Cogen[T] = MkDefaultCogen[T].cogen
- * or look up for an implicit `MkDefaultCogen[T]`.
+ *     val cogen: Cogen[T] = MkCogen[T].cogen
+ * or look up for an implicit `MkCogen[T]`.
  */
-trait MkDefaultCogen[T] extends MkCogen[T]
+trait MkCogen[T] {
+  /** `Cogen[T]` instance built by this `MkCogen[T]` */
+  def cogen: Cogen[T]
+}
 
-object MkDefaultCogen {
-  def apply[T](implicit mkCogen: MkDefaultCogen[T]): MkDefaultCogen[T] = mkCogen
+trait MkHListCogen[L <: HList] {
+  /** `Cogen[T]` instance built by this `MkCogen[T]` */
+  def cogen: Cogen[L]
+}
 
-  def of[T](cogen0: => Cogen[T]): MkDefaultCogen[T] =
-    new MkDefaultCogen[T] {
+trait MkCoproductCogen[C <: Coproduct] {
+  /** `Cogen[T]` instance built by this `MkCogen[T]` */
+  def cogen: Cogen[C]
+}
+
+object MkHListCogen {
+  def apply[L <: HList](implicit mkCogen: MkHListCogen[L]): MkHListCogen[L] = mkCogen
+
+  def of[L <: HList](cogen0: => Cogen[L]): MkHListCogen[L] =
+    new MkHListCogen[L] {
       def cogen = cogen0
     }
 
-  implicit lazy val hnilCogen: MkDefaultCogen[HNil] =
+  implicit lazy val hnilCogen: MkHListCogen[HNil] =
     of(Cogen.cogenUnit.contramap(_ => ()))
 
   implicit def hconsCogen[H, T <: HList]
    (implicit
-     headCogen: Lazy[Cogen[H]],
-     tailCogen: Lazy[MkDefaultCogen[T]]
-   ): MkDefaultCogen[H :: T] =
+     headCogen: Strict[Cogen[H]],
+     tailCogen: MkHListCogen[T]
+   ): MkHListCogen[H :: T] =
     of(
       Cogen({case (seed, h :: t) =>
-        tailCogen.value.cogen.perturb(headCogen.value.perturb(seed, h), t)
+        tailCogen.cogen.perturb(headCogen.value.perturb(seed, h), t)
       }: (Seed, H :: T) => Seed)
     )
+}
 
-  implicit lazy val cnilCogen: MkDefaultCogen[CNil] =
+object MkCoproductCogen {
+  def apply[C <: Coproduct](implicit mkCogen: MkCoproductCogen[C]): MkCoproductCogen[C] = mkCogen
+
+  def of[C <: Coproduct](cogen0: => Cogen[C]): MkCoproductCogen[C] =
+    new MkCoproductCogen[C] {
+      def cogen = cogen0
+    }
+
+  implicit lazy val cnilCogen: MkCoproductCogen[CNil] =
     of(Cogen.cogenUnit.contramap(_ => ()))
 
   implicit def cconsCogen[H, T <: Coproduct]
    (implicit
-     headCogen: Lazy[Cogen[H]],
-     tailCogen: Lazy[MkDefaultCogen[T]]
-   ): MkDefaultCogen[H :+: T] =
+     headCogen: Strict[Cogen[H]],
+     tailCogen: MkCoproductCogen[T]
+   ): MkCoproductCogen[H :+: T] =
     of(
       Cogen({
         case (seed, Inl(h)) =>
           headCogen.value.perturb(seed, h)
         case (seed, Inr(t)) =>
-          tailCogen.value.cogen.perturb(seed.next, t)
+          tailCogen.cogen.perturb(seed.next, t)
       }: (Seed, H :+: T) => Seed)
     )
-
-  implicit def instanceCogen[F, G]
-   (implicit
-     gen: Generic.Aux[F, G],
-     cogen: Lazy[MkDefaultCogen[G]]
-   ): MkDefaultCogen[F] =
-    of(cogen.value.cogen.contramap(gen.to))
 }
 
-/**
- * Derives `Cogen[T]` instances for `T` a singleton type, like
- * `Witness.``"str"``.T` or `Witness.``true``.T` for example.
- *
- * The generated `Cogen[T]` behaves like `Cogen[Unit]`, as like
- * `Unit`, singleton types only have one instance.
- */
-trait MkSingletonCogen[T] extends MkCogen[T]
+object MkCogen {
+  def apply[T](implicit mkCogen: MkCogen[T]): MkCogen[T] = mkCogen
 
-object MkSingletonCogen {
-  def apply[T](implicit mkCogen: MkSingletonCogen[T]): MkSingletonCogen[T] = mkCogen
-
-  def of[T](cogen0: => Cogen[T]): MkSingletonCogen[T] =
-    new MkSingletonCogen[T] {
+  def of[T](cogen0: => Cogen[T]): MkCogen[T] =
+    new MkCogen[T] {
       def cogen = cogen0
     }
 
-  implicit def singletonCogen[S]
+  implicit def genericProductCogen[P, L <: HList]
    (implicit
-     w: Witness.Aux[S]
-   ): MkSingletonCogen[S] =
-    of(Cogen.cogenUnit.contramap(_ => ()))
+     gen: Generic.Aux[P, L],
+     cogen: Lazy[MkHListCogen[L]]
+   ): MkCogen[P] =
+    of(cogen.value.cogen.contramap(gen.to))
+
+  implicit def genericCoproductCogen[S, C <: Coproduct]
+   (implicit
+     gen: Generic.Aux[S, C],
+     cogen: Lazy[MkCoproductCogen[C]]
+   ): MkCogen[S] =
+    of(cogen.value.cogen.contramap(gen.to))
 }

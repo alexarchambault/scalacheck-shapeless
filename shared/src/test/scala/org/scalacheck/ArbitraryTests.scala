@@ -1,7 +1,7 @@
 package org.scalacheck
 
 import org.scalacheck.Gen.Parameters
-import org.scalacheck.derive.MkDefaultArbitrary
+import org.scalacheck.derive.{MkCoproductArbitrary, MkHListArbitrary, MkArbitrary}
 import org.scalacheck.rng.{ Seed, Rng }
 
 import shapeless._
@@ -9,7 +9,9 @@ import shapeless.test.illTyped
 
 import utest._
 
-object ArbitraryTestsDefinitions extends CommonDefinitions {
+object TestsDefinitions {
+
+  case class Simple(i: Int, s: String, blah: Boolean)
 
   case object Empty
   case class EmptyCC()
@@ -70,7 +72,7 @@ object ArbitraryTestsDefinitions extends CommonDefinitions {
 }
 
 object ArbitraryTests extends TestSuite {
-  import ArbitraryTestsDefinitions._
+  import TestsDefinitions._
   import Shapeless._
 
   def stream[T](parameters: Parameters, seed: Seed)(arbitrary: Gen[T]): Stream[Option[T]] = {
@@ -99,34 +101,26 @@ object ArbitraryTests extends TestSuite {
 
   /** Ask each `Gen[T]` a sequence of values, given the same parameters and initial seed,
     * and throw an exception if both sequences aren't equal. */
-  def compare[T](
-    first: Gen[T],
-    second: Gen[T]
-  ): Unit = doCompare(Parameters.default, Rng.randomSeed())(first, second)(100)
+  def compare[T](first: Gen[T], second: Gen[T]): Unit =
+    doCompare(Parameters.default, Rng.randomSeed())(first, second)(100)
 
 
   lazy val expectedSimpleArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericProductMkArb(
       Generic[Simple],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
-          Lazy(Arbitrary.arbInt),
-          Lazy(
-            MkDefaultArbitrary.hconsMkArb(
-              Lazy(Arbitrary.arbString),
-              Lazy(
-                MkDefaultArbitrary.hconsMkArb(
-                  Lazy(Arbitrary.arbBool),
-                  Lazy(
-                    MkDefaultArbitrary.hnilMkArb
-                  ),
-                  ops.hlist.Length[HNil],
-                  ops.nat.ToInt[Nat._0]
-                )
-              ),
-              ops.hlist.Length[Boolean :: HNil],
-              ops.nat.ToInt[Nat._1]
-            )
+        MkHListArbitrary.hconsMkArb(
+          Strict(Arbitrary.arbInt),
+          MkHListArbitrary.hconsMkArb(
+            Strict(Arbitrary.arbString),
+            MkHListArbitrary.hconsMkArb(
+              Strict(Arbitrary.arbBool),
+              MkHListArbitrary.hnilMkArb,
+              ops.hlist.Length[HNil],
+              ops.nat.ToInt[Nat._0]
+            ),
+            ops.hlist.Length[Boolean :: HNil],
+            ops.nat.ToInt[Nat._1]
           ),
           ops.hlist.Length[String :: Boolean :: HNil],
           ops.nat.ToInt[Nat._2]
@@ -134,21 +128,53 @@ object ArbitraryTests extends TestSuite {
       )
     ).arbitrary
 
+  lazy val expectedIntStringBoolArb =
+    MkHListArbitrary.hconsMkArb(
+      Strict(Arbitrary.arbInt),
+      MkHListArbitrary.hconsMkArb(
+        Strict(Arbitrary.arbString),
+        MkHListArbitrary.hconsMkArb(
+          Strict(Arbitrary.arbBool),
+          MkHListArbitrary.hnilMkArb,
+          ops.hlist.Length[HNil],
+          ops.nat.ToInt[Nat._0]
+        ),
+        ops.hlist.Length[Boolean :: HNil],
+        ops.nat.ToInt[Nat._1]
+      ),
+      ops.hlist.Length[String :: Boolean :: HNil],
+      ops.nat.ToInt[Nat._2]
+    ).arbitrary
+
+  lazy val expectedIntStringBoolCoproductArb =
+    MkCoproductArbitrary.cconsMkArb(
+      Strict(Arbitrary.arbInt),
+      MkCoproductArbitrary.cconsMkArb(
+        Strict(Arbitrary.arbString),
+        MkCoproductArbitrary.cconsMkArb(
+          Strict(Arbitrary.arbBool),
+          MkCoproductArbitrary.cnilMkArb,
+          ops.coproduct.Length[CNil],
+          ops.nat.ToInt[Nat._0]
+        ),
+        ops.coproduct.Length[Boolean :+: CNil],
+        ops.nat.ToInt[Nat._1]
+      ),
+      ops.coproduct.Length[String :+: Boolean :+: CNil],
+      ops.nat.ToInt[Nat._2]
+    ).arbitrary
+
   lazy val expectedComposedArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericProductMkArb(
       Generic[Composed],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
-          Lazy(expectedSimpleArb),
-          Lazy(
-            MkDefaultArbitrary.hconsMkArb(
-              Lazy(Arbitrary.arbString),
-              Lazy(
-                MkDefaultArbitrary.hnilMkArb
-              ),
-              ops.hlist.Length[HNil],
-              ops.nat.ToInt[Nat._0]
-            )
+        MkHListArbitrary.hconsMkArb(
+          Strict(expectedSimpleArb),
+          MkHListArbitrary.hconsMkArb(
+            Strict(Arbitrary.arbString),
+            MkHListArbitrary.hnilMkArb,
+            ops.hlist.Length[HNil],
+            ops.nat.ToInt[Nat._0]
           ),
           ops.hlist.Length[String :: HNil],
           ops.nat.ToInt[Nat._1]
@@ -157,27 +183,21 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedTwiceComposedArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericProductMkArb(
       Generic[TwiceComposed],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
-          Lazy(expectedSimpleArb),
-          Lazy(
-            MkDefaultArbitrary.hconsMkArb(
-              Lazy(expectedComposedArb),
-              Lazy(
-                MkDefaultArbitrary.hconsMkArb(
-                  Lazy(Arbitrary.arbInt),
-                  Lazy(
-                    MkDefaultArbitrary.hnilMkArb
-                  ),
-                  ops.hlist.Length[HNil],
-                  ops.nat.ToInt[Nat._0]
-                )
-              ),
-              ops.hlist.Length[Int :: HNil],
-              ops.nat.ToInt[Nat._1]
-            )
+        MkHListArbitrary.hconsMkArb(
+          Strict(expectedSimpleArb),
+          MkHListArbitrary.hconsMkArb(
+            Strict(expectedComposedArb),
+            MkHListArbitrary.hconsMkArb(
+              Strict(Arbitrary.arbInt),
+              MkHListArbitrary.hnilMkArb,
+              ops.hlist.Length[HNil],
+              ops.nat.ToInt[Nat._0]
+            ),
+            ops.hlist.Length[Int :: HNil],
+            ops.nat.ToInt[Nat._1]
           ),
           ops.hlist.Length[Composed :: Int :: HNil],
           ops.nat.ToInt[Nat._2]
@@ -186,27 +206,21 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedComposedOptListArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericProductMkArb(
       Generic[ComposedOptList],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
-          Lazy(Arbitrary.arbOption(expectedSimpleArb)),
-          Lazy(
-            MkDefaultArbitrary.hconsMkArb(
-              Lazy(Arbitrary.arbString),
-              Lazy(
-                MkDefaultArbitrary.hconsMkArb(
-                  Lazy(Arbitrary.arbContainer[List, TwiceComposed](expectedTwiceComposedArb, implicitly, identity)),
-                  Lazy(
-                    MkDefaultArbitrary.hnilMkArb
-                  ),
-                  ops.hlist.Length[HNil],
-                  ops.nat.ToInt[Nat._0]
-                )
-              ),
-              ops.hlist.Length[List[TwiceComposed] :: HNil],
-              ops.nat.ToInt[Nat._1]
-            )
+        MkHListArbitrary.hconsMkArb(
+          Strict(Arbitrary.arbOption(expectedSimpleArb)),
+          MkHListArbitrary.hconsMkArb(
+            Strict(Arbitrary.arbString),
+            MkHListArbitrary.hconsMkArb(
+              Strict(Arbitrary.arbContainer[List, TwiceComposed](expectedTwiceComposedArb, implicitly, identity)),
+              MkHListArbitrary.hnilMkArb,
+              ops.hlist.Length[HNil],
+              ops.nat.ToInt[Nat._0]
+            ),
+            ops.hlist.Length[List[TwiceComposed] :: HNil],
+            ops.nat.ToInt[Nat._1]
           ),
           ops.hlist.Length[String :: List[TwiceComposed] :: HNil],
           ops.nat.ToInt[Nat._2]
@@ -215,25 +229,21 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedBaseArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericCoproductMkArb(
       Generic[Base],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
-          Lazy(
-            MkDefaultArbitrary.genericMkArb(
+        MkCoproductArbitrary.cconsMkArb(
+          Strict(
+            MkArbitrary.genericProductMkArb(
               Generic[BaseDB],
               Lazy(
-                MkDefaultArbitrary.hconsMkArb(
-                  Lazy(Arbitrary.arbDouble),
-                  Lazy(
-                    MkDefaultArbitrary.hconsMkArb(
-                      Lazy(Arbitrary.arbBool),
-                      Lazy(
-                        MkDefaultArbitrary.hnilMkArb
-                      ),
-                      ops.hlist.Length[HNil],
-                      ops.nat.ToInt[Nat._0]
-                    )
+                MkHListArbitrary.hconsMkArb(
+                  Strict(Arbitrary.arbDouble),
+                  MkHListArbitrary.hconsMkArb(
+                    Strict(Arbitrary.arbBool),
+                    MkHListArbitrary.hnilMkArb,
+                    ops.hlist.Length[HNil],
+                    ops.nat.ToInt[Nat._0]
                   ),
                   ops.hlist.Length[Boolean :: HNil],
                   ops.nat.ToInt[Nat._1]
@@ -241,57 +251,45 @@ object ArbitraryTests extends TestSuite {
               )
             ).arbitrary
           ),
-          Lazy(
-            MkDefaultArbitrary.cconsMkArb(
-              Lazy(
-                MkDefaultArbitrary.genericMkArb(
-                  Generic[BaseIS],
+          MkCoproductArbitrary.cconsMkArb(
+            Strict(
+              MkArbitrary.genericProductMkArb(
+                Generic[BaseIS],
+                Lazy(
+                  MkHListArbitrary.hconsMkArb(
+                    Strict(Arbitrary.arbInt),
+                    MkHListArbitrary.hconsMkArb(
+                      Strict(Arbitrary.arbString),
+                      MkHListArbitrary.hnilMkArb,
+                      ops.hlist.Length[HNil],
+                      ops.nat.ToInt[Nat._0]
+                    ),
+                    ops.hlist.Length[String :: HNil],
+                    ops.nat.ToInt[Nat._1]
+                  )
+                )
+              ).arbitrary
+            ),
+            MkCoproductArbitrary.cconsMkArb(
+              Strict(
+                MkArbitrary.genericProductMkArb(
+                  Generic[BaseLast],
                   Lazy(
-                    MkDefaultArbitrary.hconsMkArb(
-                      Lazy(Arbitrary.arbInt),
-                      Lazy(
-                        MkDefaultArbitrary.hconsMkArb(
-                          Lazy(Arbitrary.arbString),
-                          Lazy(
-                            MkDefaultArbitrary.hnilMkArb
-                          ),
-                          ops.hlist.Length[HNil],
-                          ops.nat.ToInt[Nat._0]
-                        )
-                      ),
-                      ops.hlist.Length[String :: HNil],
-                      ops.nat.ToInt[Nat._1]
+                    MkHListArbitrary.hconsMkArb(
+                      Strict(expectedSimpleArb),
+                      MkHListArbitrary.hnilMkArb,
+                      ops.hlist.Length[HNil],
+                      ops.nat.ToInt[Nat._0]
                     )
                   )
                 ).arbitrary
               ),
-              Lazy(
-                MkDefaultArbitrary.cconsMkArb(
-                  Lazy(
-                    MkDefaultArbitrary.genericMkArb(
-                      Generic[BaseLast],
-                      Lazy(
-                        MkDefaultArbitrary.hconsMkArb(
-                          Lazy(expectedSimpleArb),
-                          Lazy(
-                            MkDefaultArbitrary.hnilMkArb
-                          ),
-                          ops.hlist.Length[HNil],
-                          ops.nat.ToInt[Nat._0]
-                        )
-                      )
-                    ).arbitrary
-                  ),
-                  Lazy(
-                    MkDefaultArbitrary.cnilMkArb
-                  ),
-                  ops.coproduct.Length[CNil],
-                  ops.nat.ToInt[Nat._0]
-                )
-              ),
-              ops.coproduct.Length[BaseLast :+: CNil],
-              ops.nat.ToInt[Nat._1]
-            )
+              MkCoproductArbitrary.cnilMkArb,
+              ops.coproduct.Length[CNil],
+              ops.nat.ToInt[Nat._0]
+            ),
+            ops.coproduct.Length[BaseLast :+: CNil],
+            ops.nat.ToInt[Nat._1]
           ),
           ops.coproduct.Length[BaseIS :+: BaseLast :+: CNil],
           ops.nat.ToInt[Nat._2]
@@ -300,20 +298,16 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedCCWithSingletonArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericProductMkArb(
       Generic[CCWithSingleton],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
-          Lazy(Arbitrary.arbInt),
-          Lazy(
-            MkDefaultArbitrary.hconsMkArb(
-              Lazy(Shapeless.arbitrarySingletonType[Witness.`"aa"`.T]),
-              Lazy(
-                MkDefaultArbitrary.hnilMkArb
-              ),
-              ops.hlist.Length[HNil],
-              ops.nat.ToInt[Nat._0]
-            )
+        MkHListArbitrary.hconsMkArb(
+          Strict(Arbitrary.arbInt),
+          MkHListArbitrary.hconsMkArb(
+            Strict(Shapeless.arbitrarySingletonType[Witness.`"aa"`.T]),
+            MkHListArbitrary.hnilMkArb,
+            ops.hlist.Length[HNil],
+            ops.nat.ToInt[Nat._0]
           ),
           ops.hlist.Length[Witness.`"aa"`.T :: HNil],
           ops.nat.ToInt[Nat._1]
@@ -322,14 +316,12 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedBaseWithSingletonMainArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericProductMkArb(
       Generic[BaseWithSingleton.Main],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
-          Lazy(Shapeless.arbitrarySingletonType[Witness.`"aa"`.T]),
-          Lazy(
-            MkDefaultArbitrary.hnilMkArb
-          ),
+        MkHListArbitrary.hconsMkArb(
+          Strict(Shapeless.arbitrarySingletonType[Witness.`"aa"`.T]),
+          MkHListArbitrary.hnilMkArb,
           ops.hlist.Length[HNil],
           ops.nat.ToInt[Nat._0]
         )
@@ -337,14 +329,12 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedBaseWithSingletonDummyArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericProductMkArb(
       Generic[BaseWithSingleton.Dummy],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
-          Lazy(Arbitrary.arbInt),
-          Lazy(
-            MkDefaultArbitrary.hnilMkArb
-          ),
+        MkHListArbitrary.hconsMkArb(
+          Strict(Arbitrary.arbInt),
+          MkHListArbitrary.hnilMkArb,
           ops.hlist.Length[HNil],
           ops.nat.ToInt[Nat._0]
         )
@@ -352,24 +342,16 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedBaseWithSingletonArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericCoproductMkArb(
       Generic[BaseWithSingleton],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
-          Lazy(
-            expectedBaseWithSingletonDummyArb
-          ),
-          Lazy(
-            MkDefaultArbitrary.cconsMkArb(
-              Lazy(
-                expectedBaseWithSingletonMainArb
-              ),
-              Lazy(
-                MkDefaultArbitrary.cnilMkArb
-              ),
-              ops.coproduct.Length[CNil],
-              ops.nat.ToInt[Nat._0]
-            )
+        MkCoproductArbitrary.cconsMkArb(
+          Strict(expectedBaseWithSingletonDummyArb),
+          MkCoproductArbitrary.cconsMkArb(
+            Strict(expectedBaseWithSingletonMainArb),
+            MkCoproductArbitrary.cnilMkArb,
+            ops.coproduct.Length[CNil],
+            ops.nat.ToInt[Nat._0]
           ),
           ops.coproduct.Length[BaseWithSingleton.Main :+: CNil],
           ops.nat.ToInt[Nat._1]
@@ -378,61 +360,45 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedT1TreeArbitrary: Arbitrary[T1.Tree] =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericCoproductMkArb(
       Generic[T1.Tree],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
-          Lazy(
-            MkDefaultArbitrary.genericMkArb(
+        MkCoproductArbitrary.cconsMkArb(
+          Strict(
+            MkArbitrary.genericProductMkArb(
               Generic[T1.Leaf.type],
               Lazy(
-                MkDefaultArbitrary.hnilMkArb
+                MkHListArbitrary.hnilMkArb
               )
             ).arbitrary
           ),
-          Lazy(
-            MkDefaultArbitrary.cconsMkArb(
-              Lazy(
-                MkDefaultArbitrary.genericMkArb(
-                  Generic[T1.Node],
-                  Lazy(
-                    MkDefaultArbitrary.hconsMkArb(
-                      Lazy(
-                        expectedT1TreeArbitrary
+          MkCoproductArbitrary.cconsMkArb(
+            Strict(
+              MkArbitrary.genericProductMkArb(
+                Generic[T1.Node],
+                Lazy(
+                  MkHListArbitrary.hconsMkArb(
+                    Strict(expectedT1TreeArbitrary),
+                    MkHListArbitrary.hconsMkArb(
+                      Strict(expectedT1TreeArbitrary),
+                      MkHListArbitrary.hconsMkArb(
+                        Strict(Arbitrary.arbInt),
+                        MkHListArbitrary.hnilMkArb,
+                        ops.hlist.Length[HNil],
+                        ops.nat.ToInt[Nat._0]
                       ),
-                      Lazy(
-                        MkDefaultArbitrary.hconsMkArb(
-                          Lazy(
-                            expectedT1TreeArbitrary
-                          ),
-                          Lazy(
-                            MkDefaultArbitrary.hconsMkArb(
-                              Lazy(
-                                Arbitrary.arbInt
-                              ),
-                              Lazy(
-                                MkDefaultArbitrary.hnilMkArb
-                              ),
-                              ops.hlist.Length[HNil],
-                              ops.nat.ToInt[Nat._0]
-                            )
-                          ),
-                          ops.hlist.Length[Int :: HNil],
-                          ops.nat.ToInt[Nat._1]
-                        )
-                      ),
-                      ops.hlist.Length[T1.Tree :: Int :: HNil],
-                      ops.nat.ToInt[Nat._2]
-                    )
+                      ops.hlist.Length[Int :: HNil],
+                      ops.nat.ToInt[Nat._1]
+                    ),
+                    ops.hlist.Length[T1.Tree :: Int :: HNil],
+                    ops.nat.ToInt[Nat._2]
                   )
-                ).arbitrary
-              ),
-              Lazy(
-                MkDefaultArbitrary.cnilMkArb
-              ),
-              ops.coproduct.Length[CNil],
-              ops.nat.ToInt[Nat._0]
-            )
+                )
+              ).arbitrary
+            ),
+            MkCoproductArbitrary.cnilMkArb,
+            ops.coproduct.Length[CNil],
+            ops.nat.ToInt[Nat._0]
           ),
           ops.coproduct.Length[T1.Node :+: CNil],
           ops.nat.ToInt[Nat._1]
@@ -441,61 +407,45 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedT2TreeArbitrary: Arbitrary[T2.Tree] =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericCoproductMkArb(
       Generic[T2.Tree],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
-          Lazy(
-            MkDefaultArbitrary.genericMkArb(
+        MkCoproductArbitrary.cconsMkArb(
+          Strict(
+            MkArbitrary.genericProductMkArb(
               Generic[T2.Leaf.type],
               Lazy(
-                MkDefaultArbitrary.hnilMkArb
+                MkHListArbitrary.hnilMkArb
               )
             ).arbitrary
           ),
-          Lazy(
-            MkDefaultArbitrary.cconsMkArb(
-              Lazy(
-                MkDefaultArbitrary.genericMkArb(
-                  Generic[T2.Node],
-                  Lazy(
-                    MkDefaultArbitrary.hconsMkArb(
-                      Lazy(
-                        expectedT2TreeArbitrary
+          MkCoproductArbitrary.cconsMkArb(
+            Strict(
+              MkArbitrary.genericProductMkArb(
+                Generic[T2.Node],
+                Lazy(
+                  MkHListArbitrary.hconsMkArb(
+                    Strict(expectedT2TreeArbitrary),
+                    MkHListArbitrary.hconsMkArb(
+                      Strict(expectedT2TreeArbitrary),
+                      MkHListArbitrary.hconsMkArb(
+                        Strict(Arbitrary.arbInt),
+                        MkHListArbitrary.hnilMkArb,
+                        ops.hlist.Length[HNil],
+                        ops.nat.ToInt[Nat._0]
                       ),
-                      Lazy(
-                        MkDefaultArbitrary.hconsMkArb(
-                          Lazy(
-                            expectedT2TreeArbitrary
-                          ),
-                          Lazy(
-                            MkDefaultArbitrary.hconsMkArb(
-                              Lazy(
-                                Arbitrary.arbInt
-                              ),
-                              Lazy(
-                                MkDefaultArbitrary.hnilMkArb
-                              ),
-                              ops.hlist.Length[HNil],
-                              ops.nat.ToInt[Nat._0]
-                            )
-                          ),
-                          ops.hlist.Length[Int :: HNil],
-                          ops.nat.ToInt[Nat._1]
-                        )
-                      ),
-                      ops.hlist.Length[T2.Tree :: Int :: HNil],
-                      ops.nat.ToInt[Nat._2]
-                    )
+                      ops.hlist.Length[Int :: HNil],
+                      ops.nat.ToInt[Nat._1]
+                    ),
+                    ops.hlist.Length[T2.Tree :: Int :: HNil],
+                    ops.nat.ToInt[Nat._2]
                   )
-                ).arbitrary
-              ),
-              Lazy(
-                MkDefaultArbitrary.cnilMkArb
-              ),
-              ops.coproduct.Length[CNil],
-              ops.nat.ToInt[Nat._0]
-            )
+                )
+              ).arbitrary
+            ),
+            MkCoproductArbitrary.cnilMkArb,
+            ops.coproduct.Length[CNil],
+            ops.nat.ToInt[Nat._0]
           ),
           ops.coproduct.Length[T2.Node :+: CNil],
           ops.nat.ToInt[Nat._1]
@@ -504,24 +454,20 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedBazArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericProductMkArb(
       Generic[Baz.type],
       Lazy(
-        MkDefaultArbitrary.hnilMkArb
+        MkHListArbitrary.hnilMkArb
       )
     ).arbitrary
 
   lazy val expectedFooArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericCoproductMkArb(
       Generic[Foo],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
-          Lazy(
-            expectedBazArbitrary
-          ),
-          Lazy(
-            MkDefaultArbitrary.cnilMkArb
-          ),
+        MkCoproductArbitrary.cconsMkArb(
+          Strict(expectedBazArbitrary),
+          MkCoproductArbitrary.cnilMkArb,
           ops.coproduct.Length[CNil],
           ops.nat.ToInt[Nat._0]
         )
@@ -529,32 +475,24 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedFArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericProductMkArb(
       Generic[F.type],
       Lazy(
-        MkDefaultArbitrary.hnilMkArb
+        MkHListArbitrary.hnilMkArb
       )
     ).arbitrary
 
   lazy val expectedEArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericProductMkArb(
       Generic[E],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
-          Lazy(
-            Arbitrary.arbDouble
-          ),
-          Lazy(
-            MkDefaultArbitrary.hconsMkArb(
-              Lazy(
-                Arbitrary.arbOption(Arbitrary.arbFloat)
-              ),
-              Lazy(
-                MkDefaultArbitrary.hnilMkArb
-              ),
-              ops.hlist.Length[HNil],
-              ops.nat.ToInt[Nat._0]
-            )
+        MkHListArbitrary.hconsMkArb(
+          Strict(Arbitrary.arbDouble),
+          MkHListArbitrary.hconsMkArb(
+            Strict(Arbitrary.arbOption(Arbitrary.arbFloat)),
+            MkHListArbitrary.hnilMkArb,
+            ops.hlist.Length[HNil],
+            ops.nat.ToInt[Nat._0]
           ),
           ops.hlist.Length[Option[Float] :: HNil],
           ops.nat.ToInt[Nat._1]
@@ -563,33 +501,21 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedDArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericCoproductMkArb(
       Generic[D],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
-          Lazy(
-            expectedBazArbitrary
-          ),
-          Lazy(
-            MkDefaultArbitrary.cconsMkArb(
-              Lazy(
-                expectedEArbitrary
-              ),
-              Lazy(
-                MkDefaultArbitrary.cconsMkArb(
-                  Lazy(
-                    expectedFArbitrary
-                  ),
-                  Lazy(
-                    MkDefaultArbitrary.cnilMkArb
-                  ),
-                  ops.coproduct.Length[CNil],
-                  ops.nat.ToInt[Nat._0]
-                )
-              ),
-              ops.coproduct.Length[F.type :+: CNil],
-              ops.nat.ToInt[Nat._1]
-            )
+        MkCoproductArbitrary.cconsMkArb(
+          Strict(expectedBazArbitrary),
+          MkCoproductArbitrary.cconsMkArb(
+            Strict(expectedEArbitrary),
+            MkCoproductArbitrary.cconsMkArb(
+              Strict(expectedFArbitrary),
+              MkCoproductArbitrary.cnilMkArb,
+              ops.coproduct.Length[CNil],
+              ops.nat.ToInt[Nat._0]
+            ),
+            ops.coproduct.Length[F.type :+: CNil],
+            ops.nat.ToInt[Nat._1]
           ),
           ops.coproduct.Length[E :+: F.type :+: CNil],
           ops.nat.ToInt[Nat._2]
@@ -598,32 +524,24 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedCArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericProductMkArb(
       Generic[C.type],
       Lazy(
-        MkDefaultArbitrary.hnilMkArb
+        MkHListArbitrary.hnilMkArb
       )
     ).arbitrary
 
   lazy val expectedBArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericProductMkArb(
       Generic[B],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
-          Lazy(
-            Arbitrary.arbInt
-          ),
-          Lazy(
-            MkDefaultArbitrary.hconsMkArb(
-              Lazy(
-                Arbitrary.arbString
-              ),
-              Lazy(
-                MkDefaultArbitrary.hnilMkArb
-              ),
-              ops.hlist.Length[HNil],
-              ops.nat.ToInt[Nat._0]
-            )
+        MkHListArbitrary.hconsMkArb(
+          Strict(Arbitrary.arbInt),
+          MkHListArbitrary.hconsMkArb(
+            Strict(Arbitrary.arbString),
+            MkHListArbitrary.hnilMkArb,
+            ops.hlist.Length[HNil],
+            ops.nat.ToInt[Nat._0]
           ),
           ops.hlist.Length[String :: HNil],
           ops.nat.ToInt[Nat._1]
@@ -632,51 +550,31 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedAArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericCoproductMkArb(
       Generic[A],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
-          Lazy(
-            expectedBArbitrary
-          ),
-          Lazy(
-            MkDefaultArbitrary.cconsMkArb(
-              Lazy(
-                expectedBazArbitrary
+        MkCoproductArbitrary.cconsMkArb(
+          Strict(expectedBArbitrary),
+          MkCoproductArbitrary.cconsMkArb(
+            Strict(expectedBazArbitrary),
+            MkCoproductArbitrary.cconsMkArb(
+              Strict(expectedCArbitrary),
+              MkCoproductArbitrary.cconsMkArb(
+                Strict(expectedEArbitrary),
+                MkCoproductArbitrary.cconsMkArb(
+                  Strict(expectedFArbitrary),
+                  MkCoproductArbitrary.cnilMkArb,
+                  ops.coproduct.Length[CNil],
+                  ops.nat.ToInt[Nat._0]
+                ),
+                ops.coproduct.Length[F.type :+: CNil],
+                ops.nat.ToInt[Nat._1]
               ),
-              Lazy(
-                MkDefaultArbitrary.cconsMkArb(
-                  Lazy(
-                    expectedCArbitrary
-                  ),
-                  Lazy(
-                    MkDefaultArbitrary.cconsMkArb(
-                      Lazy(
-                        expectedEArbitrary
-                      ),
-                      Lazy(
-                        MkDefaultArbitrary.cconsMkArb(
-                          Lazy(
-                            expectedFArbitrary
-                          ),
-                          Lazy(
-                            MkDefaultArbitrary.cnilMkArb
-                          ),
-                          ops.coproduct.Length[CNil],
-                          ops.nat.ToInt[Nat._0]
-                        )
-                      ),
-                      ops.coproduct.Length[F.type :+: CNil],
-                      ops.nat.ToInt[Nat._1]
-                    )
-                  ),
-                  ops.coproduct.Length[E :+: F.type :+: CNil],
-                  ops.nat.ToInt[Nat._2]
-                )
-              ),
-              ops.coproduct.Length[C.type :+: E :+: F.type :+: CNil],
-              ops.nat.ToInt[Nat._3]
-            )
+              ops.coproduct.Length[E :+: F.type :+: CNil],
+              ops.nat.ToInt[Nat._2]
+            ),
+            ops.coproduct.Length[C.type :+: E :+: F.type :+: CNil],
+            ops.nat.ToInt[Nat._3]
           ),
           ops.coproduct.Length[Baz.type :+: C.type :+: E :+: F.type :+: CNil],
           ops.nat.ToInt[Nat._4]
@@ -708,9 +606,9 @@ object ArbitraryTests extends TestSuite {
 
     'empty - {
       val expectedArb =
-        MkDefaultArbitrary.genericMkArb(
+        MkArbitrary.genericProductMkArb(
           Generic[Empty.type],
-          Lazy(MkDefaultArbitrary.hnilMkArb)
+          Lazy(MkHListArbitrary.hnilMkArb)
         ).arbitrary
 
       val gen = Arbitrary.arbitrary[Empty.type]
@@ -719,9 +617,9 @@ object ArbitraryTests extends TestSuite {
 
     'emptyCC - {
       val expectedArb =
-        MkDefaultArbitrary.genericMkArb(
+        MkArbitrary.genericProductMkArb(
           Generic[EmptyCC],
-          Lazy(MkDefaultArbitrary.hnilMkArb)
+          Lazy(MkHListArbitrary.hnilMkArb)
         ).arbitrary
 
       val gen = Arbitrary.arbitrary[EmptyCC]
@@ -731,6 +629,16 @@ object ArbitraryTests extends TestSuite {
     'simple - {
       val gen = Arbitrary.arbitrary[Simple]
       compare(expectedSimpleArb.arbitrary, gen)
+    }
+
+    'simpleHList - {
+      val gen = Arbitrary.arbitrary[Int :: String :: Boolean :: HNil]
+      compare(expectedIntStringBoolArb.arbitrary, gen)
+    }
+
+    'simpleCoproduct - {
+      val gen = Arbitrary.arbitrary[Int :+: String :+: Boolean :+: CNil]
+      compare(expectedIntStringBoolCoproductArb.arbitrary, gen)
     }
 
     'composed - {
@@ -744,9 +652,6 @@ object ArbitraryTests extends TestSuite {
     }
 
     'composedOptList - {
-      // Workaround for some Lazy / Priority crash
-      implicit val simpleArb = implicitly[Arbitrary[Simple]]
-
       val gen = Arbitrary.arbitrary[ComposedOptList]
       compare(expectedComposedOptListArb.arbitrary, gen)
     }

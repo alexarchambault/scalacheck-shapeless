@@ -1,16 +1,14 @@
 package org.scalacheck
 
-import org.scalacheck.derive.MkDefaultShrink
+import org.scalacheck.derive.{MkCoproductShrink, MkHListShrink, MkShrink}
 import shapeless._
 import utest._
 import Util._
 
 import Shapeless._
 
-object ShrinkTestsDefinitions extends CommonDefinitions
-
 object ShrinkTests extends TestSuite {
-  import ShrinkTestsDefinitions._
+  import TestsDefinitions._
 
   lazy val expectedListIntShrink =
     Shrink.shrinkContainer[List, Int](identity, Shrink.shrinkInt, implicitly)
@@ -18,26 +16,43 @@ object ShrinkTests extends TestSuite {
   lazy val expectedOptionIntShrink =
     Shrink.shrinkOption(Shrink.shrinkInt)
 
+  lazy val expectedIntStringBoolShrink =
+    expectedIntStringBoolMkHListShrink.shrink
+  lazy val expectedIntStringBoolMkHListShrink =
+    MkHListShrink.hconsShrink(
+      Strict(Shrink.shrinkInt),
+      MkHListShrink.hconsShrink(
+        Strict(Shrink.shrinkString),
+        MkHListShrink.hconsShrink(
+          Strict(Shrink.shrinkAny[Boolean]),
+          MkHListShrink.hnilShrink
+        )
+      )
+    )
+
+  lazy val expectedIntStringBoolCoproductShrink =
+    MkCoproductShrink.cconsShrink(
+      Strict(Shrink.shrinkInt),
+      MkCoproductShrink.cconsShrink(
+        Strict(Shrink.shrinkString),
+        MkCoproductShrink.cconsShrink(
+          Strict(Shrink.shrinkAny[Boolean]),
+          MkCoproductShrink.cnilShrink,
+          Strict(Singletons[Boolean]),
+          Strict(Singletons[CNil])
+        ),
+        Strict(Singletons[String]),
+        Strict(Singletons[Boolean :+: CNil])
+      ),
+      Strict(Singletons[Int]),
+      Strict(Singletons[String :+: Boolean :+: CNil])
+    ).shrink
+
   lazy val expectedSimpleShrink =
-    MkDefaultShrink.genericShrink(
+    MkShrink.genericProductShrink(
       Generic[Simple],
       Lazy(
-        MkDefaultShrink.hconsShrink(
-          Lazy(Shrink.shrinkInt),
-          Lazy(
-            MkDefaultShrink.hconsShrink(
-              Lazy(Shrink.shrinkString),
-              Lazy(
-                MkDefaultShrink.hconsShrink(
-                  Lazy(Shrink.shrinkAny[Boolean]),
-                  Lazy(
-                    MkDefaultShrink.hnilShrink
-                  )
-                )
-              )
-            )
-          )
-        )
+        expectedIntStringBoolMkHListShrink
       )
     ).shrink
 
@@ -59,11 +74,20 @@ object ShrinkTests extends TestSuite {
       compare(shrink, expectedOptionIntShrink)
     }
 
-    // Doesn't pass yet, because of the fallback shrinkAny in org.scalacheck.Shrink
-    // 'simple - {
-    //   val shrink = implicitly[Shrink[Simple]]
-    //   compare(shrink, expectedSimpleShrink)
-    // }
+    'simple - {
+       val shrink = implicitly[Shrink[Simple]]
+       compare(shrink, expectedSimpleShrink)
+    }
+
+    'simpleHList - {
+      val shrink = implicitly[Shrink[Int :: String :: Boolean :: HNil]]
+      compare(shrink, expectedIntStringBoolShrink)
+    }
+
+    'simpleCoproduct - {
+      val shrink = implicitly[Shrink[Int :+: String :+: Boolean :+: CNil]]
+      compare(shrink, expectedIntStringBoolCoproductShrink)
+    }
 
   }
 

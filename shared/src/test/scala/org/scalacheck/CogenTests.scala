@@ -1,7 +1,7 @@
 package org.scalacheck
 
 import org.scalacheck.TestsDefinitions._
-import org.scalacheck.derive.{MkHListCogen, MkCogen}
+import org.scalacheck.derive.{MkCoproductCogen, MkHListCogen, MkCogen}
 import org.scalacheck.rng.{Rng, Seed}
 import shapeless._
 import utest._
@@ -28,6 +28,24 @@ object CogenTests extends TestSuite {
         )
       )
     )
+
+  lazy val expectedIntStringBoolCoproductCogen =
+    MkCoproductCogen.cconsCogen(
+      Lazy(Cogen.cogenInt),
+      Lazy(
+        MkCoproductCogen.cconsCogen(
+          Lazy(Cogen.cogenString),
+          Lazy(
+            MkCoproductCogen.cconsCogen(
+              Lazy(Cogen.cogenBoolean),
+              Lazy(
+                MkCoproductCogen.cnilCogen
+              )
+            )
+          )
+        )
+      )
+    ).cogen
 
   lazy val expectedSimpleCogen =
     MkCogen.genericProductCogen(
@@ -127,6 +145,11 @@ object CogenTests extends TestSuite {
     'simpleHList - {
       val cogen = Cogen[Int :: String :: Boolean :: HNil]
       compare(expectedIntStringBoolCogen, cogen)
+    }
+
+    'simpleCoproduct - {
+      val cogen = Cogen[Int :+: String :+: Boolean :+: CNil]
+      compare(expectedIntStringBoolCoproductCogen, cogen)
     }
 
   }

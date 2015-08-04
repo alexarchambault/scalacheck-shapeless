@@ -54,6 +54,12 @@ trait CoproductInstances {
    ): Arbitrary[C] =
     arb.arbitrary
 
+  implicit def mkCoproductCogen[C <: Coproduct]
+   (implicit
+     arb: MkCoproductCogen[C]
+   ): Cogen[C] =
+    arb.cogen
+
 }
 
 trait DerivedInstances {

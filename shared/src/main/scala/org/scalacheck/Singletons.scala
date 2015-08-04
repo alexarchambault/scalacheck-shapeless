@@ -5,6 +5,8 @@ import shapeless._
 /**
  * Type class providing the instances of `T` that can be built out of
  * singletons only.
+ *
+ * Used by the derived Shrink instances for ADTs in particular.
  */
 trait Singletons[T] {
   /**

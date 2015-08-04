@@ -134,6 +134,30 @@ object ArbitraryTests extends TestSuite {
       )
     ).arbitrary
 
+  lazy val expectedIntStringBoolArb =
+    MkHListArbitrary.hconsMkArb(
+      Lazy(Arbitrary.arbInt),
+      Lazy(
+        MkHListArbitrary.hconsMkArb(
+          Lazy(Arbitrary.arbString),
+          Lazy(
+            MkHListArbitrary.hconsMkArb(
+              Lazy(Arbitrary.arbBool),
+              Lazy(
+                MkHListArbitrary.hnilMkArb
+              ),
+              ops.hlist.Length[HNil],
+              ops.nat.ToInt[Nat._0]
+            )
+          ),
+          ops.hlist.Length[Boolean :: HNil],
+          ops.nat.ToInt[Nat._1]
+        )
+      ),
+      ops.hlist.Length[String :: Boolean :: HNil],
+      ops.nat.ToInt[Nat._2]
+    ).arbitrary
+
   lazy val expectedComposedArb =
     MkArbitrary.genericProductMkArb(
       Generic[Composed],
@@ -731,6 +755,11 @@ object ArbitraryTests extends TestSuite {
     'simple - {
       val gen = Arbitrary.arbitrary[Simple]
       compare(expectedSimpleArb.arbitrary, gen)
+    }
+
+    'simpleHList - {
+      val gen = Arbitrary.arbitrary[Int :: String :: Boolean :: HNil]
+      compare(expectedIntStringBoolArb.arbitrary, gen)
     }
 
     'composed - {

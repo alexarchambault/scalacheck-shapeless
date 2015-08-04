@@ -30,6 +30,16 @@ trait SingletonInstances {
       .contramap[S](_ => ())
 }
 
+trait HListInstances {
+
+  implicit def mkHListArbitrary[L <: HList]
+   (implicit
+     arb: MkHListArbitrary[L]
+   ): Arbitrary[L] =
+    arb.arbitrary
+
+}
+
 trait DerivedInstances {
 
   implicit def mkArbitrary[T]
@@ -61,4 +71,4 @@ trait DerivedInstances {
 
 }
 
-object Shapeless extends SingletonInstances with DerivedInstances
+object Shapeless extends SingletonInstances with HListInstances with DerivedInstances

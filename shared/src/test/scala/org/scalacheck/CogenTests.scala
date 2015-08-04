@@ -9,27 +9,30 @@ import utest._
 object CogenTests extends TestSuite {
   import Shapeless._
 
-  lazy val expectedSimpleCogen =
-    MkCogen.genericProductCogen(
-      Generic[Simple],
+  lazy val expectedIntStringBoolCogen =
+    expectedIntStringBoolMkHListCogen.cogen
+  lazy val expectedIntStringBoolMkHListCogen =
+    MkHListCogen.hconsCogen(
+      Lazy(Cogen.cogenInt),
       Lazy(
         MkHListCogen.hconsCogen(
-          Lazy(Cogen.cogenInt),
+          Lazy(Cogen.cogenString),
           Lazy(
             MkHListCogen.hconsCogen(
-              Lazy(Cogen.cogenString),
+              Lazy(Cogen.cogenBoolean),
               Lazy(
-                MkHListCogen.hconsCogen(
-                  Lazy(Cogen.cogenBoolean),
-                  Lazy(
-                    MkHListCogen.hnilCogen
-                  )
-                )
+                MkHListCogen.hnilCogen
               )
             )
           )
         )
       )
+    )
+
+  lazy val expectedSimpleCogen =
+    MkCogen.genericProductCogen(
+      Generic[Simple],
+      Lazy(expectedIntStringBoolMkHListCogen)
     ).cogen
 
 
@@ -119,6 +122,11 @@ object CogenTests extends TestSuite {
     'simple - {
       val cogen = Cogen[Simple]
       compare(expectedSimpleCogen, cogen)
+    }
+
+    'simpleHList - {
+      val cogen = Cogen[Int :: String :: Boolean :: HNil]
+      compare(expectedIntStringBoolCogen, cogen)
     }
 
   }

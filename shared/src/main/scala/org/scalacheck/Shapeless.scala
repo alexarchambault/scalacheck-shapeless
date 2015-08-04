@@ -38,6 +38,12 @@ trait HListInstances {
    ): Arbitrary[L] =
     arb.arbitrary
 
+  implicit def mkHListCogen[L <: HList]
+   (implicit
+     arb: MkHListCogen[L]
+   ): Cogen[L] =
+    arb.cogen
+
 }
 
 trait CoproductInstances {

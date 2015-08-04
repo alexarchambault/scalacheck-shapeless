@@ -44,7 +44,7 @@ trait DerivedInstances {
   implicit def mkShrink[T]
    (implicit
      priority: Strict.Cached[LowPriority[
-       Shrink[T],
+       Mask[Witness.`"Shrink.shrinkAny"`.T, Shrink[T]],
        MkDefaultShrink[T]
      ]]
    ): Shrink[T] =

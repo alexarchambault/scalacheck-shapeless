@@ -57,11 +57,10 @@ object ShrinkTests extends TestSuite {
       compare(shrink, expectedOptionIntShrink)
     }
 
-    // Doesn't pass yet, because of the fallback shrinkAny in org.scalacheck.Shrink
-    // 'simple - {
-    //   val shrink = implicitly[Shrink[Simple]]
-    //   compare(shrink, expectedSimpleShrink)
-    // }
+    'simple - {
+       val shrink = implicitly[Shrink[Simple]]
+       compare(shrink, expectedSimpleShrink)
+    }
 
   }
 

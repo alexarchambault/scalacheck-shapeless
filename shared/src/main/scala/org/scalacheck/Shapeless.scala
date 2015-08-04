@@ -40,6 +40,16 @@ trait HListInstances {
 
 }
 
+trait CoproductInstances {
+
+  implicit def mkCoproductArbitrary[C <: Coproduct]
+   (implicit
+     arb: MkCoproductArbitrary[C]
+   ): Arbitrary[C] =
+    arb.arbitrary
+
+}
+
 trait DerivedInstances {
 
   implicit def mkArbitrary[T]
@@ -71,4 +81,8 @@ trait DerivedInstances {
 
 }
 
-object Shapeless extends SingletonInstances with HListInstances with DerivedInstances
+object Shapeless
+  extends SingletonInstances
+  with HListInstances
+  with CoproductInstances
+  with DerivedInstances

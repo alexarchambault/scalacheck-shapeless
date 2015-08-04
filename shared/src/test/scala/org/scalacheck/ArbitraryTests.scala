@@ -158,6 +158,30 @@ object ArbitraryTests extends TestSuite {
       ops.nat.ToInt[Nat._2]
     ).arbitrary
 
+  lazy val expectedIntStringBoolCoproductArb =
+    MkCoproductArbitrary.cconsMkArb(
+      Lazy(Arbitrary.arbInt),
+      Lazy(
+        MkCoproductArbitrary.cconsMkArb(
+          Lazy(Arbitrary.arbString),
+          Lazy(
+            MkCoproductArbitrary.cconsMkArb(
+              Lazy(Arbitrary.arbBool),
+              Lazy(
+                MkCoproductArbitrary.cnilMkArb
+              ),
+              ops.coproduct.Length[CNil],
+              ops.nat.ToInt[Nat._0]
+            )
+          ),
+          ops.coproduct.Length[Boolean :+: CNil],
+          ops.nat.ToInt[Nat._1]
+        )
+      ),
+      ops.coproduct.Length[String :+: Boolean :+: CNil],
+      ops.nat.ToInt[Nat._2]
+    ).arbitrary
+
   lazy val expectedComposedArb =
     MkArbitrary.genericProductMkArb(
       Generic[Composed],
@@ -760,6 +784,11 @@ object ArbitraryTests extends TestSuite {
     'simpleHList - {
       val gen = Arbitrary.arbitrary[Int :: String :: Boolean :: HNil]
       compare(expectedIntStringBoolArb.arbitrary, gen)
+    }
+
+    'simpleCoproduct - {
+      val gen = Arbitrary.arbitrary[Int :+: String :+: Boolean :+: CNil]
+      compare(expectedIntStringBoolCoproductArb.arbitrary, gen)
     }
 
     'composed - {

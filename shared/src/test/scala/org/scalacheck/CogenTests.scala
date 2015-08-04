@@ -1,7 +1,7 @@
 package org.scalacheck
 
 import org.scalacheck.TestsDefinitions._
-import org.scalacheck.derive.MkDefaultCogen
+import org.scalacheck.derive.MkCogen
 import org.scalacheck.rng.{Rng, Seed}
 import shapeless._
 import utest._
@@ -10,19 +10,19 @@ object CogenTests extends TestSuite {
   import Shapeless._
 
   lazy val expectedSimpleCogen =
-    MkDefaultCogen.genericCogen(
+    MkCogen.genericCogen(
       Generic[Simple],
       Lazy(
-        MkDefaultCogen.hconsCogen(
+        MkCogen.hconsCogen(
           Lazy(Cogen.cogenInt),
           Lazy(
-            MkDefaultCogen.hconsCogen(
+            MkCogen.hconsCogen(
               Lazy(Cogen.cogenString),
               Lazy(
-                MkDefaultCogen.hconsCogen(
+                MkCogen.hconsCogen(
                   Lazy(Cogen.cogenBoolean),
                   Lazy(
-                    MkDefaultCogen.hnilCogen
+                    MkCogen.hnilCogen
                   )
                 )
               )
@@ -88,9 +88,9 @@ object CogenTests extends TestSuite {
 
     'empty - {
       val expectedCogen =
-        MkDefaultCogen.genericCogen(
+        MkCogen.genericCogen(
           Generic[Empty.type],
-          Lazy(MkDefaultCogen.hnilCogen)
+          Lazy(MkCogen.hnilCogen)
         ).cogen
 
       val cogen = Cogen[Empty.type]
@@ -107,9 +107,9 @@ object CogenTests extends TestSuite {
 
     'emptyCC - {
       val expectedCogen =
-        MkDefaultCogen.genericCogen(
+        MkCogen.genericCogen(
           Generic[EmptyCC],
-          Lazy(MkDefaultCogen.hnilCogen)
+          Lazy(MkCogen.hnilCogen)
         ).cogen
 
       val cogen = Cogen[EmptyCC]

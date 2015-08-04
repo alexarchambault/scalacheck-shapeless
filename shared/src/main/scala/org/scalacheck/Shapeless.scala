@@ -36,7 +36,7 @@ trait DerivedInstances {
    (implicit
      priority: Strict.Cached[LowPriority[
        Arbitrary[T],
-       MkDefaultArbitrary[T]
+       MkArbitrary[T]
      ]]
    ): Arbitrary[T] =
     priority.value.value.arbitrary
@@ -45,7 +45,7 @@ trait DerivedInstances {
    (implicit
      priority: Strict.Cached[LowPriority[
        Mask[Witness.`"Shrink.shrinkAny"`.T, Shrink[T]],
-       MkDefaultShrink[T]
+       MkShrink[T]
      ]]
    ): Shrink[T] =
     priority.value.value.shrink
@@ -54,7 +54,7 @@ trait DerivedInstances {
    (implicit
      priority: Strict.Cached[LowPriority[
        Cogen[T],
-       MkDefaultCogen[T]
+       MkCogen[T]
      ]]
    ): Cogen[T] =
     priority.value.value.cogen

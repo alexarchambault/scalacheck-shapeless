@@ -1,7 +1,7 @@
 package org.scalacheck
 
 import org.scalacheck.Gen.Parameters
-import org.scalacheck.derive.MkDefaultArbitrary
+import org.scalacheck.derive.MkArbitrary
 import org.scalacheck.rng.{ Seed, Rng }
 
 import shapeless._
@@ -106,19 +106,19 @@ object ArbitraryTests extends TestSuite {
 
 
   lazy val expectedSimpleArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[Simple],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
+        MkArbitrary.hconsMkArb(
           Lazy(Arbitrary.arbInt),
           Lazy(
-            MkDefaultArbitrary.hconsMkArb(
+            MkArbitrary.hconsMkArb(
               Lazy(Arbitrary.arbString),
               Lazy(
-                MkDefaultArbitrary.hconsMkArb(
+                MkArbitrary.hconsMkArb(
                   Lazy(Arbitrary.arbBool),
                   Lazy(
-                    MkDefaultArbitrary.hnilMkArb
+                    MkArbitrary.hnilMkArb
                   ),
                   ops.hlist.Length[HNil],
                   ops.nat.ToInt[Nat._0]
@@ -135,16 +135,16 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedComposedArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[Composed],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
+        MkArbitrary.hconsMkArb(
           Lazy(expectedSimpleArb),
           Lazy(
-            MkDefaultArbitrary.hconsMkArb(
+            MkArbitrary.hconsMkArb(
               Lazy(Arbitrary.arbString),
               Lazy(
-                MkDefaultArbitrary.hnilMkArb
+                MkArbitrary.hnilMkArb
               ),
               ops.hlist.Length[HNil],
               ops.nat.ToInt[Nat._0]
@@ -157,19 +157,19 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedTwiceComposedArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[TwiceComposed],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
+        MkArbitrary.hconsMkArb(
           Lazy(expectedSimpleArb),
           Lazy(
-            MkDefaultArbitrary.hconsMkArb(
+            MkArbitrary.hconsMkArb(
               Lazy(expectedComposedArb),
               Lazy(
-                MkDefaultArbitrary.hconsMkArb(
+                MkArbitrary.hconsMkArb(
                   Lazy(Arbitrary.arbInt),
                   Lazy(
-                    MkDefaultArbitrary.hnilMkArb
+                    MkArbitrary.hnilMkArb
                   ),
                   ops.hlist.Length[HNil],
                   ops.nat.ToInt[Nat._0]
@@ -186,19 +186,19 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedComposedOptListArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[ComposedOptList],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
+        MkArbitrary.hconsMkArb(
           Lazy(Arbitrary.arbOption(expectedSimpleArb)),
           Lazy(
-            MkDefaultArbitrary.hconsMkArb(
+            MkArbitrary.hconsMkArb(
               Lazy(Arbitrary.arbString),
               Lazy(
-                MkDefaultArbitrary.hconsMkArb(
+                MkArbitrary.hconsMkArb(
                   Lazy(Arbitrary.arbContainer[List, TwiceComposed](expectedTwiceComposedArb, implicitly, identity)),
                   Lazy(
-                    MkDefaultArbitrary.hnilMkArb
+                    MkArbitrary.hnilMkArb
                   ),
                   ops.hlist.Length[HNil],
                   ops.nat.ToInt[Nat._0]
@@ -215,21 +215,21 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedBaseArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[Base],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
+        MkArbitrary.cconsMkArb(
           Lazy(
-            MkDefaultArbitrary.genericMkArb(
+            MkArbitrary.genericMkArb(
               Generic[BaseDB],
               Lazy(
-                MkDefaultArbitrary.hconsMkArb(
+                MkArbitrary.hconsMkArb(
                   Lazy(Arbitrary.arbDouble),
                   Lazy(
-                    MkDefaultArbitrary.hconsMkArb(
+                    MkArbitrary.hconsMkArb(
                       Lazy(Arbitrary.arbBool),
                       Lazy(
-                        MkDefaultArbitrary.hnilMkArb
+                        MkArbitrary.hnilMkArb
                       ),
                       ops.hlist.Length[HNil],
                       ops.nat.ToInt[Nat._0]
@@ -242,18 +242,18 @@ object ArbitraryTests extends TestSuite {
             ).arbitrary
           ),
           Lazy(
-            MkDefaultArbitrary.cconsMkArb(
+            MkArbitrary.cconsMkArb(
               Lazy(
-                MkDefaultArbitrary.genericMkArb(
+                MkArbitrary.genericMkArb(
                   Generic[BaseIS],
                   Lazy(
-                    MkDefaultArbitrary.hconsMkArb(
+                    MkArbitrary.hconsMkArb(
                       Lazy(Arbitrary.arbInt),
                       Lazy(
-                        MkDefaultArbitrary.hconsMkArb(
+                        MkArbitrary.hconsMkArb(
                           Lazy(Arbitrary.arbString),
                           Lazy(
-                            MkDefaultArbitrary.hnilMkArb
+                            MkArbitrary.hnilMkArb
                           ),
                           ops.hlist.Length[HNil],
                           ops.nat.ToInt[Nat._0]
@@ -266,15 +266,15 @@ object ArbitraryTests extends TestSuite {
                 ).arbitrary
               ),
               Lazy(
-                MkDefaultArbitrary.cconsMkArb(
+                MkArbitrary.cconsMkArb(
                   Lazy(
-                    MkDefaultArbitrary.genericMkArb(
+                    MkArbitrary.genericMkArb(
                       Generic[BaseLast],
                       Lazy(
-                        MkDefaultArbitrary.hconsMkArb(
+                        MkArbitrary.hconsMkArb(
                           Lazy(expectedSimpleArb),
                           Lazy(
-                            MkDefaultArbitrary.hnilMkArb
+                            MkArbitrary.hnilMkArb
                           ),
                           ops.hlist.Length[HNil],
                           ops.nat.ToInt[Nat._0]
@@ -283,7 +283,7 @@ object ArbitraryTests extends TestSuite {
                     ).arbitrary
                   ),
                   Lazy(
-                    MkDefaultArbitrary.cnilMkArb
+                    MkArbitrary.cnilMkArb
                   ),
                   ops.coproduct.Length[CNil],
                   ops.nat.ToInt[Nat._0]
@@ -300,16 +300,16 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedCCWithSingletonArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[CCWithSingleton],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
+        MkArbitrary.hconsMkArb(
           Lazy(Arbitrary.arbInt),
           Lazy(
-            MkDefaultArbitrary.hconsMkArb(
+            MkArbitrary.hconsMkArb(
               Lazy(Shapeless.arbitrarySingletonType[Witness.`"aa"`.T]),
               Lazy(
-                MkDefaultArbitrary.hnilMkArb
+                MkArbitrary.hnilMkArb
               ),
               ops.hlist.Length[HNil],
               ops.nat.ToInt[Nat._0]
@@ -322,13 +322,13 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedBaseWithSingletonMainArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[BaseWithSingleton.Main],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
+        MkArbitrary.hconsMkArb(
           Lazy(Shapeless.arbitrarySingletonType[Witness.`"aa"`.T]),
           Lazy(
-            MkDefaultArbitrary.hnilMkArb
+            MkArbitrary.hnilMkArb
           ),
           ops.hlist.Length[HNil],
           ops.nat.ToInt[Nat._0]
@@ -337,13 +337,13 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedBaseWithSingletonDummyArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[BaseWithSingleton.Dummy],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
+        MkArbitrary.hconsMkArb(
           Lazy(Arbitrary.arbInt),
           Lazy(
-            MkDefaultArbitrary.hnilMkArb
+            MkArbitrary.hnilMkArb
           ),
           ops.hlist.Length[HNil],
           ops.nat.ToInt[Nat._0]
@@ -352,20 +352,20 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedBaseWithSingletonArb =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[BaseWithSingleton],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
+        MkArbitrary.cconsMkArb(
           Lazy(
             expectedBaseWithSingletonDummyArb
           ),
           Lazy(
-            MkDefaultArbitrary.cconsMkArb(
+            MkArbitrary.cconsMkArb(
               Lazy(
                 expectedBaseWithSingletonMainArb
               ),
               Lazy(
-                MkDefaultArbitrary.cnilMkArb
+                MkArbitrary.cnilMkArb
               ),
               ops.coproduct.Length[CNil],
               ops.nat.ToInt[Nat._0]
@@ -378,40 +378,40 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedT1TreeArbitrary: Arbitrary[T1.Tree] =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[T1.Tree],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
+        MkArbitrary.cconsMkArb(
           Lazy(
-            MkDefaultArbitrary.genericMkArb(
+            MkArbitrary.genericMkArb(
               Generic[T1.Leaf.type],
               Lazy(
-                MkDefaultArbitrary.hnilMkArb
+                MkArbitrary.hnilMkArb
               )
             ).arbitrary
           ),
           Lazy(
-            MkDefaultArbitrary.cconsMkArb(
+            MkArbitrary.cconsMkArb(
               Lazy(
-                MkDefaultArbitrary.genericMkArb(
+                MkArbitrary.genericMkArb(
                   Generic[T1.Node],
                   Lazy(
-                    MkDefaultArbitrary.hconsMkArb(
+                    MkArbitrary.hconsMkArb(
                       Lazy(
                         expectedT1TreeArbitrary
                       ),
                       Lazy(
-                        MkDefaultArbitrary.hconsMkArb(
+                        MkArbitrary.hconsMkArb(
                           Lazy(
                             expectedT1TreeArbitrary
                           ),
                           Lazy(
-                            MkDefaultArbitrary.hconsMkArb(
+                            MkArbitrary.hconsMkArb(
                               Lazy(
                                 Arbitrary.arbInt
                               ),
                               Lazy(
-                                MkDefaultArbitrary.hnilMkArb
+                                MkArbitrary.hnilMkArb
                               ),
                               ops.hlist.Length[HNil],
                               ops.nat.ToInt[Nat._0]
@@ -428,7 +428,7 @@ object ArbitraryTests extends TestSuite {
                 ).arbitrary
               ),
               Lazy(
-                MkDefaultArbitrary.cnilMkArb
+                MkArbitrary.cnilMkArb
               ),
               ops.coproduct.Length[CNil],
               ops.nat.ToInt[Nat._0]
@@ -441,40 +441,40 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedT2TreeArbitrary: Arbitrary[T2.Tree] =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[T2.Tree],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
+        MkArbitrary.cconsMkArb(
           Lazy(
-            MkDefaultArbitrary.genericMkArb(
+            MkArbitrary.genericMkArb(
               Generic[T2.Leaf.type],
               Lazy(
-                MkDefaultArbitrary.hnilMkArb
+                MkArbitrary.hnilMkArb
               )
             ).arbitrary
           ),
           Lazy(
-            MkDefaultArbitrary.cconsMkArb(
+            MkArbitrary.cconsMkArb(
               Lazy(
-                MkDefaultArbitrary.genericMkArb(
+                MkArbitrary.genericMkArb(
                   Generic[T2.Node],
                   Lazy(
-                    MkDefaultArbitrary.hconsMkArb(
+                    MkArbitrary.hconsMkArb(
                       Lazy(
                         expectedT2TreeArbitrary
                       ),
                       Lazy(
-                        MkDefaultArbitrary.hconsMkArb(
+                        MkArbitrary.hconsMkArb(
                           Lazy(
                             expectedT2TreeArbitrary
                           ),
                           Lazy(
-                            MkDefaultArbitrary.hconsMkArb(
+                            MkArbitrary.hconsMkArb(
                               Lazy(
                                 Arbitrary.arbInt
                               ),
                               Lazy(
-                                MkDefaultArbitrary.hnilMkArb
+                                MkArbitrary.hnilMkArb
                               ),
                               ops.hlist.Length[HNil],
                               ops.nat.ToInt[Nat._0]
@@ -491,7 +491,7 @@ object ArbitraryTests extends TestSuite {
                 ).arbitrary
               ),
               Lazy(
-                MkDefaultArbitrary.cnilMkArb
+                MkArbitrary.cnilMkArb
               ),
               ops.coproduct.Length[CNil],
               ops.nat.ToInt[Nat._0]
@@ -504,23 +504,23 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedBazArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[Baz.type],
       Lazy(
-        MkDefaultArbitrary.hnilMkArb
+        MkArbitrary.hnilMkArb
       )
     ).arbitrary
 
   lazy val expectedFooArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[Foo],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
+        MkArbitrary.cconsMkArb(
           Lazy(
             expectedBazArbitrary
           ),
           Lazy(
-            MkDefaultArbitrary.cnilMkArb
+            MkArbitrary.cnilMkArb
           ),
           ops.coproduct.Length[CNil],
           ops.nat.ToInt[Nat._0]
@@ -529,28 +529,28 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedFArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[F.type],
       Lazy(
-        MkDefaultArbitrary.hnilMkArb
+        MkArbitrary.hnilMkArb
       )
     ).arbitrary
 
   lazy val expectedEArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[E],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
+        MkArbitrary.hconsMkArb(
           Lazy(
             Arbitrary.arbDouble
           ),
           Lazy(
-            MkDefaultArbitrary.hconsMkArb(
+            MkArbitrary.hconsMkArb(
               Lazy(
                 Arbitrary.arbOption(Arbitrary.arbFloat)
               ),
               Lazy(
-                MkDefaultArbitrary.hnilMkArb
+                MkArbitrary.hnilMkArb
               ),
               ops.hlist.Length[HNil],
               ops.nat.ToInt[Nat._0]
@@ -563,25 +563,25 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedDArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[D],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
+        MkArbitrary.cconsMkArb(
           Lazy(
             expectedBazArbitrary
           ),
           Lazy(
-            MkDefaultArbitrary.cconsMkArb(
+            MkArbitrary.cconsMkArb(
               Lazy(
                 expectedEArbitrary
               ),
               Lazy(
-                MkDefaultArbitrary.cconsMkArb(
+                MkArbitrary.cconsMkArb(
                   Lazy(
                     expectedFArbitrary
                   ),
                   Lazy(
-                    MkDefaultArbitrary.cnilMkArb
+                    MkArbitrary.cnilMkArb
                   ),
                   ops.coproduct.Length[CNil],
                   ops.nat.ToInt[Nat._0]
@@ -598,28 +598,28 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedCArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[C.type],
       Lazy(
-        MkDefaultArbitrary.hnilMkArb
+        MkArbitrary.hnilMkArb
       )
     ).arbitrary
 
   lazy val expectedBArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[B],
       Lazy(
-        MkDefaultArbitrary.hconsMkArb(
+        MkArbitrary.hconsMkArb(
           Lazy(
             Arbitrary.arbInt
           ),
           Lazy(
-            MkDefaultArbitrary.hconsMkArb(
+            MkArbitrary.hconsMkArb(
               Lazy(
                 Arbitrary.arbString
               ),
               Lazy(
-                MkDefaultArbitrary.hnilMkArb
+                MkArbitrary.hnilMkArb
               ),
               ops.hlist.Length[HNil],
               ops.nat.ToInt[Nat._0]
@@ -632,35 +632,35 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedAArbitrary =
-    MkDefaultArbitrary.genericMkArb(
+    MkArbitrary.genericMkArb(
       Generic[A],
       Lazy(
-        MkDefaultArbitrary.cconsMkArb(
+        MkArbitrary.cconsMkArb(
           Lazy(
             expectedBArbitrary
           ),
           Lazy(
-            MkDefaultArbitrary.cconsMkArb(
+            MkArbitrary.cconsMkArb(
               Lazy(
                 expectedBazArbitrary
               ),
               Lazy(
-                MkDefaultArbitrary.cconsMkArb(
+                MkArbitrary.cconsMkArb(
                   Lazy(
                     expectedCArbitrary
                   ),
                   Lazy(
-                    MkDefaultArbitrary.cconsMkArb(
+                    MkArbitrary.cconsMkArb(
                       Lazy(
                         expectedEArbitrary
                       ),
                       Lazy(
-                        MkDefaultArbitrary.cconsMkArb(
+                        MkArbitrary.cconsMkArb(
                           Lazy(
                             expectedFArbitrary
                           ),
                           Lazy(
-                            MkDefaultArbitrary.cnilMkArb
+                            MkArbitrary.cnilMkArb
                           ),
                           ops.coproduct.Length[CNil],
                           ops.nat.ToInt[Nat._0]
@@ -708,9 +708,9 @@ object ArbitraryTests extends TestSuite {
 
     'empty - {
       val expectedArb =
-        MkDefaultArbitrary.genericMkArb(
+        MkArbitrary.genericMkArb(
           Generic[Empty.type],
-          Lazy(MkDefaultArbitrary.hnilMkArb)
+          Lazy(MkArbitrary.hnilMkArb)
         ).arbitrary
 
       val gen = Arbitrary.arbitrary[Empty.type]
@@ -719,9 +719,9 @@ object ArbitraryTests extends TestSuite {
 
     'emptyCC - {
       val expectedArb =
-        MkDefaultArbitrary.genericMkArb(
+        MkArbitrary.genericMkArb(
           Generic[EmptyCC],
-          Lazy(MkDefaultArbitrary.hnilMkArb)
+          Lazy(MkArbitrary.hnilMkArb)
         ).arbitrary
 
       val gen = Arbitrary.arbitrary[EmptyCC]

@@ -9,37 +9,29 @@ object Shapeless {
 
   implicit def mkArbitrary[T]
    (implicit
-     priority: Lazy[Priority[
+     priority: Strict.Cached[LowPriority[
        Arbitrary[T],
-       Implicit[
-         MkSingletonArbitrary[T] :+:
-         MkDefaultArbitrary[T] :+: CNil
-       ]
+       MkDefaultArbitrary[T]
      ]]
    ): Arbitrary[T] =
-    priority.value.fold(identity)(impl => impl.value.unify.arbitrary)
+    priority.value.value.arbitrary
 
   implicit def mkShrink[T]
    (implicit
-     priority: Lazy[Priority[
+     priority: Strict.Cached[LowPriority[
        Shrink[T],
-       Implicit[
-         MkDefaultShrink[T] :+: CNil
-       ]
+       MkDefaultShrink[T]
      ]]
    ): Shrink[T] =
-    priority.value.fold(identity)(impl => impl.value.unify.shrink)
+    priority.value.value.shrink
 
   implicit def mkCogen[T]
    (implicit
-     priority: Lazy[Priority[
+     priority: Strict.Cached[LowPriority[
        Cogen[T],
-       Implicit[
-         MkSingletonCogen[T] :+:
-         MkDefaultCogen[T] :+:CNil
-       ]
+       MkDefaultCogen[T]
      ]]
    ): Cogen[T] =
-    priority.value.fold(identity)(impl => impl.value.unify.cogen)
+    priority.value.value.cogen
 
 }

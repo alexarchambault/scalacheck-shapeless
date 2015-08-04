@@ -60,34 +60,10 @@ object MkDefaultCogen {
       }: (Seed, H :+: T) => Seed)
     )
 
-  implicit def instanceCogen[F, G]
+  implicit def genericCogen[F, G]
    (implicit
      gen: Generic.Aux[F, G],
      cogen: Lazy[MkDefaultCogen[G]]
    ): MkDefaultCogen[F] =
     of(cogen.value.cogen.contramap(gen.to))
-}
-
-/**
- * Derives `Cogen[T]` instances for `T` a singleton type, like
- * `Witness.``"str"``.T` or `Witness.``true``.T` for example.
- *
- * The generated `Cogen[T]` behaves like `Cogen[Unit]`, as like
- * `Unit`, singleton types only have one instance.
- */
-trait MkSingletonCogen[T] extends MkCogen[T]
-
-object MkSingletonCogen {
-  def apply[T](implicit mkCogen: MkSingletonCogen[T]): MkSingletonCogen[T] = mkCogen
-
-  def of[T](cogen0: => Cogen[T]): MkSingletonCogen[T] =
-    new MkSingletonCogen[T] {
-      def cogen = cogen0
-    }
-
-  implicit def singletonCogen[S]
-   (implicit
-     w: Witness.Aux[S]
-   ): MkSingletonCogen[S] =
-    of(Cogen.cogenUnit.contramap(_ => ()))
 }

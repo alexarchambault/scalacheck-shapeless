@@ -7,10 +7,8 @@ import Util._
 
 import Shapeless._
 
-object ShrinkTestsDefinitions extends CommonDefinitions
-
 object ShrinkTests extends TestSuite {
-  import ShrinkTestsDefinitions._
+  import TestsDefinitions._
 
   lazy val expectedListIntShrink =
     Shrink.shrinkContainer[List, Int](identity, Shrink.shrinkInt, implicitly)

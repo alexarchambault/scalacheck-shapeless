@@ -9,7 +9,9 @@ import shapeless.test.illTyped
 
 import utest._
 
-object ArbitraryTestsDefinitions extends CommonDefinitions {
+object TestsDefinitions {
+
+  case class Simple(i: Int, s: String, blah: Boolean)
 
   case object Empty
   case class EmptyCC()
@@ -70,7 +72,7 @@ object ArbitraryTestsDefinitions extends CommonDefinitions {
 }
 
 object ArbitraryTests extends TestSuite {
-  import ArbitraryTestsDefinitions._
+  import TestsDefinitions._
   import Shapeless._
 
   def stream[T](parameters: Parameters, seed: Seed)(arbitrary: Gen[T]): Stream[Option[T]] = {
@@ -99,10 +101,8 @@ object ArbitraryTests extends TestSuite {
 
   /** Ask each `Gen[T]` a sequence of values, given the same parameters and initial seed,
     * and throw an exception if both sequences aren't equal. */
-  def compare[T](
-    first: Gen[T],
-    second: Gen[T]
-  ): Unit = doCompare(Parameters.default, Rng.randomSeed())(first, second)(100)
+  def compare[T](first: Gen[T], second: Gen[T]): Unit =
+    doCompare(Parameters.default, Rng.randomSeed())(first, second)(100)
 
 
   lazy val expectedSimpleArb =

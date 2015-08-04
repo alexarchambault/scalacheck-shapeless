@@ -44,13 +44,13 @@ object MkHListShrink {
   implicit def hconsShrink[H, T <: HList]
    (implicit
      headShrink: Lazy[Shrink[H]],
-     tailShrink: Lazy[MkHListShrink[T]]
+     tailShrink: MkHListShrink[T]
    ): MkHListShrink[H :: T] =
     of(
       Shrink {
         case h :: t =>
           headShrink.value.shrink(h).map(_ :: t) #:::
-            tailShrink.value.shrink.shrink(t).map(h :: _)
+            tailShrink.shrink.shrink(t).map(h :: _)
       }
     )
 }
@@ -69,7 +69,7 @@ object MkCoproductShrink {
   implicit def cconsShrink[H, T <: Coproduct]
    (implicit
      headShrink: Lazy[Shrink[H]],
-     tailShrink: Lazy[MkCoproductShrink[T]],
+     tailShrink: MkCoproductShrink[T],
      headSingletons: Lazy[Singletons[H]],
      tailSingletons: Lazy[Singletons[T]]
    ): MkCoproductShrink[H :+: T] =
@@ -78,7 +78,7 @@ object MkCoproductShrink {
         case Inl(h) =>
           tailSingletons.value().toStream.map(Inr(_)) ++ headShrink.value.shrink(h).map(Inl(_))
         case Inr(t) =>
-          headSingletons.value().toStream.map(Inl(_)) ++ tailShrink.value.shrink.shrink(t).map(Inr(_))
+          headSingletons.value().toStream.map(Inl(_)) ++ tailShrink.shrink.shrink(t).map(Inr(_))
       }
     )
 }

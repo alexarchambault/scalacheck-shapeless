@@ -38,7 +38,7 @@ object MkHListArbitrary {
   implicit def hconsMkArb[H, T <: HList, N <: Nat]
    (implicit
      headArbitrary: Lazy[Arbitrary[H]],
-     tailArbitrary: Lazy[MkHListArbitrary[T]],
+     tailArbitrary: MkHListArbitrary[T],
      length: ops.hlist.Length.Aux[T, N],
      n: ops.nat.ToInt[N]
    ): MkHListArbitrary[H :: T] =
@@ -57,7 +57,7 @@ object MkHListArbitrary {
             fromRemainder <- fromRemainderGen
             headSize = size / (n() + 1) + fromRemainder
             head <- Gen.resize(headSize, Gen.lzy(headArbitrary.value.arbitrary))
-            tail <- Gen.resize(size - headSize, Gen.lzy(tailArbitrary.value.arbitrary.arbitrary))
+            tail <- Gen.resize(size - headSize, Gen.lzy(tailArbitrary.arbitrary.arbitrary))
           } yield head :: tail
         }
       }
@@ -83,7 +83,7 @@ object MkCoproductArbitrary {
   implicit def cconsMkArb[H, T <: Coproduct, N <: Nat]
    (implicit
      headArbitrary: Lazy[Arbitrary[H]],
-     tailArbitrary: Lazy[MkCoproductArbitrary[T]],
+     tailArbitrary: MkCoproductArbitrary[T],
      length: ops.coproduct.Length.Aux[T, N],
      n: ops.nat.ToInt[N]
    ): MkCoproductArbitrary[H :+: T] =
@@ -96,7 +96,7 @@ object MkCoproductArbitrary {
 
             Gen.frequency(
               1   -> Gen.resize(size - sig, Gen.lzy(headArbitrary.value.arbitrary)).map(Inl(_)),
-              n() -> Gen.resize(size - sig, Gen.lzy(tailArbitrary.value.arbitrary.arbitrary)).map(Inr(_))
+              n() -> Gen.resize(size - sig, Gen.lzy(tailArbitrary.arbitrary.arbitrary)).map(Inr(_))
             )
         }
       }

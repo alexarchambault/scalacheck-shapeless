@@ -14,17 +14,11 @@ object CogenTests extends TestSuite {
   lazy val expectedIntStringBoolMkHListCogen =
     MkHListCogen.hconsCogen(
       Lazy(Cogen.cogenInt),
-      Lazy(
+      MkHListCogen.hconsCogen(
+        Lazy(Cogen.cogenString),
         MkHListCogen.hconsCogen(
-          Lazy(Cogen.cogenString),
-          Lazy(
-            MkHListCogen.hconsCogen(
-              Lazy(Cogen.cogenBoolean),
-              Lazy(
-                MkHListCogen.hnilCogen
-              )
-            )
-          )
+          Lazy(Cogen.cogenBoolean),
+          MkHListCogen.hnilCogen
         )
       )
     )
@@ -32,17 +26,11 @@ object CogenTests extends TestSuite {
   lazy val expectedIntStringBoolCoproductCogen =
     MkCoproductCogen.cconsCogen(
       Lazy(Cogen.cogenInt),
-      Lazy(
+      MkCoproductCogen.cconsCogen(
+        Lazy(Cogen.cogenString),
         MkCoproductCogen.cconsCogen(
-          Lazy(Cogen.cogenString),
-          Lazy(
-            MkCoproductCogen.cconsCogen(
-              Lazy(Cogen.cogenBoolean),
-              Lazy(
-                MkCoproductCogen.cnilCogen
-              )
-            )
-          )
+          Lazy(Cogen.cogenBoolean),
+          MkCoproductCogen.cnilCogen
         )
       )
     ).cogen

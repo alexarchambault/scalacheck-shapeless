@@ -42,11 +42,11 @@ object MkHListCogen {
   implicit def hconsCogen[H, T <: HList]
    (implicit
      headCogen: Lazy[Cogen[H]],
-     tailCogen: Lazy[MkHListCogen[T]]
+     tailCogen: MkHListCogen[T]
    ): MkHListCogen[H :: T] =
     of(
       Cogen({case (seed, h :: t) =>
-        tailCogen.value.cogen.perturb(headCogen.value.perturb(seed, h), t)
+        tailCogen.cogen.perturb(headCogen.value.perturb(seed, h), t)
       }: (Seed, H :: T) => Seed)
     )
 }
@@ -65,14 +65,14 @@ object MkCoproductCogen {
   implicit def cconsCogen[H, T <: Coproduct]
    (implicit
      headCogen: Lazy[Cogen[H]],
-     tailCogen: Lazy[MkCoproductCogen[T]]
+     tailCogen: MkCoproductCogen[T]
    ): MkCoproductCogen[H :+: T] =
     of(
       Cogen({
         case (seed, Inl(h)) =>
           headCogen.value.perturb(seed, h)
         case (seed, Inr(t)) =>
-          tailCogen.value.cogen.perturb(seed.next, t)
+          tailCogen.cogen.perturb(seed.next, t)
       }: (Seed, H :+: T) => Seed)
     )
 }

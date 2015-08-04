@@ -4,8 +4,17 @@ import shapeless._
 
 import derive._
 
+trait SingletonArbitraries {
 
-object Shapeless {
+  implicit def arbitrarySingletonType[S]
+   (implicit
+     w: Witness.Aux[S]
+   ): Arbitrary[S] =
+    Arbitrary(Gen.const(w.value))
+
+}
+
+trait DerivedInstances {
 
   implicit def mkArbitrary[T]
    (implicit
@@ -35,3 +44,5 @@ object Shapeless {
     priority.value.value.cogen
 
 }
+
+object Shapeless extends SingletonArbitraries with DerivedInstances

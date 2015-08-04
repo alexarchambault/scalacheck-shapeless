@@ -91,21 +91,3 @@ object MkDefaultArbitrary {
       Arbitrary(Gen.lzy(mkArb.value.arbitrary.arbitrary).map(gen.from))
     )
 }
-
-
-trait MkSingletonArbitrary[T] extends MkArbitrary[T]
-
-object MkSingletonArbitrary {
-  def apply[T](implicit mkArb: MkSingletonArbitrary[T]): MkSingletonArbitrary[T] = mkArb
-
-  def of[T](arb: => Arbitrary[T]): MkSingletonArbitrary[T] =
-    new MkSingletonArbitrary[T] {
-      def arbitrary = arb
-    }
-
-  implicit def singletonArb[S]
-   (implicit
-     w: Witness.Aux[S]
-   ): MkSingletonArbitrary[S] =
-    of(Arbitrary(Gen.const(w.value)))
-}

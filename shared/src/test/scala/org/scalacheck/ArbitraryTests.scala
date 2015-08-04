@@ -22,6 +22,14 @@ object ArbitraryTestsDefinitions extends CommonDefinitions {
   case class BaseDB(d: Double, b: Boolean) extends Base
   case class BaseLast(c: Simple) extends Base
 
+  case class CCWithSingleton(i: Int, s: Witness.`"aa"`.T)
+
+  sealed trait BaseWithSingleton
+  object BaseWithSingleton {
+    case class Main(s: Witness.`"aa"`.T) extends BaseWithSingleton
+    case class Dummy(i: Int) extends BaseWithSingleton
+  }
+
   object T1 {
     sealed abstract class Tree
     final case class Node(left: Tree, right: Tree, v: Int) extends Tree
@@ -287,6 +295,84 @@ object ArbitraryTests extends TestSuite {
           ),
           ops.coproduct.Length[BaseIS :+: BaseLast :+: CNil],
           ops.nat.ToInt[Nat._2]
+        )
+      )
+    ).arbitrary
+
+  lazy val expectedCCWithSingletonArb =
+    MkDefaultArbitrary.genericMkArb(
+      Generic[CCWithSingleton],
+      Lazy(
+        MkDefaultArbitrary.hconsMkArb(
+          Lazy(Arbitrary.arbInt),
+          Lazy(
+            MkDefaultArbitrary.hconsMkArb(
+              Lazy(Shapeless.arbitrarySingletonType[Witness.`"aa"`.T]),
+              Lazy(
+                MkDefaultArbitrary.hnilMkArb
+              ),
+              ops.hlist.Length[HNil],
+              ops.nat.ToInt[Nat._0]
+            )
+          ),
+          ops.hlist.Length[Witness.`"aa"`.T :: HNil],
+          ops.nat.ToInt[Nat._1]
+        )
+      )
+    ).arbitrary
+
+  lazy val expectedBaseWithSingletonMainArb =
+    MkDefaultArbitrary.genericMkArb(
+      Generic[BaseWithSingleton.Main],
+      Lazy(
+        MkDefaultArbitrary.hconsMkArb(
+          Lazy(Shapeless.arbitrarySingletonType[Witness.`"aa"`.T]),
+          Lazy(
+            MkDefaultArbitrary.hnilMkArb
+          ),
+          ops.hlist.Length[HNil],
+          ops.nat.ToInt[Nat._0]
+        )
+      )
+    ).arbitrary
+
+  lazy val expectedBaseWithSingletonDummyArb =
+    MkDefaultArbitrary.genericMkArb(
+      Generic[BaseWithSingleton.Dummy],
+      Lazy(
+        MkDefaultArbitrary.hconsMkArb(
+          Lazy(Arbitrary.arbInt),
+          Lazy(
+            MkDefaultArbitrary.hnilMkArb
+          ),
+          ops.hlist.Length[HNil],
+          ops.nat.ToInt[Nat._0]
+        )
+      )
+    ).arbitrary
+
+  lazy val expectedBaseWithSingletonArb =
+    MkDefaultArbitrary.genericMkArb(
+      Generic[BaseWithSingleton],
+      Lazy(
+        MkDefaultArbitrary.cconsMkArb(
+          Lazy(
+            expectedBaseWithSingletonDummyArb
+          ),
+          Lazy(
+            MkDefaultArbitrary.cconsMkArb(
+              Lazy(
+                expectedBaseWithSingletonMainArb
+              ),
+              Lazy(
+                MkDefaultArbitrary.cnilMkArb
+              ),
+              ops.coproduct.Length[CNil],
+              ops.nat.ToInt[Nat._0]
+            )
+          ),
+          ops.coproduct.Length[BaseWithSingleton.Main :+: CNil],
+          ops.nat.ToInt[Nat._1]
         )
       )
     ).arbitrary
@@ -700,6 +786,24 @@ object ArbitraryTests extends TestSuite {
       val expected = Arbitrary.arbOption(Arbitrary.arbInt)
       val gen = Arbitrary.arbitrary[Option[Int]]
       compare(expected.arbitrary, gen)
+    }
+
+    'singleton - {
+      'simple - {
+        val expected = Arbitrary(Gen.const(2: Witness.`2`.T))
+        val gen = Arbitrary.arbitrary[Witness.`2`.T]
+        compare(expected.arbitrary, gen)
+      }
+
+      'caseClass - {
+        val gen = Arbitrary.arbitrary[CCWithSingleton]
+        compare(expectedCCWithSingletonArb.arbitrary, gen)
+      }
+
+      'ADT - {
+        val gen = Arbitrary.arbitrary[BaseWithSingleton]
+        compare(expectedBaseWithSingletonArb.arbitrary, gen)
+      }
     }
 
   }

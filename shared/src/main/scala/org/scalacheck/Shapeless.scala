@@ -66,6 +66,12 @@ trait CoproductInstances {
    ): Cogen[C] =
     arb.cogen
 
+  implicit def mkCoproductShrink[C <: Coproduct]
+   (implicit
+     arb: MkCoproductShrink[C]
+   ): Shrink[C] =
+    arb.shrink
+
 }
 
 trait DerivedInstances {

@@ -18,10 +18,9 @@ trait Singletons[T] {
 
 trait LowPrioritySingletons {
   /**
-   * Fallback case if `H` cannot be built out of singletons - then
-   * `H :: T` can't either.
+   * Fallback case if `T` cannot be built out of singletons.
    */
-  implicit def hconsSingletonsNotFound[H, T <: HList]: Singletons[H :: T] =
+  implicit def singletonsNotFound[T]: Singletons[T] =
     Singletons.empty
 }
 

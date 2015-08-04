@@ -1,6 +1,6 @@
 package org.scalacheck
 
-import org.scalacheck.derive.{MkHListShrink, MkShrink}
+import org.scalacheck.derive.{MkCoproductShrink, MkHListShrink, MkShrink}
 import shapeless._
 import utest._
 import Util._
@@ -36,6 +36,30 @@ object ShrinkTests extends TestSuite {
       )
     )
 
+  lazy val expectedIntStringBoolCoproductShrink =
+    MkCoproductShrink.cconsShrink(
+      Lazy(Shrink.shrinkInt),
+      Lazy(
+        MkCoproductShrink.cconsShrink(
+          Lazy(Shrink.shrinkString),
+          Lazy(
+            MkCoproductShrink.cconsShrink(
+              Lazy(Shrink.shrinkAny[Boolean]),
+              Lazy(
+                MkCoproductShrink.cnilShrink
+              ),
+              Lazy(Singletons[Boolean]),
+              Lazy(Singletons[CNil])
+            )
+          ),
+          Lazy(Singletons[String]),
+          Lazy(Singletons[Boolean :+: CNil])
+        )
+      ),
+      Lazy(Singletons[Int]),
+      Lazy(Singletons[String :+: Boolean :+: CNil])
+    ).shrink
+
   lazy val expectedSimpleShrink =
     MkShrink.genericProductShrink(
       Generic[Simple],
@@ -70,6 +94,11 @@ object ShrinkTests extends TestSuite {
     'simpleHList - {
       val shrink = implicitly[Shrink[Int :: String :: Boolean :: HNil]]
       compare(shrink, expectedIntStringBoolShrink)
+    }
+
+    'simpleCoproduct - {
+      val shrink = implicitly[Shrink[Int :+: String :+: Boolean :+: CNil]]
+      compare(shrink, expectedIntStringBoolCoproductShrink)
     }
 
   }

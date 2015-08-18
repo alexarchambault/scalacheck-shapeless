@@ -78,7 +78,7 @@ trait DerivedInstances {
 
   implicit def mkArbitrary[T]
    (implicit
-     priority: Strict.Cached[LowPriority[
+     priority: Strict.Global[LowPriority[
        Arbitrary[T],
        MkArbitrary[T]
      ]]
@@ -87,7 +87,7 @@ trait DerivedInstances {
 
   implicit def mkShrink[T]
    (implicit
-     priority: Strict.Cached[LowPriority[
+     priority: Strict.Global[LowPriority[
        Mask[Witness.`"Shrink.shrinkAny"`.T, Shrink[T]],
        MkShrink[T]
      ]]
@@ -96,7 +96,7 @@ trait DerivedInstances {
 
   implicit def mkCogen[T]
    (implicit
-     priority: Strict.Cached[LowPriority[
+     priority: Strict.Global[LowPriority[
        Cogen[T],
        MkCogen[T]
      ]]

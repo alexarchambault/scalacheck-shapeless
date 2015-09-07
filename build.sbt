@@ -31,6 +31,7 @@ lazy val commonSettings = Seq(
 lazy val compileSettings = Seq(
   scalaVersion := "2.11.7",
   crossScalaVersions := Seq("2.10.5", "2.11.7"),
+  unmanagedSourceDirectories in Compile += (baseDirectory in Compile).value / ".." / "shared" / "src" / "main" / s"scala-${scalaBinaryVersion.value}",
   libraryDependencies += "com.lihaoyi" %%% "utest" % "0.3.0" % "test",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   resolvers ++= Seq(
@@ -39,7 +40,8 @@ lazy val compileSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     "org.scalacheck" %%% "scalacheck" % "1.13.0-e5cb830-SNAPSHOT",
-    "com.github.alexarchambault" %%% "shapeless" % "2.2.6-SNAPSHOT"
+    "com.chuusai" %%% "shapeless" % "2.3.0-SNAPSHOT",
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
   ),
   libraryDependencies ++= {
     if (scalaVersion.value.startsWith("2.10."))

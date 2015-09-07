@@ -3,6 +3,7 @@ package org.scalacheck
 import shapeless._
 
 import derive._
+import util._
 
 trait SingletonInstances {
 

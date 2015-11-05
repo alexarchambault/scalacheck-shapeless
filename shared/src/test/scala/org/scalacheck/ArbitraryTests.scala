@@ -2,7 +2,7 @@ package org.scalacheck
 
 import org.scalacheck.Gen.Parameters
 import org.scalacheck.derive.{MkCoproductArbitrary, MkHListArbitrary, MkArbitrary}
-import org.scalacheck.rng.{ Seed, Rng }
+import org.scalacheck.rng.Seed
 
 import shapeless._
 import shapeless.test.illTyped
@@ -102,7 +102,7 @@ object ArbitraryTests extends TestSuite {
   /** Ask each `Gen[T]` a sequence of values, given the same parameters and initial seed,
     * and throw an exception if both sequences aren't equal. */
   def compare[T](first: Gen[T], second: Gen[T]): Unit =
-    doCompare(Parameters.default, Rng.randomSeed())(first, second)(100)
+    doCompare(Parameters.default, Seed.random())(first, second)(100)
 
 
   lazy val expectedSimpleArb =

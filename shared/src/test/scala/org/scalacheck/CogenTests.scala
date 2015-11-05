@@ -2,7 +2,7 @@ package org.scalacheck
 
 import org.scalacheck.TestsDefinitions._
 import org.scalacheck.derive.{MkCoproductCogen, MkHListCogen, MkCogen}
-import org.scalacheck.rng.{Rng, Seed}
+import org.scalacheck.rng.Seed
 import shapeless._
 import utest._
 
@@ -61,10 +61,10 @@ object CogenTests extends TestSuite {
     assert(values.lengthCompare(min) >= 0)
 
     val firstSeeds = values.scanLeft(seed)(first.perturb)
-      .map(Rng.long)
+      .map(_.long)
       .map(_._1)
     val secondSeeds = values.scanLeft(seed)(second.perturb)
-      .map(Rng.long)
+      .map(_.long)
       .map(_._1)
     val seeds = firstSeeds zip secondSeeds
 

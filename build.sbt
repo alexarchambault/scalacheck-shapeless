@@ -12,8 +12,6 @@ lazy val scalacheckShapeless = crossProject.in(file("."))
   .settings(commonSettings: _*)
   .settings(compileSettings: _*)
   .settings(publishSettings: _*)
-  .settings(releaseSettings: _*)
-  .settings(extraReleaseSettings: _*)
   .settings(mimaSettings: _*)
   .jsSettings(scalaJSStage in Test := FastOptStage)
 
@@ -40,9 +38,8 @@ lazy val compileSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     "org.scalacheck" %%% "scalacheck" % "1.13.0-bceacad-SNAPSHOT",
-    "com.chuusai" %%% "shapeless" % "2.3.0-SNAPSHOT",
-    "com.github.alexarchambault" %%% "derive" % "0.1.0-SNAPSHOT",
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
+    "com.chuusai" %%% "shapeless" % "2.2.5",
+    "com.github.alexarchambault" %%% "shapeless-compat" % "1.0.0-M1"
   ),
   libraryDependencies ++= {
     if (scalaVersion.value.startsWith("2.10."))
@@ -91,11 +88,6 @@ lazy val noPublishSettings = Seq(
   publish := (),
   publishLocal := (),
   publishArtifact := false
-)
-
-lazy val extraReleaseSettings = Seq(
-  ReleaseKeys.versionBump := sbtrelease.Version.Bump.Bugfix,
-  sbtrelease.ReleasePlugin.ReleaseKeys.publishArtifactsAction := PgpKeys.publishSigned.value
 )
 
 lazy val mimaSettings =

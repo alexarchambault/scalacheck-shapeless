@@ -1,7 +1,7 @@
 package org.scalacheck
 
-import shapeless._
-import _root_.derive.LowPriority
+import shapeless.{ Lazy => _, _ }
+import shapeless.compat._
 
 import derive._
 import util._
@@ -80,30 +80,24 @@ trait DerivedInstances {
 
   implicit def mkArbitrary[T]
    (implicit
-     priority: Cached[Strict[LowPriority[
-       Arbitrary[T],
-       MkArbitrary[T]
-     ]]]
+     ev: Strict[LowPriority[Arbitrary[T]]],
+     priority: Strict[MkArbitrary[T]]
    ): Arbitrary[T] =
-    priority.value.value.value.arbitrary
+    priority.value.arbitrary
 
   implicit def mkShrink[T]
    (implicit
-     priority: Cached[Strict[LowPriority[
-       Mask[Witness.`"Shrink.shrinkAny"`.T, Shrink[T]],
-       MkShrink[T]
-     ]]]
+     ev: Strict[LowPriority[Ignoring[Witness.`"Shrink.shrinkAny"`.T, Shrink[T]]]],
+     priority: Strict[MkShrink[T]]
    ): Shrink[T] =
-    priority.value.value.value.shrink
+    priority.value.shrink
 
   implicit def mkCogen[T]
    (implicit
-     priority: Cached[Strict[LowPriority[
-       Cogen[T],
-       MkCogen[T]
-     ]]]
+     ev: Strict[LowPriority[Cogen[T]]],
+     priority: Strict[MkCogen[T]]
    ): Cogen[T] =
-    priority.value.value.value.cogen
+    priority.value.cogen
 
 }
 

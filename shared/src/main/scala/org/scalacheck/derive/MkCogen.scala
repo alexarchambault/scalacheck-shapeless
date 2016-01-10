@@ -2,7 +2,9 @@ package org.scalacheck
 package derive
 
 import org.scalacheck.rng.Seed
-import shapeless._
+import shapeless.compat._
+
+import shapeless.{ Lazy => _, _ }
 
 /**
  * Derives `Cogen[T]` instances for `T` an `HList`, a `Coproduct`,

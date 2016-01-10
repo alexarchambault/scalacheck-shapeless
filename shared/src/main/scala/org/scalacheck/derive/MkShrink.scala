@@ -1,7 +1,8 @@
 package org.scalacheck
 package derive
 
-import shapeless._
+import shapeless.{ Lazy => _, _ }
+import shapeless.compat._
 
 /**
  * Derives `Shrink[T]` instances for `T` an `HList`, a `Coproduct`,
@@ -91,13 +92,17 @@ object MkShrink {
       def shrink = shrink0
     }
 
+  private def lazyxmap[T, U](from: T => U, to: U => T)(st: => Shrink[T]): Shrink[U] = Shrink[U] { u: U ⇒
+    st.shrink(to(u)).map(from)
+  }
+
   implicit def genericProductShrink[P, L <: HList]
    (implicit
      gen: Generic.Aux[P, L],
      shrink: Lazy[MkHListShrink[L]]
    ): MkShrink[P] =
     of(
-      Shrink.xmap(gen.from, gen.to)(shrink.value.shrink)
+      lazyxmap(gen.from, gen.to)(shrink.value.shrink)
     )
 
   implicit def genericCoproductShrink[S, C <: Coproduct]
@@ -106,7 +111,7 @@ object MkShrink {
      shrink: Lazy[MkCoproductShrink[C]]
    ): MkShrink[S] =
     of(
-      Shrink.xmap(gen.from, gen.to)(shrink.value.shrink)
+      lazyxmap(gen.from, gen.to)(shrink.value.shrink)
     )
 
 }

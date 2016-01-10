@@ -12,8 +12,6 @@ lazy val scalacheckShapeless = crossProject.in(file("."))
   .settings(commonSettings: _*)
   .settings(compileSettings: _*)
   .settings(publishSettings: _*)
-  .settings(releaseSettings: _*)
-  .settings(extraReleaseSettings: _*)
   .settings(mimaSettings: _*)
   .jsSettings(scalaJSStage in Test := FastOptStage)
 
@@ -91,11 +89,6 @@ lazy val noPublishSettings = Seq(
   publish := (),
   publishLocal := (),
   publishArtifact := false
-)
-
-lazy val extraReleaseSettings = Seq(
-  ReleaseKeys.versionBump := sbtrelease.Version.Bump.Bugfix,
-  sbtrelease.ReleasePlugin.ReleaseKeys.publishArtifactsAction := PgpKeys.publishSigned.value
 )
 
 lazy val mimaSettings =

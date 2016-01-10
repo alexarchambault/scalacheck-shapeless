@@ -1,10 +1,11 @@
 package org.scalacheck
 
 import org.scalacheck.Gen.Parameters
-import org.scalacheck.derive.{MkCoproductArbitrary, MkHListArbitrary, MkArbitrary}
+import org.scalacheck.derive._
 import org.scalacheck.rng.Seed
 
-import shapeless._
+import shapeless.{ Lazy => _, _ }
+import shapeless.compat._
 import shapeless.test.illTyped
 
 import utest._

@@ -1,6 +1,7 @@
 package org.scalacheck
 
-import shapeless._
+import shapeless.{ Lazy => _, _ }
+import shapeless.compat._
 
 /**
  * Type class providing the instances of `T` that can be built out of

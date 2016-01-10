@@ -1,7 +1,8 @@
 package org.scalacheck
 
-import org.scalacheck.derive.{MkCoproductShrink, MkHListShrink, MkShrink}
-import shapeless._
+import org.scalacheck.derive._
+import shapeless.{ Lazy => _, _ }
+import shapeless.compat._
 import utest._
 import Util._
 

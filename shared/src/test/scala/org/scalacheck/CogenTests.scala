@@ -1,9 +1,10 @@
 package org.scalacheck
 
 import org.scalacheck.TestsDefinitions._
-import org.scalacheck.derive.{MkCoproductCogen, MkHListCogen, MkCogen}
+import org.scalacheck.derive._
 import org.scalacheck.rng.Seed
-import shapeless._
+import shapeless.{ Lazy => _, _ }
+import shapeless.compat._
 import utest._
 
 object CogenTests extends TestSuite {

@@ -1,7 +1,8 @@
 package org.scalacheck
 package derive
 
-import shapeless._
+import shapeless.{ Lazy => _, _ }
+import shapeless.compat._
 
 
 /**

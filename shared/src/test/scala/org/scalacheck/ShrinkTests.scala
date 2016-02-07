@@ -12,16 +12,16 @@ object ShrinkTests extends TestSuite {
   import TestsDefinitions._
 
   lazy val expectedListIntShrink =
-    Shrink.shrinkContainer[List, Int](identity, Shrink.shrinkInt, implicitly)
+    Shrink.shrinkContainer[List, Int](identity, Shrink.shrinkIntegral[Int], implicitly)
 
   lazy val expectedOptionIntShrink =
-    Shrink.shrinkOption(Shrink.shrinkInt)
+    Shrink.shrinkOption(Shrink.shrinkIntegral[Int])
 
   lazy val expectedIntStringBoolShrink =
     expectedIntStringBoolMkHListShrink.shrink
   lazy val expectedIntStringBoolMkHListShrink =
     MkHListShrink.hconsShrink(
-      Strict(Shrink.shrinkInt),
+      Strict(Shrink.shrinkIntegral[Int]),
       MkHListShrink.hconsShrink(
         Strict(Shrink.shrinkString),
         MkHListShrink.hconsShrink(
@@ -33,7 +33,7 @@ object ShrinkTests extends TestSuite {
 
   lazy val expectedIntStringBoolCoproductShrink =
     MkCoproductShrink.cconsShrink(
-      Strict(Shrink.shrinkInt),
+      Strict(Shrink.shrinkIntegral[Int]),
       MkCoproductShrink.cconsShrink(
         Strict(Shrink.shrinkString),
         MkCoproductShrink.cconsShrink(

@@ -61,12 +61,12 @@ resolvers ++= Seq(
 )
 
 libraryDependencies +=
-  "com.github.alexarchambault" %% "scalacheck-shapeless_1.12" % "0.3.2-SNAPSHOT"
+  "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.0.0-SNAPSHOT"
 ```
 
 (Macro paradise plugin also necessary with scala 2.10, see above.)
 
-Available for scala 2.10 and 2.11. Uses scalacheck 1.12.4 and shapeless >= 2.2. For shapeless 2.1, see the [0.1.x branch](https://github.com/alexarchambault/scalacheck-shapeless/tree/0.1.x).
+Available for scala 2.10 and 2.11. Uses scalacheck 1.13.0 and shapeless >= 2.2. For shapeless 2.1, see the [0.1.x branch](https://github.com/alexarchambault/scalacheck-shapeless/tree/0.1.x).
 
 ## See also
 

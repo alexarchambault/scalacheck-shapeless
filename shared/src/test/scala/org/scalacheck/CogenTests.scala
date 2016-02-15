@@ -3,8 +3,7 @@ package org.scalacheck
 import org.scalacheck.TestsDefinitions._
 import org.scalacheck.derive._
 import org.scalacheck.rng.Seed
-import shapeless.{ Lazy => _, _ }
-import shapeless.compat._
+import shapeless._
 import utest._
 
 object CogenTests extends TestSuite {

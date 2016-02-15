@@ -1,8 +1,7 @@
 package org.scalacheck
 package derive
 
-import shapeless.{ Lazy => _, _ }
-import shapeless.compat._
+import shapeless._
 
 /**
  * Derives `Shrink[T]` instances for `T` an `HList`, a `Coproduct`,

@@ -1,7 +1,6 @@
 package org.scalacheck
 
-import shapeless.{ Lazy => _, _ }
-import shapeless.compat._
+import shapeless._
 import utest._
 
 object SingletonsTestsDefinitions {

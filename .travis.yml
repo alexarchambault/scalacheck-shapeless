@@ -3,12 +3,14 @@ scala:
 - 2.11.7
 - 2.10.6
 jdk:
-- oraclejdk7
 - oraclejdk8
-script: sbt ++${TRAVIS_SCALA_VERSION} test $(if false; then echo "mima-report-binary-issues"; fi) $(if [[ "${TRAVIS_PULL_REQUEST}" ==
+script: sbt ++${TRAVIS_SCALA_VERSION} test:compile scalacheckShapelessJVM/test $(if false; then echo "mima-report-binary-issues"; fi) $(if [[ "${TRAVIS_PULL_REQUEST}" ==
   "false" && ${JAVA_HOME} == $(jdk_switcher home oraclejdk7) && "${TRAVIS_BRANCH}" == "master" ]]; then echo "publish"; fi)
 sudo: false
 env:
   global:
   - secure: Pu7MuoqV27IULy/jCC4XBSTApLgeW02bf/g5/3/dNiwHllc3JPhzvMpuonJajlExx9+dkdxZSA4d9HmqGvZIonoa2Z292FFLVWIQOATjzWVuZ9ZFH4l7HsDiK/SPfgh9fYKF40aEw2bmIACYu5M2MOGilk4bsLl92ff5T/tr+uc=
   - secure: K8wTOFoZ1KSlD1RnR5BhBHgE4nrLZQnX6w99GS1+kQIqRO0PG9DP5ZMHcFz3MJBnxOCs0DBA+a41SHa8TXWIY0pzXT+cY6e3gzcU0+1VCpPtU1BJ3qH+PdW5Cl0c+Nl3mQQoRWi6iDdxVV/3DhpIujsoY/boZ4aMyBUqQEvJh8s=
+branches:
+  only:
+  - master

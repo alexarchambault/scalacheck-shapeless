@@ -4,8 +4,7 @@ import org.scalacheck.Gen.Parameters
 import org.scalacheck.derive._
 import org.scalacheck.rng.Seed
 
-import shapeless.{ Lazy => _, _ }
-import shapeless.compat._
+import shapeless._
 import shapeless.test.illTyped
 
 import utest._

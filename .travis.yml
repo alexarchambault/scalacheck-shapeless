@@ -5,7 +5,7 @@ scala:
 jdk:
 - oraclejdk8
 script: sbt ++${TRAVIS_SCALA_VERSION} test:compile scalacheckShapelessJVM/test $(if false; then echo "mima-report-binary-issues"; fi) $(if [[ "${TRAVIS_PULL_REQUEST}" ==
-  "false" && ${JAVA_HOME} == $(jdk_switcher home oraclejdk7) && "${TRAVIS_BRANCH}" == "master" ]]; then echo "publish"; fi)
+  "false" && "${TRAVIS_BRANCH}" == "master" ]]; then echo "publish"; fi)
 sudo: false
 env:
   global:

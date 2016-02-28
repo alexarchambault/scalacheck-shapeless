@@ -5,13 +5,10 @@ import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 lazy val root = project.in(file("."))
   .aggregate(scalacheckShapelessJVM, scalacheckShapelessJS)
   .settings(commonSettings)
-  .settings(compileSettings)
   .settings(noPublishSettings)
 
 lazy val scalacheckShapeless = crossProject.in(file("."))
   .settings(commonSettings: _*)
-  .settings(compileSettings: _*)
-  .settings(publishSettings: _*)
   .settings(mimaSettings: _*)
   .jsSettings(scalaJSStage in Test := FastOptStage)
 
@@ -24,7 +21,7 @@ lazy val commonSettings = Seq(
   organization := "com.github.alexarchambault",
   name := coreName,
   moduleName := coreName
-)
+) ++ compileSettings ++ publishSettings
 
 lazy val compileSettings = Seq(
   scalaVersion := "2.11.7",

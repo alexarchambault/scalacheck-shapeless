@@ -44,6 +44,13 @@ trait FieldTypeInstances {
         .arbitrary
         .map(field[K](_))
     )
+
+  implicit def cogenFieldType[K, H]
+   (implicit
+     underlying: Cogen[H]
+   ): Cogen[FieldType[K, H]] =
+    underlying
+      .contramap(h => h: H)
 }
 
 trait HListInstances {

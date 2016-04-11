@@ -51,6 +51,12 @@ trait FieldTypeInstances {
    ): Cogen[FieldType[K, H]] =
     underlying
       .contramap(h => h: H)
+
+  implicit def shrinkFieldType[K, H]
+   (implicit
+     underlying: Shrink[H]
+   ): Shrink[FieldType[K, H]] =
+    Shrink.xmap[H, FieldType[K, H]](field[K](_), h => h: H)(underlying)
 }
 
 trait HListInstances {

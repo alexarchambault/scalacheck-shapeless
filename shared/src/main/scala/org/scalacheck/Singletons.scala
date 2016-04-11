@@ -2,6 +2,7 @@ package org.scalacheck
 
 import shapeless.{ Lazy => _, _ }
 import shapeless.compat._
+import shapeless.labelled._
 
 /**
  * Type class providing the instances of `T` that can be built out of
@@ -120,5 +121,11 @@ object Singletons extends LowPrioritySingletons {
      underlying: CoproductSingletons[C]
    ): Singletons[C] =
     singletons(underlying())
+
+  implicit def fieldTypeSingletons[K, H]
+   (implicit
+     underlying: Singletons[H]
+   ): Singletons[FieldType[K, H]] =
+    singletons(underlying().map(field[K](_)))
 
 }

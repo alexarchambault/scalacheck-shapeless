@@ -5,6 +5,9 @@ import org.scalacheck.derive._
 import org.scalacheck.rng.Seed
 import shapeless.{ Lazy => _, _ }
 import shapeless.compat._
+import shapeless.labelled.FieldType
+import shapeless.record.Record
+import shapeless.union.Union
 import utest._
 
 object CogenTests extends TestSuite {
@@ -40,6 +43,24 @@ object CogenTests extends TestSuite {
     MkCogen.genericProductCogen(
       Generic[Simple],
       Lazy(expectedIntStringBoolMkHListCogen)
+    ).cogen
+
+  lazy val expectetRecCogen =
+    MkHListCogen.hconsCogen[FieldType[Witness.`'i`.T, Int], Record.`'s -> String`.T](
+      cogenFieldType[Witness.`'i`.T, Int](Cogen.cogenInt),
+      MkHListCogen.hconsCogen[FieldType[Witness.`'s`.T, String], HNil](
+        cogenFieldType[Witness.`'s`.T, String](Cogen.cogenString),
+        MkHListCogen.hnilCogen
+      )
+    ).cogen
+
+  lazy val expectedUnionCogen =
+    MkCoproductCogen.cconsCogen[FieldType[Witness.`'i`.T, Int], Union.`'s -> String`.T](
+      cogenFieldType[Witness.`'i`.T, Int](Cogen.cogenInt),
+      MkCoproductCogen.cconsCogen[FieldType[Witness.`'s`.T, String], CNil](
+        cogenFieldType[Witness.`'s`.T, String](Cogen.cogenString),
+        MkCoproductCogen.cnilCogen
+      )
     ).cogen
 
 
@@ -139,6 +160,16 @@ object CogenTests extends TestSuite {
     'simpleCoproduct - {
       val cogen = Cogen[Int :+: String :+: Boolean :+: CNil]
       compare(expectedIntStringBoolCoproductCogen, cogen)
+    }
+
+    'simpleRec - {
+      val cogen = Cogen[Rec]
+      compare(expectetRecCogen, cogen)
+    }
+
+    'simpleUnion - {
+      val cogen = Cogen[Un]
+      compare(expectedUnionCogen, cogen)
     }
 
   }

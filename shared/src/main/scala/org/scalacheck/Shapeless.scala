@@ -1,6 +1,7 @@
 package org.scalacheck
 
 import shapeless.{ Lazy => _, _ }
+import shapeless.labelled._
 import shapeless.compat._
 
 import derive._
@@ -30,6 +31,32 @@ trait SingletonInstances {
       // so that case objects are returned the same Cogen here and when derived through Generic.
       .contramap[Unit](identity)
       .contramap[S](_ => ())
+}
+
+trait FieldTypeInstances {
+
+  implicit def arbitraryFieldType[K, H]
+   (implicit
+     underlying: Arbitrary[H]
+   ): Arbitrary[FieldType[K, H]] =
+    Arbitrary(
+      underlying
+        .arbitrary
+        .map(field[K](_))
+    )
+
+  implicit def cogenFieldType[K, H]
+   (implicit
+     underlying: Cogen[H]
+   ): Cogen[FieldType[K, H]] =
+    underlying
+      .contramap(h => h: H)
+
+  implicit def shrinkFieldType[K, H]
+   (implicit
+     underlying: Shrink[H]
+   ): Shrink[FieldType[K, H]] =
+    Shrink.xmap[H, FieldType[K, H]](field[K](_), h => h: H)(underlying)
 }
 
 trait HListInstances {
@@ -106,3 +133,4 @@ object Shapeless
   with HListInstances
   with CoproductInstances
   with DerivedInstances
+  with FieldTypeInstances

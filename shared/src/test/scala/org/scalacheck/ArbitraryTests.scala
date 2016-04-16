@@ -5,6 +5,9 @@ import org.scalacheck.derive._
 import org.scalacheck.rng.Seed
 
 import shapeless._
+import shapeless.labelled.FieldType
+import shapeless.record._
+import shapeless.union._
 import shapeless.test.illTyped
 
 import utest._
@@ -56,6 +59,12 @@ object TestsDefinitions {
   // Not supporting this one
   // final class Bar extends Foo
   // final class Baz(i1: Int)(s1: String) extends Foo
+
+  type L = Int :: String :: HNil
+  type Rec = Record.`'i -> Int, 's -> String`.T
+
+  type C0 = Int :+: String :+: CNil
+  type Un = Union.`'i -> Int, 's -> String`.T
 
 
   object NoTCDefinitions {
@@ -582,6 +591,58 @@ object ArbitraryTests extends TestSuite {
       )
     ).arbitrary
 
+  lazy val expectetLArbitrary =
+    MkHListArbitrary.hconsMkArb(
+      Arbitrary.arbInt,
+      MkHListArbitrary.hconsMkArb(
+        Arbitrary.arbString,
+        MkHListArbitrary.hnilMkArb,
+        ops.hlist.Length.hnilLength[HNil],
+        ops.nat.ToInt[Nat._0]
+      ),
+      ops.hlist.Length.hlistLength[String, HNil, Nat._0],
+      ops.nat.ToInt[Nat._1]
+    ).arbitrary
+
+  lazy val expectetRecArbitrary: Arbitrary[Rec] =
+    MkHListArbitrary.hconsMkArb[FieldType[Witness.`'i`.T, Int], Record.`'s -> String`.T, Nat._1](
+      arbitraryFieldType[Witness.`'i`.T, Int](Arbitrary.arbInt),
+      MkHListArbitrary.hconsMkArb[FieldType[Witness.`'s`.T, String], HNil, Nat._0](
+        arbitraryFieldType[Witness.`'s`.T, String](Arbitrary.arbString),
+        MkHListArbitrary.hnilMkArb,
+        ops.hlist.Length.hnilLength[HNil],
+        ops.nat.ToInt[Nat._0]
+      ),
+      ops.hlist.Length.hlistLength[FieldType[Witness.`'s`.T, String], HNil, Nat._0],
+      ops.nat.ToInt[Nat._1]
+    ).arbitrary
+
+  lazy val expectetC0Arbitrary =
+    MkCoproductArbitrary.cconsMkArb(
+      Arbitrary.arbInt,
+      MkCoproductArbitrary.cconsMkArb(
+        Arbitrary.arbString,
+        MkCoproductArbitrary.cnilMkArb,
+        ops.coproduct.Length.cnilLength,
+        ops.nat.ToInt[Nat._0]
+      ),
+      ops.coproduct.Length.coproductLength[String, CNil, Nat._0],
+      ops.nat.ToInt[Nat._1]
+    ).arbitrary
+
+  lazy val expectedUnionArbitrary: Arbitrary[Un] =
+    MkCoproductArbitrary.cconsMkArb[FieldType[Witness.`'i`.T, Int], Union.`'s -> String`.T, Nat._1](
+      arbitraryFieldType[Witness.`'i`.T, Int](Arbitrary.arbInt),
+      MkCoproductArbitrary.cconsMkArb[FieldType[Witness.`'s`.T, String], CNil, Nat._0](
+        arbitraryFieldType[Witness.`'s`.T, String](Arbitrary.arbString),
+        MkCoproductArbitrary.cnilMkArb,
+        ops.coproduct.Length.cnilLength,
+        ops.nat.ToInt[Nat._0]
+      ),
+      ops.coproduct.Length.coproductLength[FieldType[Witness.`'s`.T, String], CNil, Nat._0],
+      ops.nat.ToInt[Nat._1]
+    ).arbitrary
+
 
   val tests = TestSuite {
 
@@ -708,6 +769,28 @@ object ArbitraryTests extends TestSuite {
       'ADT - {
         val gen = Arbitrary.arbitrary[BaseWithSingleton]
         compare(expectedBaseWithSingletonArb.arbitrary, gen)
+      }
+    }
+
+    'shapeless - {
+      'hlist - {
+        val gen = Arbitrary.arbitrary[L]
+        compare(expectetLArbitrary.arbitrary, gen)
+      }
+
+      'record - {
+        val gen = Arbitrary.arbitrary[Rec]
+        compare(expectetRecArbitrary.arbitrary, gen)
+      }
+
+      'copproduct - {
+        val gen = Arbitrary.arbitrary[C0]
+        compare(expectetC0Arbitrary.arbitrary, gen)
+      }
+
+      'union - {
+        val gen = Arbitrary.arbitrary[Un]
+        compare(expectedUnionArbitrary.arbitrary, gen)
       }
     }
 

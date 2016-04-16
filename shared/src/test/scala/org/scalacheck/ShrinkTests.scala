@@ -2,6 +2,10 @@ package org.scalacheck
 
 import org.scalacheck.derive._
 import shapeless._
+import shapeless.labelled._
+import shapeless.record.Record
+import shapeless.union.Union
+
 import utest._
 import Util._
 
@@ -56,6 +60,29 @@ object ShrinkTests extends TestSuite {
       )
     ).shrink
 
+  lazy val expectedRecShrink =
+    MkHListShrink.hconsShrink[FieldType[Witness.`'i`.T, Int], Record.`'s -> String`.T](
+      shrinkFieldType[Witness.`'i`.T, Int](Shrink.shrinkIntegral[Int]),
+      MkHListShrink.hconsShrink[FieldType[Witness.`'s`.T, String], HNil](
+        shrinkFieldType[Witness.`'s`.T, String](Shrink.shrinkString),
+        MkHListShrink.hnilShrink
+      )
+    ).shrink
+
+  lazy val expectedUnionShrink =
+    MkCoproductShrink.cconsShrink[FieldType[Witness.`'i`.T, Int], Union.`'s -> String`.T](
+      shrinkFieldType[Witness.`'i`.T, Int](Shrink.shrinkIntegral[Int]),
+      MkCoproductShrink.cconsShrink[FieldType[Witness.`'s`.T, String], CNil](
+        shrinkFieldType[Witness.`'s`.T, String](Shrink.shrinkString),
+        MkCoproductShrink.cnilShrink,
+        Singletons[FieldType[Witness.`'s`.T, String]],
+        Singletons[CNil]
+      ),
+      Singletons[FieldType[Witness.`'i`.T, Int]],
+      Singletons[Union.`'s -> String`.T]
+    ).shrink
+
+
   def compare[T: Arbitrary](first: Shrink[T], second: Shrink[T]): Unit =
     Prop.forAll {
       t: T =>
@@ -87,6 +114,16 @@ object ShrinkTests extends TestSuite {
     'simpleCoproduct - {
       val shrink = implicitly[Shrink[Int :+: String :+: Boolean :+: CNil]]
       compare(shrink, expectedIntStringBoolCoproductShrink)
+    }
+
+    'simpleRecord - {
+      val shrink = implicitly[Shrink[Rec]]
+      compare(shrink, expectedRecShrink)
+    }
+
+    'simpleUnion - {
+      val shrink = implicitly[Shrink[Un]]
+      compare(shrink, expectedUnionShrink)
     }
 
   }

@@ -4,7 +4,7 @@ scala:
 - 2.10.6
 jdk:
 - oraclejdk8
-script: sbt ++${TRAVIS_SCALA_VERSION} test:compile scalacheckShapelessJVM/test $(if false; then echo "mima-report-binary-issues"; fi) $(if [[ "${TRAVIS_PULL_REQUEST}" ==
+script: sbt -batch ++${TRAVIS_SCALA_VERSION} test:compile testJVM/test $(if false; then echo "mima-report-binary-issues"; fi) $(if [[ "${TRAVIS_PULL_REQUEST}" ==
   "false" && "${TRAVIS_BRANCH}" == "scalacheck-shapeless-1.1" ]]; then echo "publish"; fi)
 sudo: false
 env:

@@ -1,44 +1,58 @@
-import com.typesafe.sbt.pgp.PgpKeys
+
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 
-lazy val root = project.in(file("."))
-  .aggregate(scalacheckShapelessJVM, scalacheckShapelessJS)
+lazy val `scalacheck-shapeless` = project.in(file("."))
+  .aggregate(coreJVM, coreJS, testJVM, testJS)
   .settings(commonSettings)
   .settings(noPublishSettings)
 
-lazy val scalacheckShapeless = crossProject.in(file("."))
+lazy val core = crossProject
   .settings(commonSettings: _*)
   .settings(mimaSettings: _*)
+  .settings(
+    name := coreName,
+    moduleName := coreName,
+    libraryDependencies ++= Seq(
+      "org.scalacheck" %%% "scalacheck" % "1.13.1",
+      "com.chuusai" %%% "shapeless" % "2.3.1"
+    )
+  )
   .jsSettings(
     postLinkJSEnv := NodeJSEnv().value,
     scalaJSUseRhino in Global := false,
     scalaJSStage in Test := FastOptStage
   )
 
-lazy val scalacheckShapelessJVM = scalacheckShapeless.jvm
-lazy val scalacheckShapelessJS = scalacheckShapeless.js
+lazy val coreJVM = core.jvm
+lazy val coreJS = core.js
+
+lazy val test = crossProject
+  .dependsOn(core)
+  .settings(commonSettings: _*)
+  .settings(noPublishSettings: _*)
+  .settings(
+    libraryDependencies += "com.lihaoyi" %%% "utest" % "0.3.0" % "test",
+    testFrameworks += new TestFramework("utest.runner.Framework")
+  )
+  .jsSettings(
+    scalaJSStage in Test := FastOptStage
+  )
+
+lazy val testJVM = test.jvm
+lazy val testJS = test.js
 
 lazy val coreName = "scalacheck-shapeless_1.13"
 
 lazy val commonSettings = Seq(
-  organization := "com.github.alexarchambault",
-  name := coreName,
-  moduleName := coreName
+  organization := "com.github.alexarchambault"
 ) ++ compileSettings ++ publishSettings
 
 lazy val compileSettings = Seq(
   scalaVersion := "2.11.8",
-  unmanagedSourceDirectories in Compile += (baseDirectory in Compile).value / ".." / "shared" / "src" / "main" / s"scala-${scalaBinaryVersion.value}",
-  libraryDependencies += "com.lihaoyi" %%% "utest" % "0.3.0" % "test",
-  testFrameworks += new TestFramework("utest.runner.Framework"),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
     Resolver.sonatypeRepo("snapshots")
-  ),
-  libraryDependencies ++= Seq(
-    "org.scalacheck" %%% "scalacheck" % "1.13.1",
-    "com.chuusai" %%% "shapeless" % "2.3.1"
   ),
   libraryDependencies ++= {
     if (scalaVersion.value.startsWith("2.10."))
@@ -74,12 +88,12 @@ lazy val publishSettings = Seq(
     else
       "releases" at nexus + "service/local/staging/deploy/maven2"
   },
-  credentials += {
+  credentials ++= {
     Seq("SONATYPE_USER", "SONATYPE_PASS").map(sys.env.get) match {
       case Seq(Some(user), Some(pass)) =>
-        Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
+        Seq(Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass))
       case _ =>
-        Credentials(Path.userHome / ".ivy2" / ".credentials")
+        Seq()
     }
   }
 )

@@ -3,11 +3,11 @@ import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 
 lazy val root = project.in(file("."))
-  .aggregate(scalacheckShapelessJVM, scalacheckShapelessJS)
+  .aggregate(coreJVM, coreJS)
   .settings(commonSettings)
   .settings(noPublishSettings)
 
-lazy val scalacheckShapeless = crossProject.in(file("."))
+lazy val core = crossProject
   .settings(commonSettings: _*)
   .settings(mimaSettings: _*)
   .jsSettings(
@@ -16,8 +16,8 @@ lazy val scalacheckShapeless = crossProject.in(file("."))
     scalaJSStage in Test := FastOptStage
   )
 
-lazy val scalacheckShapelessJVM = scalacheckShapeless.jvm
-lazy val scalacheckShapelessJS = scalacheckShapeless.js
+lazy val coreJVM = core.jvm
+lazy val coreJS = core.js
 
 lazy val coreName = "scalacheck-shapeless_1.13"
 

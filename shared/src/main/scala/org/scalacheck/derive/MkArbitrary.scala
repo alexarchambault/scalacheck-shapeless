@@ -19,6 +19,33 @@ trait MkArbitrary[T] {
   def arbitrary: Arbitrary[T]
 }
 
+object MkArbitrary {
+  def apply[T](implicit mkArb: MkArbitrary[T]): MkArbitrary[T] = mkArb
+
+  def instance[T](arb: => Arbitrary[T]): MkArbitrary[T] =
+    new MkArbitrary[T] {
+      def arbitrary = arb
+    }
+
+  implicit def genericProduct[P, L <: HList]
+   (implicit
+     gen: Generic.Aux[P, L],
+     mkArb: Lazy[MkHListArbitrary[L]]
+   ): MkArbitrary[P] =
+    instance(
+      Arbitrary(Gen.lzy(mkArb.value.arbitrary.arbitrary).map(gen.from))
+    )
+
+  implicit def genericCoproduct[S, C <: Coproduct]
+   (implicit
+     gen: Generic.Aux[S, C],
+     mkArb: Lazy[MkCoproductArbitrary[C]]
+   ): MkArbitrary[S] =
+    instance(
+      Arbitrary(Gen.lzy(mkArb.value.arbitrary.arbitrary).map(gen.from))
+    )
+}
+
 
 trait MkHListArbitrary[L <: HList] {
   /** `Arbitrary[T]` instance built by this `MkArbitraryHList[T]` */
@@ -28,22 +55,22 @@ trait MkHListArbitrary[L <: HList] {
 object MkHListArbitrary {
   def apply[L <: HList](implicit mkArb: MkHListArbitrary[L]): MkHListArbitrary[L] = mkArb
 
-  def of[L <: HList](arb: => Arbitrary[L]): MkHListArbitrary[L] =
+  def instance[L <: HList](arb: => Arbitrary[L]): MkHListArbitrary[L] =
     new MkHListArbitrary[L] {
       def arbitrary = arb
     }
 
-  implicit val hnilMkArb: MkHListArbitrary[HNil] =
-    of(Arbitrary(Gen.const(HNil)))
+  implicit val hnil: MkHListArbitrary[HNil] =
+    instance(Arbitrary(Gen.const(HNil)))
 
-  implicit def hconsMkArb[H, T <: HList, N <: Nat]
+  implicit def hcons[H, T <: HList, N <: Nat]
    (implicit
      headArbitrary: Strict[Arbitrary[H]],
      tailArbitrary: MkHListArbitrary[T],
      length: ops.hlist.Length.Aux[T, N],
      n: ops.nat.ToInt[N]
    ): MkHListArbitrary[H :: T] =
-    of(
+    instance(
       Arbitrary {
         Gen.sized { size =>
           val sig = math.signum(size)
@@ -73,22 +100,22 @@ trait MkCoproductArbitrary[C <: Coproduct] {
 object MkCoproductArbitrary {
   def apply[C <: Coproduct](implicit mkArb: MkCoproductArbitrary[C]): MkCoproductArbitrary[C] = mkArb
 
-  def of[C <: Coproduct](arb: => Arbitrary[C]): MkCoproductArbitrary[C] =
+  def instance[C <: Coproduct](arb: => Arbitrary[C]): MkCoproductArbitrary[C] =
     new MkCoproductArbitrary[C] {
       def arbitrary = arb
     }
 
-  implicit val cnilMkArb: MkCoproductArbitrary[CNil] =
-    of(Arbitrary(Gen.fail))
+  implicit val cnil: MkCoproductArbitrary[CNil] =
+    instance(Arbitrary(Gen.fail))
 
-  implicit def cconsMkArb[H, T <: Coproduct, N <: Nat]
+  implicit def ccons[H, T <: Coproduct, N <: Nat]
    (implicit
      headArbitrary: Strict[Arbitrary[H]],
      tailArbitrary: MkCoproductArbitrary[T],
      length: ops.coproduct.Length.Aux[T, N],
      n: ops.nat.ToInt[N]
    ): MkCoproductArbitrary[H :+: T] =
-    of(
+    instance(
       Arbitrary {
         Gen.sized {
           case 0 => Gen.fail
@@ -101,33 +128,5 @@ object MkCoproductArbitrary {
             )
         }
       }
-    )
-}
-
-
-object MkArbitrary {
-  def apply[T](implicit mkArb: MkArbitrary[T]): MkArbitrary[T] = mkArb
-
-  def of[T](arb: => Arbitrary[T]): MkArbitrary[T] =
-    new MkArbitrary[T] {
-      def arbitrary = arb
-    }
-
-  implicit def genericProductMkArb[P, L <: HList]
-   (implicit
-     gen: Generic.Aux[P, L],
-     mkArb: Lazy[MkHListArbitrary[L]]
-   ): MkArbitrary[P] =
-    of(
-      Arbitrary(Gen.lzy(mkArb.value.arbitrary.arbitrary).map(gen.from))
-    )
-
-  implicit def genericCoproductMkArb[S, C <: Coproduct]
-   (implicit
-     gen: Generic.Aux[S, C],
-     mkArb: Lazy[MkCoproductArbitrary[C]]
-   ): MkArbitrary[S] =
-    of(
-      Arbitrary(Gen.lzy(mkArb.value.arbitrary.arbitrary).map(gen.from))
     )
 }

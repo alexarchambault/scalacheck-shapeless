@@ -16,50 +16,50 @@ object CogenTests extends TestSuite {
   lazy val expectedIntStringBoolCogen =
     expectedIntStringBoolMkHListCogen.cogen
   lazy val expectedIntStringBoolMkHListCogen =
-    MkHListCogen.hconsCogen(
+    MkHListCogen.hcons(
       Strict(Cogen.cogenInt),
-      MkHListCogen.hconsCogen(
+      MkHListCogen.hcons(
         Strict(Cogen.cogenString),
-        MkHListCogen.hconsCogen(
+        MkHListCogen.hcons(
           Strict(Cogen.cogenBoolean),
-          MkHListCogen.hnilCogen
+          MkHListCogen.hnil
         )
       )
     )
 
   lazy val expectedIntStringBoolCoproductCogen =
-    MkCoproductCogen.cconsCogen(
+    MkCoproductCogen.ccons(
       Strict(Cogen.cogenInt),
-      MkCoproductCogen.cconsCogen(
+      MkCoproductCogen.ccons(
         Strict(Cogen.cogenString),
-        MkCoproductCogen.cconsCogen(
+        MkCoproductCogen.ccons(
           Strict(Cogen.cogenBoolean),
-          MkCoproductCogen.cnilCogen
+          MkCoproductCogen.cnil
         )
       )
     ).cogen
 
   lazy val expectedSimpleCogen =
-    MkCogen.genericProductCogen(
+    MkCogen.genericProduct(
       Generic[Simple],
       Lazy(expectedIntStringBoolMkHListCogen)
     ).cogen
 
   lazy val expectetRecCogen =
-    MkHListCogen.hconsCogen[FieldType[Witness.`'i`.T, Int], Record.`'s -> String`.T](
+    MkHListCogen.hcons[FieldType[Witness.`'i`.T, Int], Record.`'s -> String`.T](
       cogenFieldType[Witness.`'i`.T, Int](Cogen.cogenInt),
-      MkHListCogen.hconsCogen[FieldType[Witness.`'s`.T, String], HNil](
+      MkHListCogen.hcons[FieldType[Witness.`'s`.T, String], HNil](
         cogenFieldType[Witness.`'s`.T, String](Cogen.cogenString),
-        MkHListCogen.hnilCogen
+        MkHListCogen.hnil
       )
     ).cogen
 
   lazy val expectedUnionCogen =
-    MkCoproductCogen.cconsCogen[FieldType[Witness.`'i`.T, Int], Union.`'s -> String`.T](
+    MkCoproductCogen.ccons[FieldType[Witness.`'i`.T, Int], Union.`'s -> String`.T](
       cogenFieldType[Witness.`'i`.T, Int](Cogen.cogenInt),
-      MkCoproductCogen.cconsCogen[FieldType[Witness.`'s`.T, String], CNil](
+      MkCoproductCogen.ccons[FieldType[Witness.`'s`.T, String], CNil](
         cogenFieldType[Witness.`'s`.T, String](Cogen.cogenString),
-        MkCoproductCogen.cnilCogen
+        MkCoproductCogen.cnil
       )
     ).cogen
 
@@ -119,9 +119,9 @@ object CogenTests extends TestSuite {
 
     'empty - {
       val expectedCogen =
-        MkCogen.genericProductCogen(
+        MkCogen.genericProduct(
           Generic[Empty.type],
-          Lazy(MkHListCogen.hnilCogen)
+          Lazy(MkHListCogen.hnil)
         ).cogen
 
       val cogen = Cogen[Empty.type]
@@ -138,9 +138,9 @@ object CogenTests extends TestSuite {
 
     'emptyCC - {
       val expectedCogen =
-        MkCogen.genericProductCogen(
+        MkCogen.genericProduct(
           Generic[EmptyCC],
-          Lazy(MkHListCogen.hnilCogen)
+          Lazy(MkHListCogen.hnil)
         ).cogen
 
       val cogen = Cogen[EmptyCC]

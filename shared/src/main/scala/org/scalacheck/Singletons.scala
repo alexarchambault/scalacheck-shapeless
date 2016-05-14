@@ -18,6 +18,57 @@ trait Singletons[T] {
   def apply(): Seq[T]
 }
 
+trait LowPrioritySingletons {
+  /**
+    * Fallback case if `T` cannot be built out of singletons.
+    */
+  implicit def singletonsNotFound[T]: Singletons[T] =
+    Singletons.empty
+}
+
+object Singletons extends LowPrioritySingletons {
+  def apply[T](implicit s: Singletons[T]): Singletons[T] = s
+
+  def instance[T](s: => Seq[T]): Singletons[T] =
+    new Singletons[T] {
+      def apply() = s
+    }
+
+  def empty[T]: Singletons[T] = instance(Seq.empty)
+
+  implicit def genericProduct[P, L <: HList]
+   (implicit
+     gen: Generic.Aux[P, L],
+     reprSingletons: Lazy[HListSingletons[L]]
+   ): Singletons[P] =
+    instance(reprSingletons.value().map(gen.from))
+
+  implicit def genericCoproduct[S, C <: Coproduct]
+   (implicit
+     gen: Generic.Aux[S, C],
+     reprSingletons: Lazy[CoproductSingletons[C]]
+   ): Singletons[S] =
+    instance(reprSingletons.value().map(gen.from))
+
+  implicit def hlist[L <: HList]
+   (implicit
+     underlying: HListSingletons[L]
+   ): Singletons[L] =
+    instance(underlying())
+
+  implicit def coproduct[C <: Coproduct]
+   (implicit
+     underlying: CoproductSingletons[C]
+   ): Singletons[C] =
+    instance(underlying())
+
+  implicit def fieldType[K, H]
+   (implicit
+     underlying: Singletons[H]
+   ): Singletons[FieldType[K, H]] =
+    instance(underlying().map(field[K](_)))
+}
+
 trait HListSingletons[L <: HList] {
   /**
    * Instances of `L` that can be built out of singletons, or
@@ -26,32 +77,24 @@ trait HListSingletons[L <: HList] {
   def apply(): Seq[L]
 }
 
-trait CoproductSingletons[C <: Coproduct] {
-  /**
-   * Instances of `C` that can be built out of singletons, or
-   * an empty sequence if none were found.
-   */
-  def apply(): Seq[C]
-}
-
 object HListSingletons {
   def apply[L <: HList](implicit s: HListSingletons[L]): HListSingletons[L] = s
 
-  def singletons[L <: HList](s: => Seq[L]): HListSingletons[L] =
+  def instance[L <: HList](s: => Seq[L]): HListSingletons[L] =
     new HListSingletons[L] {
       def apply() = s
     }
 
 
-  implicit val hnilSingletons: HListSingletons[HNil] =
-    singletons(Seq(HNil))
+  implicit val hnil: HListSingletons[HNil] =
+    instance(Seq(HNil))
 
-  implicit def hconsSingletonsFound[H, T <: HList]
+  implicit def hconsFound[H, T <: HList]
    (implicit
      headSingletons: Strict[Singletons[H]],
      tailSingletons: HListSingletons[T]
    ): HListSingletons[H :: T] =
-    singletons {
+    instance {
       for {
         h <- headSingletons.value()
         t <- tailSingletons()
@@ -59,73 +102,29 @@ object HListSingletons {
     }
 }
 
+trait CoproductSingletons[C <: Coproduct] {
+  /**
+    * Instances of `C` that can be built out of singletons, or
+    * an empty sequence if none were found.
+    */
+  def apply(): Seq[C]
+}
+
 object CoproductSingletons {
   def apply[C <: Coproduct](implicit s: CoproductSingletons[C]): CoproductSingletons[C] = s
 
-  def singletons[C <: Coproduct](s: => Seq[C]): CoproductSingletons[C] =
+  def instance[C <: Coproduct](s: => Seq[C]): CoproductSingletons[C] =
     new CoproductSingletons[C] {
       def apply() = s
     }
 
-  implicit val cnilSingletons: CoproductSingletons[CNil] =
-    singletons(Seq.empty)
+  implicit val cnil: CoproductSingletons[CNil] =
+    instance(Seq.empty)
 
-  implicit def cconsSingletons[H, T <: Coproduct]
+  implicit def ccons[H, T <: Coproduct]
    (implicit
      headSingletons: Strict[Singletons[H]],
      tailSingletons: CoproductSingletons[T]
    ): CoproductSingletons[H :+: T] =
-    singletons(headSingletons.value().map(Inl(_)) ++ tailSingletons().map(Inr(_)))
-}
-
-trait LowPrioritySingletons {
-  /**
-   * Fallback case if `T` cannot be built out of singletons.
-   */
-  implicit def singletonsNotFound[T]: Singletons[T] =
-    Singletons.empty
-}
-
-object Singletons extends LowPrioritySingletons {
-  def apply[T](implicit s: Singletons[T]): Singletons[T] = s
-
-  def singletons[T](s: => Seq[T]): Singletons[T] =
-    new Singletons[T] {
-      def apply() = s
-    }
-
-  def empty[T]: Singletons[T] = singletons(Seq.empty)
-
-  implicit def genericProductSingletons[P, L <: HList]
-   (implicit
-     gen: Generic.Aux[P, L],
-     reprSingletons: Lazy[HListSingletons[L]]
-   ): Singletons[P] =
-    singletons(reprSingletons.value().map(gen.from))
-
-  implicit def genericCoproductSingletons[S, C <: Coproduct]
-   (implicit
-     gen: Generic.Aux[S, C],
-     reprSingletons: Lazy[CoproductSingletons[C]]
-   ): Singletons[S] =
-    singletons(reprSingletons.value().map(gen.from))
-
-  implicit def hlistSingletons[L <: HList]
-   (implicit
-     underlying: HListSingletons[L]
-   ): Singletons[L] =
-    singletons(underlying())
-
-  implicit def coproductSingletons[C <: Coproduct]
-   (implicit
-     underlying: CoproductSingletons[C]
-   ): Singletons[C] =
-    singletons(underlying())
-
-  implicit def fieldTypeSingletons[K, H]
-   (implicit
-     underlying: Singletons[H]
-   ): Singletons[FieldType[K, H]] =
-    singletons(underlying().map(field[K](_)))
-
+    instance(headSingletons.value().map(Inl(_)) ++ tailSingletons().map(Inr(_)))
 }

@@ -38,7 +38,7 @@ lazy val compileSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     "org.scalacheck" %%% "scalacheck" % "1.13.1",
-    "com.chuusai" %%% "shapeless" % "2.3.0"
+    "com.chuusai" %%% "shapeless" % "2.3.1"
   ),
   libraryDependencies ++= {
     if (scalaVersion.value.startsWith("2.10."))

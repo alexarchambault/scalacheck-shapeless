@@ -5,7 +5,6 @@ import shapeless.labelled._
 import shapeless.compat._
 
 import derive._
-import util._
 
 trait SingletonInstances {
 

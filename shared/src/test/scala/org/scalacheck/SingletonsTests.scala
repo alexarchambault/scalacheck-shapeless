@@ -2,7 +2,10 @@ package org.scalacheck
 
 import shapeless.{ Lazy => _, _ }
 import shapeless.compat._
+
 import utest._
+
+import Util.validateSingletons
 
 object SingletonsTestsDefinitions {
 
@@ -27,34 +30,29 @@ object SingletonsTestsDefinitions {
 object SingletonsTests extends TestSuite {
   import SingletonsTestsDefinitions._
 
-  def validate[T: Singletons](expected: T*) = {
-    val found = Singletons[T].apply()
-    assert(found == expected)
-  }
-
   val tests = TestSuite {
     'hnil - {
-      validate[HNil](HNil)
+      validateSingletons[HNil](HNil)
     }
 
     'caseObject - {
-      validate[CaseObj.type](CaseObj)
+      validateSingletons[CaseObj.type](CaseObj)
     }
 
     'emptyCaseClass - {
-      validate[Empty](Empty())
+      validateSingletons[Empty](Empty())
     }
 
     'adt - {
-      validate[Base](BaseEmpty(), BaseObj)
+      validateSingletons[Base](BaseEmpty(), BaseObj)
     }
 
     'adtNotAllSingletons - {
-      validate[BaseMore](BaseMoreEmpty(), BaseMoreObj)
+      validateSingletons[BaseMore](BaseMoreEmpty(), BaseMoreObj)
     }
 
     'nonSingletonCaseClass - {
-      validate[NonSingleton]()
+      validateSingletons[NonSingleton]()
     }
   }
 

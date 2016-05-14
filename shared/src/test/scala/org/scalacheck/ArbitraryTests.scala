@@ -1,8 +1,6 @@
 package org.scalacheck
 
-import org.scalacheck.Gen.Parameters
 import org.scalacheck.derive._
-import org.scalacheck.rng.Seed
 
 import shapeless.{ Lazy => _, _ }
 import shapeless.compat._
@@ -12,6 +10,8 @@ import shapeless.union._
 import shapeless.test.illTyped
 
 import utest._
+
+import Util._
 
 object TestsDefinitions {
 
@@ -85,66 +85,35 @@ object ArbitraryTests extends TestSuite {
   import TestsDefinitions._
   import Shapeless._
 
-  def stream[T](parameters: Parameters, seed: Seed)(arbitrary: Gen[T]): Stream[Option[T]] = {
-    def helper(seed: Seed): Stream[Option[T]] = {
-      val r = arbitrary.doApply(parameters, seed)
-      r.retrieve #:: helper(r.seed)
-    }
-
-    helper(seed)
-  }
-
-  def doCompare[T](
-    parameters: Parameters,
-    seed: Seed )(
-    first: Gen[T],
-    second: Gen[T] )(
-    len: Int
-  ): Unit = {
-    val generated =
-      stream(parameters, seed)(first)
-        .zip(stream(parameters, seed)(second))
-        .take(len)
-
-    assert(generated.forall{case (a, b) => a == b})
-  }
-
-  /** Ask each `Gen[T]` a sequence of values, given the same parameters and initial seed,
-    * and throw an exception if both sequences aren't equal. */
-  def compare[T](first: Gen[T], second: Gen[T]): Unit =
-    doCompare(Parameters.default, Seed.random())(first, second)(100)
-
 
   lazy val expectedSimpleArb =
     MkArbitrary.genericProduct(
       Generic[Simple],
-      Lazy(
+      MkHListArbitrary.hcons(
+        Arbitrary.arbInt,
         MkHListArbitrary.hcons(
-          Strict(Arbitrary.arbInt),
+          Arbitrary.arbString,
           MkHListArbitrary.hcons(
-            Strict(Arbitrary.arbString),
-            MkHListArbitrary.hcons(
-              Strict(Arbitrary.arbBool),
-              MkHListArbitrary.hnil,
-              ops.hlist.Length[HNil],
-              ops.nat.ToInt[Nat._0]
-            ),
-            ops.hlist.Length[Boolean :: HNil],
-            ops.nat.ToInt[Nat._1]
+            Arbitrary.arbBool,
+            MkHListArbitrary.hnil,
+            ops.hlist.Length[HNil],
+            ops.nat.ToInt[Nat._0]
           ),
-          ops.hlist.Length[String :: Boolean :: HNil],
-          ops.nat.ToInt[Nat._2]
-        )
+          ops.hlist.Length[Boolean :: HNil],
+          ops.nat.ToInt[Nat._1]
+        ),
+        ops.hlist.Length[String :: Boolean :: HNil],
+        ops.nat.ToInt[Nat._2]
       )
     ).arbitrary
 
   lazy val expectedIntStringBoolArb =
     MkHListArbitrary.hcons(
-      Strict(Arbitrary.arbInt),
+      Arbitrary.arbInt,
       MkHListArbitrary.hcons(
-        Strict(Arbitrary.arbString),
+        Arbitrary.arbString,
         MkHListArbitrary.hcons(
-          Strict(Arbitrary.arbBool),
+          Arbitrary.arbBool,
           MkHListArbitrary.hnil,
           ops.hlist.Length[HNil],
           ops.nat.ToInt[Nat._0]
@@ -158,11 +127,11 @@ object ArbitraryTests extends TestSuite {
 
   lazy val expectedIntStringBoolCoproductArb =
     MkCoproductArbitrary.ccons(
-      Strict(Arbitrary.arbInt),
+      Arbitrary.arbInt,
       MkCoproductArbitrary.ccons(
-        Strict(Arbitrary.arbString),
+        Arbitrary.arbString,
         MkCoproductArbitrary.ccons(
-          Strict(Arbitrary.arbBool),
+          Arbitrary.arbBool,
           MkCoproductArbitrary.cnil,
           ops.coproduct.Length[CNil],
           ops.nat.ToInt[Nat._0]
@@ -177,418 +146,356 @@ object ArbitraryTests extends TestSuite {
   lazy val expectedComposedArb =
     MkArbitrary.genericProduct(
       Generic[Composed],
-      Lazy(
+      MkHListArbitrary.hcons(
+        expectedSimpleArb,
         MkHListArbitrary.hcons(
-          Strict(expectedSimpleArb),
-          MkHListArbitrary.hcons(
-            Strict(Arbitrary.arbString),
-            MkHListArbitrary.hnil,
-            ops.hlist.Length[HNil],
-            ops.nat.ToInt[Nat._0]
-          ),
-          ops.hlist.Length[String :: HNil],
-          ops.nat.ToInt[Nat._1]
-        )
+          Arbitrary.arbString,
+          MkHListArbitrary.hnil,
+          ops.hlist.Length[HNil],
+          ops.nat.ToInt[Nat._0]
+        ),
+        ops.hlist.Length[String :: HNil],
+        ops.nat.ToInt[Nat._1]
       )
     ).arbitrary
 
   lazy val expectedTwiceComposedArb =
     MkArbitrary.genericProduct(
       Generic[TwiceComposed],
-      Lazy(
+      MkHListArbitrary.hcons(
+        expectedSimpleArb,
         MkHListArbitrary.hcons(
-          Strict(expectedSimpleArb),
+          expectedComposedArb,
           MkHListArbitrary.hcons(
-            Strict(expectedComposedArb),
-            MkHListArbitrary.hcons(
-              Strict(Arbitrary.arbInt),
-              MkHListArbitrary.hnil,
-              ops.hlist.Length[HNil],
-              ops.nat.ToInt[Nat._0]
-            ),
-            ops.hlist.Length[Int :: HNil],
-            ops.nat.ToInt[Nat._1]
+            Arbitrary.arbInt,
+            MkHListArbitrary.hnil,
+            ops.hlist.Length[HNil],
+            ops.nat.ToInt[Nat._0]
           ),
-          ops.hlist.Length[Composed :: Int :: HNil],
-          ops.nat.ToInt[Nat._2]
-        )
+          ops.hlist.Length[Int :: HNil],
+          ops.nat.ToInt[Nat._1]
+        ),
+        ops.hlist.Length[Composed :: Int :: HNil],
+        ops.nat.ToInt[Nat._2]
       )
     ).arbitrary
 
   lazy val expectedComposedOptListArb =
     MkArbitrary.genericProduct(
       Generic[ComposedOptList],
-      Lazy(
+      MkHListArbitrary.hcons(
+        Arbitrary.arbOption(expectedSimpleArb),
         MkHListArbitrary.hcons(
-          Strict(Arbitrary.arbOption(expectedSimpleArb)),
+          Arbitrary.arbString,
           MkHListArbitrary.hcons(
-            Strict(Arbitrary.arbString),
-            MkHListArbitrary.hcons(
-              Strict(Arbitrary.arbContainer[List, TwiceComposed](expectedTwiceComposedArb, implicitly, identity)),
-              MkHListArbitrary.hnil,
-              ops.hlist.Length[HNil],
-              ops.nat.ToInt[Nat._0]
-            ),
-            ops.hlist.Length[List[TwiceComposed] :: HNil],
-            ops.nat.ToInt[Nat._1]
+            Arbitrary.arbContainer[List, TwiceComposed](expectedTwiceComposedArb, implicitly, identity),
+            MkHListArbitrary.hnil,
+            ops.hlist.Length[HNil],
+            ops.nat.ToInt[Nat._0]
           ),
-          ops.hlist.Length[String :: List[TwiceComposed] :: HNil],
-          ops.nat.ToInt[Nat._2]
-        )
+          ops.hlist.Length[List[TwiceComposed] :: HNil],
+          ops.nat.ToInt[Nat._1]
+        ),
+        ops.hlist.Length[String :: List[TwiceComposed] :: HNil],
+        ops.nat.ToInt[Nat._2]
       )
     ).arbitrary
 
   lazy val expectedBaseArb =
     MkArbitrary.genericCoproduct(
       Generic[Base],
-      Lazy(
-        MkCoproductArbitrary.ccons(
-          Strict(
-            MkArbitrary.genericProduct(
-              Generic[BaseDB],
-              Lazy(
-                MkHListArbitrary.hcons(
-                  Strict(Arbitrary.arbDouble),
-                  MkHListArbitrary.hcons(
-                    Strict(Arbitrary.arbBool),
-                    MkHListArbitrary.hnil,
-                    ops.hlist.Length[HNil],
-                    ops.nat.ToInt[Nat._0]
-                  ),
-                  ops.hlist.Length[Boolean :: HNil],
-                  ops.nat.ToInt[Nat._1]
-                )
-              )
-            ).arbitrary
-          ),
-          MkCoproductArbitrary.ccons(
-            Strict(
-              MkArbitrary.genericProduct(
-                Generic[BaseIS],
-                Lazy(
-                  MkHListArbitrary.hcons(
-                    Strict(Arbitrary.arbInt),
-                    MkHListArbitrary.hcons(
-                      Strict(Arbitrary.arbString),
-                      MkHListArbitrary.hnil,
-                      ops.hlist.Length[HNil],
-                      ops.nat.ToInt[Nat._0]
-                    ),
-                    ops.hlist.Length[String :: HNil],
-                    ops.nat.ToInt[Nat._1]
-                  )
-                )
-              ).arbitrary
-            ),
-            MkCoproductArbitrary.ccons(
-              Strict(
-                MkArbitrary.genericProduct(
-                  Generic[BaseLast],
-                  Lazy(
-                    MkHListArbitrary.hcons(
-                      Strict(expectedSimpleArb),
-                      MkHListArbitrary.hnil,
-                      ops.hlist.Length[HNil],
-                      ops.nat.ToInt[Nat._0]
-                    )
-                  )
-                ).arbitrary
-              ),
-              MkCoproductArbitrary.cnil,
-              ops.coproduct.Length[CNil],
+      MkCoproductArbitrary.ccons(
+        MkArbitrary.genericProduct(
+          Generic[BaseDB],
+          MkHListArbitrary.hcons(
+            Arbitrary.arbDouble,
+            MkHListArbitrary.hcons(
+              Arbitrary.arbBool,
+              MkHListArbitrary.hnil,
+              ops.hlist.Length[HNil],
               ops.nat.ToInt[Nat._0]
             ),
-            ops.coproduct.Length[BaseLast :+: CNil],
+            ops.hlist.Length[Boolean :: HNil],
             ops.nat.ToInt[Nat._1]
+          )
+        ).arbitrary,
+        MkCoproductArbitrary.ccons(
+          MkArbitrary.genericProduct(
+            Generic[BaseIS],
+            MkHListArbitrary.hcons(
+              Arbitrary.arbInt,
+              MkHListArbitrary.hcons(
+                Arbitrary.arbString,
+                MkHListArbitrary.hnil,
+                ops.hlist.Length[HNil],
+                ops.nat.ToInt[Nat._0]
+              ),
+              ops.hlist.Length[String :: HNil],
+              ops.nat.ToInt[Nat._1]
+            )
+          ).arbitrary,
+          MkCoproductArbitrary.ccons(
+            MkArbitrary.genericProduct(
+              Generic[BaseLast],
+              MkHListArbitrary.hcons(
+                expectedSimpleArb,
+                MkHListArbitrary.hnil,
+                ops.hlist.Length[HNil],
+                ops.nat.ToInt[Nat._0]
+              )
+            ).arbitrary,
+            MkCoproductArbitrary.cnil,
+            ops.coproduct.Length[CNil],
+            ops.nat.ToInt[Nat._0]
           ),
-          ops.coproduct.Length[BaseIS :+: BaseLast :+: CNil],
-          ops.nat.ToInt[Nat._2]
-        )
+          ops.coproduct.Length[BaseLast :+: CNil],
+          ops.nat.ToInt[Nat._1]
+        ),
+        ops.coproduct.Length[BaseIS :+: BaseLast :+: CNil],
+        ops.nat.ToInt[Nat._2]
       )
     ).arbitrary
 
   lazy val expectedCCWithSingletonArb =
     MkArbitrary.genericProduct(
       Generic[CCWithSingleton],
-      Lazy(
+      MkHListArbitrary.hcons(
+        Arbitrary.arbInt,
         MkHListArbitrary.hcons(
-          Strict(Arbitrary.arbInt),
-          MkHListArbitrary.hcons(
-            Strict(Shapeless.arbitrarySingletonType[Witness.`"aa"`.T]),
-            MkHListArbitrary.hnil,
-            ops.hlist.Length[HNil],
-            ops.nat.ToInt[Nat._0]
-          ),
-          ops.hlist.Length[Witness.`"aa"`.T :: HNil],
-          ops.nat.ToInt[Nat._1]
-        )
+          Shapeless.arbitrarySingletonType[Witness.`"aa"`.T],
+          MkHListArbitrary.hnil,
+          ops.hlist.Length[HNil],
+          ops.nat.ToInt[Nat._0]
+        ),
+        ops.hlist.Length[Witness.`"aa"`.T :: HNil],
+        ops.nat.ToInt[Nat._1]
       )
     ).arbitrary
 
   lazy val expectedBaseWithSingletonMainArb =
     MkArbitrary.genericProduct(
       Generic[BaseWithSingleton.Main],
-      Lazy(
-        MkHListArbitrary.hcons(
-          Strict(Shapeless.arbitrarySingletonType[Witness.`"aa"`.T]),
-          MkHListArbitrary.hnil,
-          ops.hlist.Length[HNil],
-          ops.nat.ToInt[Nat._0]
-        )
+      MkHListArbitrary.hcons(
+        Shapeless.arbitrarySingletonType[Witness.`"aa"`.T],
+        MkHListArbitrary.hnil,
+        ops.hlist.Length[HNil],
+        ops.nat.ToInt[Nat._0]
       )
     ).arbitrary
 
   lazy val expectedBaseWithSingletonDummyArb =
     MkArbitrary.genericProduct(
       Generic[BaseWithSingleton.Dummy],
-      Lazy(
-        MkHListArbitrary.hcons(
-          Strict(Arbitrary.arbInt),
-          MkHListArbitrary.hnil,
-          ops.hlist.Length[HNil],
-          ops.nat.ToInt[Nat._0]
-        )
+      MkHListArbitrary.hcons(
+        Arbitrary.arbInt,
+        MkHListArbitrary.hnil,
+        ops.hlist.Length[HNil],
+        ops.nat.ToInt[Nat._0]
       )
     ).arbitrary
 
   lazy val expectedBaseWithSingletonArb =
     MkArbitrary.genericCoproduct(
       Generic[BaseWithSingleton],
-      Lazy(
+      MkCoproductArbitrary.ccons(
+        expectedBaseWithSingletonDummyArb,
         MkCoproductArbitrary.ccons(
-          Strict(expectedBaseWithSingletonDummyArb),
-          MkCoproductArbitrary.ccons(
-            Strict(expectedBaseWithSingletonMainArb),
-            MkCoproductArbitrary.cnil,
-            ops.coproduct.Length[CNil],
-            ops.nat.ToInt[Nat._0]
-          ),
-          ops.coproduct.Length[BaseWithSingleton.Main :+: CNil],
-          ops.nat.ToInt[Nat._1]
-        )
+          expectedBaseWithSingletonMainArb,
+          MkCoproductArbitrary.cnil,
+          ops.coproduct.Length[CNil],
+          ops.nat.ToInt[Nat._0]
+        ),
+        ops.coproduct.Length[BaseWithSingleton.Main :+: CNil],
+        ops.nat.ToInt[Nat._1]
       )
     ).arbitrary
 
   lazy val expectedT1TreeArbitrary: Arbitrary[T1.Tree] =
     MkArbitrary.genericCoproduct(
       Generic[T1.Tree],
-      Lazy(
+      MkCoproductArbitrary.ccons(
+        MkArbitrary.genericProduct(
+          Generic[T1.Leaf.type],
+          Lazy(
+            MkHListArbitrary.hnil
+          )
+        ).arbitrary,
         MkCoproductArbitrary.ccons(
-          Strict(
-            MkArbitrary.genericProduct(
-              Generic[T1.Leaf.type],
-              Lazy(
-                MkHListArbitrary.hnil
-              )
-            ).arbitrary
-          ),
-          MkCoproductArbitrary.ccons(
-            Strict(
-              MkArbitrary.genericProduct(
-                Generic[T1.Node],
-                Lazy(
-                  MkHListArbitrary.hcons(
-                    Strict(expectedT1TreeArbitrary),
-                    MkHListArbitrary.hcons(
-                      Strict(expectedT1TreeArbitrary),
-                      MkHListArbitrary.hcons(
-                        Strict(Arbitrary.arbInt),
-                        MkHListArbitrary.hnil,
-                        ops.hlist.Length[HNil],
-                        ops.nat.ToInt[Nat._0]
-                      ),
-                      ops.hlist.Length[Int :: HNil],
-                      ops.nat.ToInt[Nat._1]
-                    ),
-                    ops.hlist.Length[T1.Tree :: Int :: HNil],
-                    ops.nat.ToInt[Nat._2]
-                  )
-                )
-              ).arbitrary
-            ),
-            MkCoproductArbitrary.cnil,
-            ops.coproduct.Length[CNil],
-            ops.nat.ToInt[Nat._0]
-          ),
-          ops.coproduct.Length[T1.Node :+: CNil],
-          ops.nat.ToInt[Nat._1]
-        )
+          MkArbitrary.genericProduct(
+            Generic[T1.Node],
+            MkHListArbitrary.hcons(
+              expectedT1TreeArbitrary,
+              MkHListArbitrary.hcons(
+                expectedT1TreeArbitrary,
+                MkHListArbitrary.hcons(
+                  Arbitrary.arbInt,
+                  MkHListArbitrary.hnil,
+                  ops.hlist.Length[HNil],
+                  ops.nat.ToInt[Nat._0]
+                ),
+                ops.hlist.Length[Int :: HNil],
+                ops.nat.ToInt[Nat._1]
+              ),
+              ops.hlist.Length[T1.Tree :: Int :: HNil],
+              ops.nat.ToInt[Nat._2]
+            )
+          ).arbitrary,
+          MkCoproductArbitrary.cnil,
+          ops.coproduct.Length[CNil],
+          ops.nat.ToInt[Nat._0]
+        ),
+        ops.coproduct.Length[T1.Node :+: CNil],
+        ops.nat.ToInt[Nat._1]
       )
     ).arbitrary
 
   lazy val expectedT2TreeArbitrary: Arbitrary[T2.Tree] =
     MkArbitrary.genericCoproduct(
       Generic[T2.Tree],
-      Lazy(
+      MkCoproductArbitrary.ccons(
+        MkArbitrary.genericProduct(
+          Generic[T2.Leaf.type],
+          MkHListArbitrary.hnil
+        ).arbitrary,
         MkCoproductArbitrary.ccons(
-          Strict(
-            MkArbitrary.genericProduct(
-              Generic[T2.Leaf.type],
-              Lazy(
-                MkHListArbitrary.hnil
-              )
-            ).arbitrary
-          ),
-          MkCoproductArbitrary.ccons(
-            Strict(
-              MkArbitrary.genericProduct(
-                Generic[T2.Node],
-                Lazy(
-                  MkHListArbitrary.hcons(
-                    Strict(expectedT2TreeArbitrary),
-                    MkHListArbitrary.hcons(
-                      Strict(expectedT2TreeArbitrary),
-                      MkHListArbitrary.hcons(
-                        Strict(Arbitrary.arbInt),
-                        MkHListArbitrary.hnil,
-                        ops.hlist.Length[HNil],
-                        ops.nat.ToInt[Nat._0]
-                      ),
-                      ops.hlist.Length[Int :: HNil],
-                      ops.nat.ToInt[Nat._1]
-                    ),
-                    ops.hlist.Length[T2.Tree :: Int :: HNil],
-                    ops.nat.ToInt[Nat._2]
-                  )
-                )
-              ).arbitrary
-            ),
-            MkCoproductArbitrary.cnil,
-            ops.coproduct.Length[CNil],
-            ops.nat.ToInt[Nat._0]
-          ),
-          ops.coproduct.Length[T2.Node :+: CNil],
-          ops.nat.ToInt[Nat._1]
-        )
+          MkArbitrary.genericProduct(
+            Generic[T2.Node],
+            MkHListArbitrary.hcons(
+              expectedT2TreeArbitrary,
+              MkHListArbitrary.hcons(
+                expectedT2TreeArbitrary,
+                MkHListArbitrary.hcons(
+                  Arbitrary.arbInt,
+                  MkHListArbitrary.hnil,
+                  ops.hlist.Length[HNil],
+                  ops.nat.ToInt[Nat._0]
+                ),
+                ops.hlist.Length[Int :: HNil],
+                ops.nat.ToInt[Nat._1]
+              ),
+              ops.hlist.Length[T2.Tree :: Int :: HNil],
+              ops.nat.ToInt[Nat._2]
+            )
+          ).arbitrary,
+          MkCoproductArbitrary.cnil,
+          ops.coproduct.Length[CNil],
+          ops.nat.ToInt[Nat._0]
+        ),
+        ops.coproduct.Length[T2.Node :+: CNil],
+        ops.nat.ToInt[Nat._1]
       )
     ).arbitrary
 
   lazy val expectedBazArbitrary =
     MkArbitrary.genericProduct(
       Generic[Baz.type],
-      Lazy(
-        MkHListArbitrary.hnil
-      )
+      MkHListArbitrary.hnil
     ).arbitrary
 
   lazy val expectedFooArbitrary =
     MkArbitrary.genericCoproduct(
       Generic[Foo],
-      Lazy(
-        MkCoproductArbitrary.ccons(
-          Strict(expectedBazArbitrary),
-          MkCoproductArbitrary.cnil,
-          ops.coproduct.Length[CNil],
-          ops.nat.ToInt[Nat._0]
-        )
+      MkCoproductArbitrary.ccons(
+        expectedBazArbitrary,
+        MkCoproductArbitrary.cnil,
+        ops.coproduct.Length[CNil],
+        ops.nat.ToInt[Nat._0]
       )
     ).arbitrary
 
   lazy val expectedFArbitrary =
     MkArbitrary.genericProduct(
       Generic[F.type],
-      Lazy(
-        MkHListArbitrary.hnil
-      )
+      MkHListArbitrary.hnil
     ).arbitrary
 
   lazy val expectedEArbitrary =
     MkArbitrary.genericProduct(
       Generic[E],
-      Lazy(
+      MkHListArbitrary.hcons(
+        Arbitrary.arbDouble,
         MkHListArbitrary.hcons(
-          Strict(Arbitrary.arbDouble),
-          MkHListArbitrary.hcons(
-            Strict(Arbitrary.arbOption(Arbitrary.arbFloat)),
-            MkHListArbitrary.hnil,
-            ops.hlist.Length[HNil],
-            ops.nat.ToInt[Nat._0]
-          ),
-          ops.hlist.Length[Option[Float] :: HNil],
-          ops.nat.ToInt[Nat._1]
-        )
+          Arbitrary.arbOption(Arbitrary.arbFloat),
+          MkHListArbitrary.hnil,
+          ops.hlist.Length[HNil],
+          ops.nat.ToInt[Nat._0]
+        ),
+        ops.hlist.Length[Option[Float] :: HNil],
+        ops.nat.ToInt[Nat._1]
       )
     ).arbitrary
 
   lazy val expectedDArbitrary =
     MkArbitrary.genericCoproduct(
       Generic[D],
-      Lazy(
+      MkCoproductArbitrary.ccons(
+        expectedBazArbitrary,
         MkCoproductArbitrary.ccons(
-          Strict(expectedBazArbitrary),
+          expectedEArbitrary,
           MkCoproductArbitrary.ccons(
-            Strict(expectedEArbitrary),
-            MkCoproductArbitrary.ccons(
-              Strict(expectedFArbitrary),
-              MkCoproductArbitrary.cnil,
-              ops.coproduct.Length[CNil],
-              ops.nat.ToInt[Nat._0]
-            ),
-            ops.coproduct.Length[F.type :+: CNil],
-            ops.nat.ToInt[Nat._1]
+            expectedFArbitrary,
+            MkCoproductArbitrary.cnil,
+            ops.coproduct.Length[CNil],
+            ops.nat.ToInt[Nat._0]
           ),
-          ops.coproduct.Length[E :+: F.type :+: CNil],
-          ops.nat.ToInt[Nat._2]
-        )
+          ops.coproduct.Length[F.type :+: CNil],
+          ops.nat.ToInt[Nat._1]
+        ),
+        ops.coproduct.Length[E :+: F.type :+: CNil],
+        ops.nat.ToInt[Nat._2]
       )
     ).arbitrary
 
   lazy val expectedCArbitrary =
     MkArbitrary.genericProduct(
       Generic[C.type],
-      Lazy(
-        MkHListArbitrary.hnil
-      )
+      MkHListArbitrary.hnil
     ).arbitrary
 
   lazy val expectedBArbitrary =
     MkArbitrary.genericProduct(
       Generic[B],
-      Lazy(
+      MkHListArbitrary.hcons(
+        Arbitrary.arbInt,
         MkHListArbitrary.hcons(
-          Strict(Arbitrary.arbInt),
-          MkHListArbitrary.hcons(
-            Strict(Arbitrary.arbString),
-            MkHListArbitrary.hnil,
-            ops.hlist.Length[HNil],
-            ops.nat.ToInt[Nat._0]
-          ),
-          ops.hlist.Length[String :: HNil],
-          ops.nat.ToInt[Nat._1]
-        )
+          Arbitrary.arbString,
+          MkHListArbitrary.hnil,
+          ops.hlist.Length[HNil],
+          ops.nat.ToInt[Nat._0]
+        ),
+        ops.hlist.Length[String :: HNil],
+        ops.nat.ToInt[Nat._1]
       )
     ).arbitrary
 
   lazy val expectedAArbitrary =
     MkArbitrary.genericCoproduct(
       Generic[A],
-      Lazy(
+      MkCoproductArbitrary.ccons(
+        expectedBArbitrary,
         MkCoproductArbitrary.ccons(
-          Strict(expectedBArbitrary),
+          expectedBazArbitrary,
           MkCoproductArbitrary.ccons(
-            Strict(expectedBazArbitrary),
+            expectedCArbitrary,
             MkCoproductArbitrary.ccons(
-              Strict(expectedCArbitrary),
+              expectedEArbitrary,
               MkCoproductArbitrary.ccons(
-                Strict(expectedEArbitrary),
-                MkCoproductArbitrary.ccons(
-                  Strict(expectedFArbitrary),
-                  MkCoproductArbitrary.cnil,
-                  ops.coproduct.Length[CNil],
-                  ops.nat.ToInt[Nat._0]
-                ),
-                ops.coproduct.Length[F.type :+: CNil],
-                ops.nat.ToInt[Nat._1]
+                expectedFArbitrary,
+                MkCoproductArbitrary.cnil,
+                ops.coproduct.Length[CNil],
+                ops.nat.ToInt[Nat._0]
               ),
-              ops.coproduct.Length[E :+: F.type :+: CNil],
-              ops.nat.ToInt[Nat._2]
+              ops.coproduct.Length[F.type :+: CNil],
+              ops.nat.ToInt[Nat._1]
             ),
-            ops.coproduct.Length[C.type :+: E :+: F.type :+: CNil],
-            ops.nat.ToInt[Nat._3]
+            ops.coproduct.Length[E :+: F.type :+: CNil],
+            ops.nat.ToInt[Nat._2]
           ),
-          ops.coproduct.Length[Baz.type :+: C.type :+: E :+: F.type :+: CNil],
-          ops.nat.ToInt[Nat._4]
-        )
+          ops.coproduct.Length[C.type :+: E :+: F.type :+: CNil],
+          ops.nat.ToInt[Nat._3]
+        ),
+        ops.coproduct.Length[Baz.type :+: C.type :+: E :+: F.type :+: CNil],
+        ops.nat.ToInt[Nat._4]
       )
     ).arbitrary
 
@@ -649,14 +556,14 @@ object ArbitraryTests extends TestSuite {
 
     'compareSuccess - {
       val arb = Arbitrary.arbInt.arbitrary
-      compare(arb, arb)
+      compareArbitrary(arb, arb)
     }
 
     'compareFailure - {
       val arb = Arbitrary.arbInt
       val result =
         try {
-          compare(arb.arbitrary, arb.arbitrary.map(_ + 1))
+          compareArbitrary(arb.arbitrary, arb.arbitrary.map(_ + 1))
           false
         }
         catch {
@@ -674,7 +581,7 @@ object ArbitraryTests extends TestSuite {
         ).arbitrary
 
       val gen = Arbitrary.arbitrary[Empty.type]
-      compare(expectedArb.arbitrary, gen)
+      compareArbitrary(expectedArb.arbitrary, gen)
     }
 
     'emptyCC - {
@@ -685,113 +592,113 @@ object ArbitraryTests extends TestSuite {
         ).arbitrary
 
       val gen = Arbitrary.arbitrary[EmptyCC]
-      compare(expectedArb.arbitrary, gen)
+      compareArbitrary(expectedArb.arbitrary, gen)
     }
 
     'simple - {
       val gen = Arbitrary.arbitrary[Simple]
-      compare(expectedSimpleArb.arbitrary, gen)
+      compareArbitrary(expectedSimpleArb.arbitrary, gen)
     }
 
     'simpleHList - {
       val gen = Arbitrary.arbitrary[Int :: String :: Boolean :: HNil]
-      compare(expectedIntStringBoolArb.arbitrary, gen)
+      compareArbitrary(expectedIntStringBoolArb.arbitrary, gen)
     }
 
     'simpleCoproduct - {
       val gen = Arbitrary.arbitrary[Int :+: String :+: Boolean :+: CNil]
-      compare(expectedIntStringBoolCoproductArb.arbitrary, gen)
+      compareArbitrary(expectedIntStringBoolCoproductArb.arbitrary, gen)
     }
 
     'composed - {
       val gen = Arbitrary.arbitrary[Composed]
-      compare(expectedComposedArb.arbitrary, gen)
+      compareArbitrary(expectedComposedArb.arbitrary, gen)
     }
 
     'twiceComposed - {
       val gen = Arbitrary.arbitrary[TwiceComposed]
-      compare(expectedTwiceComposedArb.arbitrary, gen)
+      compareArbitrary(expectedTwiceComposedArb.arbitrary, gen)
     }
 
     'composedOptList - {
       val gen = Arbitrary.arbitrary[ComposedOptList]
-      compare(expectedComposedOptListArb.arbitrary, gen)
+      compareArbitrary(expectedComposedOptListArb.arbitrary, gen)
     }
 
     'base - {
       val gen = Arbitrary.arbitrary[Base]
-      compare(expectedBaseArb.arbitrary, gen)
+      compareArbitrary(expectedBaseArb.arbitrary, gen)
     }
 
     'tree1 - {
       val gen = Arbitrary.arbitrary[T1.Tree]
-      compare(expectedT1TreeArbitrary.arbitrary, gen)
+      compareArbitrary(expectedT1TreeArbitrary.arbitrary, gen)
     }
 
     'tree2 - {
       val gen = Arbitrary.arbitrary[T2.Tree]
-      compare(expectedT2TreeArbitrary.arbitrary, gen)
+      compareArbitrary(expectedT2TreeArbitrary.arbitrary, gen)
     }
 
     'a - {
       val gen = Arbitrary.arbitrary[A]
-      compare(expectedAArbitrary.arbitrary, gen)
+      compareArbitrary(expectedAArbitrary.arbitrary, gen)
     }
 
     'd - {
       val gen = Arbitrary.arbitrary[D]
-      compare(expectedDArbitrary.arbitrary, gen)
+      compareArbitrary(expectedDArbitrary.arbitrary, gen)
     }
 
     'list - {
       val expected = Arbitrary.arbContainer[List, Int](Arbitrary.arbInt, implicitly, identity)
       val gen = Arbitrary.arbitrary[List[Int]]
-      compare(expected.arbitrary, gen)
+      compareArbitrary(expected.arbitrary, gen)
     }
 
     'option - {
       val expected = Arbitrary.arbOption(Arbitrary.arbInt)
       val gen = Arbitrary.arbitrary[Option[Int]]
-      compare(expected.arbitrary, gen)
+      compareArbitrary(expected.arbitrary, gen)
     }
 
     'singleton - {
       'simple - {
         val expected = Arbitrary(Gen.const(2: Witness.`2`.T))
         val gen = Arbitrary.arbitrary[Witness.`2`.T]
-        compare(expected.arbitrary, gen)
+        compareArbitrary(expected.arbitrary, gen)
       }
 
       'caseClass - {
         val gen = Arbitrary.arbitrary[CCWithSingleton]
-        compare(expectedCCWithSingletonArb.arbitrary, gen)
+        compareArbitrary(expectedCCWithSingletonArb.arbitrary, gen)
       }
 
       'ADT - {
         val gen = Arbitrary.arbitrary[BaseWithSingleton]
-        compare(expectedBaseWithSingletonArb.arbitrary, gen)
+        compareArbitrary(expectedBaseWithSingletonArb.arbitrary, gen)
       }
     }
 
     'shapeless - {
       'hlist - {
         val gen = Arbitrary.arbitrary[L]
-        compare(expectetLArbitrary.arbitrary, gen)
+        compareArbitrary(expectetLArbitrary.arbitrary, gen)
       }
 
       'record - {
         val gen = Arbitrary.arbitrary[Rec]
-        compare(expectetRecArbitrary.arbitrary, gen)
+        compareArbitrary(expectetRecArbitrary.arbitrary, gen)
       }
 
       'copproduct - {
         val gen = Arbitrary.arbitrary[C0]
-        compare(expectetC0Arbitrary.arbitrary, gen)
+        compareArbitrary(expectetC0Arbitrary.arbitrary, gen)
       }
 
       'union - {
         val gen = Arbitrary.arbitrary[Un]
-        compare(expectedUnionArbitrary.arbitrary, gen)
+        compareArbitrary(expectedUnionArbitrary.arbitrary, gen)
       }
     }
 

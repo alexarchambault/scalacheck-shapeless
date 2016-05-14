@@ -10,7 +10,11 @@ lazy val root = project.in(file("."))
 lazy val scalacheckShapeless = crossProject.in(file("."))
   .settings(commonSettings: _*)
   .settings(mimaSettings: _*)
-  .jsSettings(scalaJSStage in Test := FastOptStage)
+  .jsSettings(
+    postLinkJSEnv := NodeJSEnv().value,
+    scalaJSUseRhino in Global := false,
+    scalaJSStage in Test := FastOptStage
+  )
 
 lazy val scalacheckShapelessJVM = scalacheckShapeless.jvm
 lazy val scalacheckShapelessJS = scalacheckShapeless.js

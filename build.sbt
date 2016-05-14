@@ -1,8 +1,8 @@
-import com.typesafe.sbt.pgp.PgpKeys
+
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 
-lazy val root = project.in(file("."))
+lazy val `scalacheck-shapeless` = project.in(file("."))
   .aggregate(coreJVM, coreJS)
   .settings(commonSettings)
   .settings(noPublishSettings)
@@ -10,6 +10,10 @@ lazy val root = project.in(file("."))
 lazy val core = crossProject
   .settings(commonSettings: _*)
   .settings(mimaSettings: _*)
+  .settings(
+    name := coreName,
+    moduleName := coreName
+  )
   .jsSettings(
     postLinkJSEnv := NodeJSEnv().value,
     scalaJSUseRhino in Global := false,
@@ -22,9 +26,7 @@ lazy val coreJS = core.js
 lazy val coreName = "scalacheck-shapeless_1.13"
 
 lazy val commonSettings = Seq(
-  organization := "com.github.alexarchambault",
-  name := coreName,
-  moduleName := coreName
+  organization := "com.github.alexarchambault"
 ) ++ compileSettings ++ publishSettings
 
 lazy val compileSettings = Seq(
@@ -75,12 +77,12 @@ lazy val publishSettings = Seq(
     else
       "releases" at nexus + "service/local/staging/deploy/maven2"
   },
-  credentials += {
+  credentials ++= {
     Seq("SONATYPE_USER", "SONATYPE_PASS").map(sys.env.get) match {
       case Seq(Some(user), Some(pass)) =>
-        Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
+        Seq(Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass))
       case _ =>
-        Credentials(Path.userHome / ".ivy2" / ".credentials")
+        Seq()
     }
   }
 )

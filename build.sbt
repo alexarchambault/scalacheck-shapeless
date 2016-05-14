@@ -10,7 +10,11 @@ lazy val root = project.in(file("."))
 lazy val scalacheckShapeless = crossProject.in(file("."))
   .settings(commonSettings: _*)
   .settings(mimaSettings: _*)
-  .jsSettings(scalaJSStage in Test := FastOptStage)
+  .jsSettings(
+    postLinkJSEnv := NodeJSEnv().value,
+    scalaJSUseRhino in Global := false,
+    scalaJSStage in Test := FastOptStage
+  )
 
 lazy val scalacheckShapelessJVM = scalacheckShapeless.jvm
 lazy val scalacheckShapelessJS = scalacheckShapeless.js
@@ -24,8 +28,7 @@ lazy val commonSettings = Seq(
 ) ++ compileSettings ++ publishSettings
 
 lazy val compileSettings = Seq(
-  scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.6", "2.11.7"),
+  scalaVersion := "2.11.8",
   unmanagedSourceDirectories in Compile += (baseDirectory in Compile).value / ".." / "shared" / "src" / "main" / s"scala-${scalaBinaryVersion.value}",
   libraryDependencies += "com.lihaoyi" %%% "utest" % "0.3.0" % "test",
   testFrameworks += new TestFramework("utest.runner.Framework"),
@@ -34,9 +37,9 @@ lazy val compileSettings = Seq(
     Resolver.sonatypeRepo("snapshots")
   ),
   libraryDependencies ++= Seq(
-    "org.scalacheck" %%% "scalacheck" % "1.13.0",
+    "org.scalacheck" %%% "scalacheck" % "1.13.1",
     "com.chuusai" %%% "shapeless" % "2.2.5",
-    "com.github.alexarchambault" %%% "shapeless-compat" % "1.0.0-M1"
+    "com.github.alexarchambault" %%% "shapeless-compat" % "1.0.0-M3"
   ),
   libraryDependencies ++= {
     if (scalaVersion.value.startsWith("2.10."))

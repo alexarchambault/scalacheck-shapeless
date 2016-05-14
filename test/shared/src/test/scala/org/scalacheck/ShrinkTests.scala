@@ -1,6 +1,8 @@
 package org.scalacheck
 
+import org.scalacheck.Shapeless._
 import org.scalacheck.derive._
+
 import shapeless.{ Lazy => _, _ }
 import shapeless.compat._
 import shapeless.labelled._
@@ -8,9 +10,8 @@ import shapeless.record.Record
 import shapeless.union.Union
 
 import utest._
-import Util._
 
-import Shapeless._
+import Util._
 
 object ShrinkTests extends TestSuite {
   import TestsDefinitions._
@@ -24,25 +25,25 @@ object ShrinkTests extends TestSuite {
   lazy val expectedIntStringBoolShrink =
     expectedIntStringBoolMkHListShrink.shrink
   lazy val expectedIntStringBoolMkHListShrink =
-    MkHListShrink.hconsShrink(
+    MkHListShrink.hcons(
       Strict(Shrink.shrinkIntegral[Int]),
-      MkHListShrink.hconsShrink(
+      MkHListShrink.hcons(
         Strict(Shrink.shrinkString),
-        MkHListShrink.hconsShrink(
+        MkHListShrink.hcons(
           Strict(Shrink.shrinkAny[Boolean]),
-          MkHListShrink.hnilShrink
+          MkHListShrink.hnil
         )
       )
     )
 
   lazy val expectedIntStringBoolCoproductShrink =
-    MkCoproductShrink.cconsShrink(
+    MkCoproductShrink.ccons(
       Strict(Shrink.shrinkIntegral[Int]),
-      MkCoproductShrink.cconsShrink(
+      MkCoproductShrink.ccons(
         Strict(Shrink.shrinkString),
-        MkCoproductShrink.cconsShrink(
+        MkCoproductShrink.ccons(
           Strict(Shrink.shrinkAny[Boolean]),
-          MkCoproductShrink.cnilShrink,
+          MkCoproductShrink.cnil,
           Strict(Singletons[Boolean]),
           Strict(Singletons[CNil])
         ),
@@ -54,7 +55,7 @@ object ShrinkTests extends TestSuite {
     ).shrink
 
   lazy val expectedSimpleShrink =
-    MkShrink.genericProductShrink(
+    MkShrink.genericProduct(
       Generic[Simple],
       Lazy(
         expectedIntStringBoolMkHListShrink
@@ -62,20 +63,20 @@ object ShrinkTests extends TestSuite {
     ).shrink
 
   lazy val expectedRecShrink =
-    MkHListShrink.hconsShrink[FieldType[Witness.`'i`.T, Int], Record.`'s -> String`.T](
+    MkHListShrink.hcons[FieldType[Witness.`'i`.T, Int], Record.`'s -> String`.T](
       shrinkFieldType[Witness.`'i`.T, Int](Shrink.shrinkIntegral[Int]),
-      MkHListShrink.hconsShrink[FieldType[Witness.`'s`.T, String], HNil](
+      MkHListShrink.hcons[FieldType[Witness.`'s`.T, String], HNil](
         shrinkFieldType[Witness.`'s`.T, String](Shrink.shrinkString),
-        MkHListShrink.hnilShrink
+        MkHListShrink.hnil
       )
     ).shrink
 
   lazy val expectedUnionShrink =
-    MkCoproductShrink.cconsShrink[FieldType[Witness.`'i`.T, Int], Union.`'s -> String`.T](
+    MkCoproductShrink.ccons[FieldType[Witness.`'i`.T, Int], Union.`'s -> String`.T](
       shrinkFieldType[Witness.`'i`.T, Int](Shrink.shrinkIntegral[Int]),
-      MkCoproductShrink.cconsShrink[FieldType[Witness.`'s`.T, String], CNil](
+      MkCoproductShrink.ccons[FieldType[Witness.`'s`.T, String], CNil](
         shrinkFieldType[Witness.`'s`.T, String](Shrink.shrinkString),
-        MkCoproductShrink.cnilShrink,
+        MkCoproductShrink.cnil,
         Singletons[FieldType[Witness.`'s`.T, String]],
         Singletons[CNil]
       ),
@@ -84,47 +85,41 @@ object ShrinkTests extends TestSuite {
     ).shrink
 
 
-  def compare[T: Arbitrary](first: Shrink[T], second: Shrink[T]): Unit =
-    Prop.forAll {
-      t: T =>
-        first.shrink(t) == second.shrink(t)
-    }.validate
-
   val tests = TestSuite {
 
     'listInt - {
       val shrink = implicitly[Shrink[List[Int]]]
-      compare(shrink, expectedListIntShrink)
+      compareShrink(shrink, expectedListIntShrink)
     }
 
     'optionInt - {
       val shrink = implicitly[Shrink[Option[Int]]]
-      compare(shrink, expectedOptionIntShrink)
+      compareShrink(shrink, expectedOptionIntShrink)
     }
 
     'simple - {
        val shrink = implicitly[Shrink[Simple]]
-       compare(shrink, expectedSimpleShrink)
+       compareShrink(shrink, expectedSimpleShrink)
     }
 
     'simpleHList - {
       val shrink = implicitly[Shrink[Int :: String :: Boolean :: HNil]]
-      compare(shrink, expectedIntStringBoolShrink)
+      compareShrink(shrink, expectedIntStringBoolShrink)
     }
 
     'simpleCoproduct - {
       val shrink = implicitly[Shrink[Int :+: String :+: Boolean :+: CNil]]
-      compare(shrink, expectedIntStringBoolCoproductShrink)
+      compareShrink(shrink, expectedIntStringBoolCoproductShrink)
     }
 
     'simpleRecord - {
       val shrink = implicitly[Shrink[Rec]]
-      compare(shrink, expectedRecShrink)
+      compareShrink(shrink, expectedRecShrink)
     }
 
     'simpleUnion - {
       val shrink = implicitly[Shrink[Un]]
-      compare(shrink, expectedUnionShrink)
+      compareShrink(shrink, expectedUnionShrink)
     }
 
   }

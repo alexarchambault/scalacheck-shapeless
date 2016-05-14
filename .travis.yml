@@ -4,7 +4,7 @@ scala:
 - 2.10.6
 jdk:
 - oraclejdk8
-script: sbt ++${TRAVIS_SCALA_VERSION} test:compile coreJVM/test $(if false; then echo "mima-report-binary-issues"; fi) $(if [[ "${TRAVIS_PULL_REQUEST}" ==
+script: sbt ++${TRAVIS_SCALA_VERSION} test:compile testJVM/test $(if false; then echo "mima-report-binary-issues"; fi) $(if [[ "${TRAVIS_PULL_REQUEST}" ==
   "false" && "${TRAVIS_BRANCH}" == "master" ]]; then echo "publish"; fi)
 sudo: false
 env:

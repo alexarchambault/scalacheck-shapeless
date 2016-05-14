@@ -3,7 +3,7 @@ import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 
 lazy val `scalacheck-shapeless` = project.in(file("."))
-  .aggregate(coreJVM, coreJS)
+  .aggregate(coreJVM, coreJS, testJVM, testJS)
   .settings(commonSettings)
   .settings(noPublishSettings)
 
@@ -12,7 +12,12 @@ lazy val core = crossProject
   .settings(mimaSettings: _*)
   .settings(
     name := coreName,
-    moduleName := coreName
+    moduleName := coreName,
+    libraryDependencies ++= Seq(
+      "org.scalacheck" %%% "scalacheck" % "1.13.1",
+      "com.chuusai" %%% "shapeless" % "2.2.5",
+      "com.github.alexarchambault" %%% "shapeless-compat" % "1.0.0-M4"
+    )
   )
   .jsSettings(
     postLinkJSEnv := NodeJSEnv().value,
@@ -23,6 +28,21 @@ lazy val core = crossProject
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 
+lazy val test = crossProject
+  .dependsOn(core)
+  .settings(commonSettings: _*)
+  .settings(noPublishSettings: _*)
+  .settings(
+    libraryDependencies += "com.lihaoyi" %%% "utest" % "0.3.0" % "test",
+    testFrameworks += new TestFramework("utest.runner.Framework")
+  )
+  .jsSettings(
+    scalaJSStage in Test := FastOptStage
+  )
+
+lazy val testJVM = test.jvm
+lazy val testJS = test.js
+
 lazy val coreName = "scalacheck-shapeless_1.13"
 
 lazy val commonSettings = Seq(
@@ -31,17 +51,9 @@ lazy val commonSettings = Seq(
 
 lazy val compileSettings = Seq(
   scalaVersion := "2.11.8",
-  unmanagedSourceDirectories in Compile += (baseDirectory in Compile).value / ".." / "shared" / "src" / "main" / s"scala-${scalaBinaryVersion.value}",
-  libraryDependencies += "com.lihaoyi" %%% "utest" % "0.3.0" % "test",
-  testFrameworks += new TestFramework("utest.runner.Framework"),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
     Resolver.sonatypeRepo("snapshots")
-  ),
-  libraryDependencies ++= Seq(
-    "org.scalacheck" %%% "scalacheck" % "1.13.1",
-    "com.chuusai" %%% "shapeless" % "2.2.5",
-    "com.github.alexarchambault" %%% "shapeless-compat" % "1.0.0-M4"
   ),
   libraryDependencies ++= {
     if (scalaVersion.value.startsWith("2.10."))

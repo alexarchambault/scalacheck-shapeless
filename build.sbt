@@ -38,7 +38,7 @@ lazy val compileSettings = Seq(
     Resolver.sonatypeRepo("snapshots")
   ),
   libraryDependencies ++= Seq(
-    "org.scalacheck" %%% "scalacheck" % "1.13.0",
+    "org.scalacheck" %%% "scalacheck" % "1.13.1",
     "com.chuusai" %%% "shapeless" % "2.2.5",
     "com.github.alexarchambault" %%% "shapeless-compat" % "1.0.0-M1"
   ),

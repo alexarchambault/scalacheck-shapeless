@@ -3,6 +3,8 @@ package org.scalacheck
 import org.scalacheck.Gen.Parameters
 import org.scalacheck.rng.Seed
 
+import org.scalacheck.derive.Singletons
+
 import utest._
 
 object Util {

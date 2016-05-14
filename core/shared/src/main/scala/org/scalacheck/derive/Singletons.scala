@@ -1,4 +1,4 @@
-package org.scalacheck
+package org.scalacheck.derive
 
 import shapeless.{ Lazy => _, _ }
 import shapeless.compat._

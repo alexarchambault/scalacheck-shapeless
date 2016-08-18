@@ -15,7 +15,7 @@ lazy val core = crossProject
     moduleName := coreName,
     libraryDependencies ++= Seq(
       "org.scalacheck" %%% "scalacheck" % "1.13.1",
-      "com.chuusai" %%% "shapeless" % "2.3.1"
+      "com.chuusai" %%% "shapeless" % "2.3.2"
     )
   )
   .jsSettings(

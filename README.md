@@ -12,7 +12,7 @@ Add to your `build.sbt`
 ```scala
 resolvers += Resolver.sonatypeRepo("releases")
 
-libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.0-RC1"
+libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.0"
 ```
 
 If you are using scala 2.10.x, also add the macro paradise plugin to your build,
@@ -22,7 +22,7 @@ libraryDependencies +=
 ```
 
 scalacheck-shapeless depends on shapeless 2.3 and scalacheck 1.13. If you are using shapeless 2.2
-along with scalacheck 1.13, use the `1.0.0-RC1` version. If you are using shapeless 2.2 along
+along with scalacheck 1.13, use the `1.0.0` version. If you are using shapeless 2.2 along
 with scalacheck 1.12, see the [0.3.x branch](https://github.com/alexarchambault/scalacheck-shapeless/tree/scalacheck-shapeless-0.3).
 
 
@@ -70,8 +70,6 @@ libraryDependencies +=
 ```
 
 (Macro paradise plugin also necessary with scala 2.10, see above.)
-
-Available for scala 2.10 and 2.11. Uses scalacheck 1.13.0 and shapeless >= 2.2. For shapeless 2.1, see the [0.1.x branch](https://github.com/alexarchambault/scalacheck-shapeless/tree/0.1.x).
 
 ## See also
 

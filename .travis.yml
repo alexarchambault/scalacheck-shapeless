@@ -5,7 +5,7 @@ scala:
 jdk:
 - oraclejdk8
 script: sbt -batch ++${TRAVIS_SCALA_VERSION} test:compile testJVM/test $(if false; then echo "mima-report-binary-issues"; fi) $(if [[ "${TRAVIS_PULL_REQUEST}" ==
-  "false" && "${TRAVIS_BRANCH}" == "scalacheck-shapeless-1.1" ]]; then echo "publish"; fi)
+  "false" && "${TRAVIS_BRANCH}" == "master" ]]; then echo "publish"; fi)
 sudo: false
 env:
   global:
@@ -13,4 +13,4 @@ env:
   - secure: K8wTOFoZ1KSlD1RnR5BhBHgE4nrLZQnX6w99GS1+kQIqRO0PG9DP5ZMHcFz3MJBnxOCs0DBA+a41SHa8TXWIY0pzXT+cY6e3gzcU0+1VCpPtU1BJ3qH+PdW5Cl0c+Nl3mQQoRWi6iDdxVV/3DhpIujsoY/boZ4aMyBUqQEvJh8s=
 branches:
   only:
-  - scalacheck-shapeless-1.1
+  - master

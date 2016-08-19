@@ -12,7 +12,7 @@ Add to your `build.sbt`
 ```scala
 resolvers += Resolver.sonatypeRepo("releases")
 
-libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.0"
+libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.1"
 ```
 
 If you are using scala 2.10.x, also add the macro paradise plugin to your build,
@@ -66,7 +66,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies +=
-  "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.0.0-SNAPSHOT"
+  "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.2-SNAPSHOT"
 ```
 
 (Macro paradise plugin also necessary with scala 2.10, see above.)

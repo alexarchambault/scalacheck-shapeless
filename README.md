@@ -74,4 +74,4 @@ libraryDependencies +=
 ## See also
 
 - [scalacheck-datetime](https://github.com/47deg/scalacheck-datetime), a library to deal with datetimes with scalacheck,
-- [scalacheck-extensions](https://github.com/cvogt/scalacheck-extensions), a macro-based automatic `Arbitrary` generation.
+- [scalacheck-extensions](https://github.com/cvogt/scalacheck-extensions), a macro-based automatic `Arbitrary` generation (discontinued?).

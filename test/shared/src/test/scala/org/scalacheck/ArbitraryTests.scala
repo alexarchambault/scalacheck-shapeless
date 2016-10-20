@@ -498,7 +498,7 @@ object ArbitraryTests extends TestSuite {
           false
         }
         catch {
-          case _: utest.AssertionError => true
+          case _: java.lang.AssertionError => true
         }
 
       assert(result)

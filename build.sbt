@@ -14,7 +14,7 @@ lazy val core = crossProject
     name := coreName,
     moduleName := coreName,
     libraryDependencies ++= Seq(
-      "org.scalacheck" %%% "scalacheck" % "1.13.2",
+      "org.scalacheck" %%% "scalacheck" % "1.13.3",
       "com.chuusai" %%% "shapeless" % "2.3.2"
     )
   )
@@ -32,7 +32,7 @@ lazy val test = crossProject
   .settings(commonSettings: _*)
   .settings(noPublishSettings: _*)
   .settings(
-    libraryDependencies += "com.lihaoyi" %%% "utest" % "0.3.0" % "test",
+    libraryDependencies += "com.lihaoyi" %%% "utest" % "0.4.4" % "test",
     testFrameworks += new TestFramework("utest.runner.Framework")
   )
   .jsSettings(
@@ -56,7 +56,7 @@ lazy val compileSettings = Seq(
   ),
   libraryDependencies ++= {
     if (scalaVersion.value.startsWith("2.10."))
-      Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full))
+      Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full))
     else
       Seq()
   },

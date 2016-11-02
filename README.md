@@ -4,7 +4,7 @@ Generation of arbitrary case classes / ADTs instances with [scalacheck](https://
 
 [![Build Status](https://travis-ci.org/alexarchambault/scalacheck-shapeless.svg)](https://travis-ci.org/alexarchambault/scalacheck-shapeless)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/alexarchambault/scalacheck-shapeless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.alexarchambault/scalacheck-shapeless_1.13_2.11.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.alexarchambault/scalacheck-shapeless_1.13_2.11)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.alexarchambault/scalacheck-shapeless_1.13_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.alexarchambault/scalacheck-shapeless_1.13_2.12)
 
 ## Usage
 
@@ -12,18 +12,21 @@ Add to your `build.sbt`
 ```scala
 resolvers += Resolver.sonatypeRepo("releases")
 
-libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.1"
+libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.3"
 ```
 
 If you are using scala 2.10.x, also add the macro paradise plugin to your build,
 ```scala
 libraryDependencies +=
-  compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+  compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 ```
 
-scalacheck-shapeless depends on shapeless 2.3 and scalacheck 1.13. If you are using shapeless 2.2
-along with scalacheck 1.13, use the `1.0.0` version. If you are using shapeless 2.2 along
-with scalacheck 1.12, see the [0.3.x branch](https://github.com/alexarchambault/scalacheck-shapeless/tree/scalacheck-shapeless-0.3).
+scalacheck-shapeless depends on shapeless 2.3 and scalacheck 1.13. It is built against scala 2.10, 2.11, and 2.12.
+
+If you are using shapeless 2.2 along with scalacheck 1.13, use the `1.0.0` version. If you are
+using shapeless 2.2 along with scalacheck 1.12, see the
+[0.3.x branch](https://github.com/alexarchambault/scalacheck-shapeless/tree/scalacheck-shapeless-0.3).
+
 
 
 Import the content of `org.scalacheck.Shapeless` close to where you want
@@ -57,19 +60,6 @@ property("some property about Foo") {
 }
 ```
 without having to define yourself an `Arbitrary` for `Foo`.
-
-For the development version, add instead to your `build.sbt`
-```scala
-resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases"),
-  Resolver.sonatypeRepo("snapshots")
-)
-
-libraryDependencies +=
-  "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.2-SNAPSHOT"
-```
-
-(Macro paradise plugin also necessary with scala 2.10, see above.)
 
 ## See also
 

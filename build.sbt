@@ -107,7 +107,12 @@ lazy val noPublishSettings = Seq(
 lazy val mimaSettings =
   mimaDefaultSettings ++
   Seq(
-    previousArtifact := Some(organization.value %% moduleName.value % "1.0.0")
+    previousArtifact := {
+      if (scalaBinaryVersion.value == "2.12")
+        None
+      else
+        Some(organization.value %% moduleName.value % "1.1.0")
+    }
   )
 
 // build.sbt shamelessly inspired by https://github.com/fthomas/refined/blob/master/build.sbt

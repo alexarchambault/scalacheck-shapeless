@@ -2,7 +2,7 @@ package org.scalacheck
 package derive
 
 import shapeless._
-
+import GenExtra._
 
 /**
  * Derives `Arbitrary[T]` instances for `T` an `HList`, a `Coproduct`,
@@ -18,7 +18,25 @@ trait MkArbitrary[T] {
   def arbitrary: Arbitrary[T]
 }
 
-object MkArbitrary {
+abstract class MkArbitraryLowPriority {
+
+  implicit def genericNonRecursiveCoproduct[S, C <: Coproduct]
+   (implicit
+     gen: Generic.Aux[S, C],
+     mkArb: Lazy[MkCoproductArbitrary[C]]
+   ): MkArbitrary[S] =
+    MkArbitrary.instance(
+      Arbitrary(
+        // failing on stack overflows - see the discussion in https://github.com/alexarchambault/scalacheck-shapeless/issues/50
+        GenExtra.failOnStackOverflow(
+          Gen.lzy(mkArb.value.arbitrary.arbitrary)
+            .map(gen.from)
+        )
+      )
+    )
+}
+
+object MkArbitrary extends MkArbitraryLowPriority {
   def apply[T](implicit mkArb: MkArbitrary[T]): MkArbitrary[T] = mkArb
 
   def instance[T](arb: => Arbitrary[T]): MkArbitrary[T] =
@@ -35,13 +53,36 @@ object MkArbitrary {
       Arbitrary(Gen.lzy(mkArb.value.arbitrary.arbitrary).map(gen.from))
     )
 
-  implicit def genericCoproduct[S, C <: Coproduct]
+  implicit def genericRecursiveCoproduct[S, C <: Coproduct]
    (implicit
+     rec: Recursive[S],
      gen: Generic.Aux[S, C],
-     mkArb: Lazy[MkCoproductArbitrary[C]]
+     mkArb: Lazy[MkRecursiveCoproductArbitrary[C]]
    ): MkArbitrary[S] =
     instance(
-      Arbitrary(Gen.lzy(mkArb.value.arbitrary.arbitrary).map(gen.from))
+      Arbitrary(
+        Gen.lzy(mkArb.value.arbitrary.arbitrary)
+          .flatMap {
+            _.valueOpt match {
+              case None =>
+                rec.default
+              case Some(c) =>
+                Gen.const(gen.from(c))
+            }
+          }
+      )
+    )
+
+  @deprecated("Kept for binary compatibility purposes only.")
+  def genericCoproduct[S, C <: Coproduct](
+    gen: Generic.Aux[S, C],
+    mkArb: Lazy[MkCoproductArbitrary[C]]
+  ): MkArbitrary[S] =
+    instance(
+      Arbitrary(
+        Gen.lzy(mkArb.value.arbitrary.arbitrary)
+          .map(gen.from)
+      )
     )
 }
 
@@ -91,8 +132,46 @@ object MkHListArbitrary {
     )
 }
 
+trait MkRecursiveCoproductArbitrary[C <: Coproduct] {
+  /** `Arbitrary[T]` instance built by this `MkRecursiveCoproductArbitrary[T]` */
+  def arbitrary: Arbitrary[Recursive.Value[C]]
+}
+
+object MkRecursiveCoproductArbitrary {
+  def apply[C <: Coproduct](implicit mkArb: MkRecursiveCoproductArbitrary[C]): MkRecursiveCoproductArbitrary[C] = mkArb
+
+  def instance[C <: Coproduct](arb: => Arbitrary[Recursive.Value[C]]): MkRecursiveCoproductArbitrary[C] =
+    new MkRecursiveCoproductArbitrary[C] {
+      def arbitrary = arb
+    }
+
+  implicit val cnil: MkRecursiveCoproductArbitrary[CNil] =
+    instance(Arbitrary(Gen.fail))
+
+  implicit def ccons[H, T <: Coproduct, N <: Nat]
+   (implicit
+     headArbitrary: Strict[Arbitrary[H]],
+     tailArbitrary: MkRecursiveCoproductArbitrary[T],
+     length: ops.coproduct.Length.Aux[T, N],
+     n: ops.nat.ToInt[N]
+   ): MkRecursiveCoproductArbitrary[H :+: T] =
+    instance(
+      Arbitrary {
+        Gen.sized {
+          case n if n < 0 => Gen.const(Recursive.Value(None))
+          case size =>
+            val nextSize = size - 1
+            Gen.frequency(
+              1   -> Gen.resize(nextSize, Gen.lzy(headArbitrary.value.arbitrary)).map(h => Recursive.Value(Some(Inl(h)))),
+              n() -> Gen.resize(nextSize, Gen.lzy(tailArbitrary.arbitrary.arbitrary)).map(_.map(Inr(_)))
+            )
+        }
+      }
+    )
+}
+
 trait MkCoproductArbitrary[C <: Coproduct] {
-  /** `Arbitrary[T]` instance built by this `MkArbitraryCoproduct[T]` */
+  /** `Arbitrary[T]` instance built by this `MkCoproductArbitrary[T]` */
   def arbitrary: Arbitrary[C]
 }
 
@@ -116,15 +195,16 @@ object MkCoproductArbitrary {
    ): MkCoproductArbitrary[H :+: T] =
     instance(
       Arbitrary {
-        Gen.sized {
-          case 0 => Gen.fail
-          case size =>
-            val sig = math.signum(size)
-
-            Gen.frequency(
-              1   -> Gen.resize(size - sig, Gen.lzy(headArbitrary.value.arbitrary)).map(Inl(_)),
-              n() -> Gen.resize(size - sig, Gen.lzy(tailArbitrary.arbitrary.arbitrary)).map(Inr(_))
-            )
+        Gen.sized { size =>
+          /*
+           * Unlike MkCoproductArbitrary above, try to generate a value no matter what (no Gen.fail).
+           * This can blow the stack for recursive types, so should be avoided for those.
+           */
+          val nextSize = (size - 1) max 0
+          Gen.frequency(
+            1   -> Gen.resize(nextSize, Gen.lzy(headArbitrary.value.arbitrary)).map(Inl(_)),
+            n() -> Gen.resize(nextSize, Gen.lzy(tailArbitrary.arbitrary.arbitrary)).map(Inr(_))
+          )
         }
       }
     )

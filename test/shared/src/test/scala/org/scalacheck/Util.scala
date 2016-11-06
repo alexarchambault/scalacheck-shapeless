@@ -1,6 +1,7 @@
 package org.scalacheck
 
 import org.scalacheck.Gen.Parameters
+import org.scalacheck.Test.PropException
 import org.scalacheck.rng.Seed
 
 import org.scalacheck.derive.Singletons
@@ -10,9 +11,28 @@ import utest._
 object Util {
 
   implicit class PropExtensions(val prop: Prop) extends AnyVal {
-    def validate: Unit = {
-      val result = Test.check(Test.Parameters.default, prop)
+    def validate(minSuccessfulTests: Int = 1000): Unit = {
+      val result = Test.check(
+        Test.Parameters.default
+          .withMinSuccessfulTests(minSuccessfulTests),
+        prop
+      )
+      if (!result.passed)
+        Console.err.println(result)
+      result.status match {
+        case p: PropException =>
+          throw p.e
+        case _ =>
+      }
       assert(result.passed)
+    }
+    def mustFail(minSuccessfulTests: Int = 1000): Unit = {
+      val result = Test.check(
+        Test.Parameters.default
+          .withMinSuccessfulTests(minSuccessfulTests),
+        prop
+      )
+      assert(!result.passed)
     }
   }
 
@@ -82,7 +102,7 @@ object Util {
     Prop.forAll {
       t: T =>
         first.shrink(t) == second.shrink(t)
-    }.validate
+    }.validate()
 
   def validateSingletons[T: Singletons](expected: T*) = {
     val found = Singletons[T].apply()

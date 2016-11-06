@@ -133,7 +133,7 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedBaseArb =
-    MkArbitrary.genericCoproduct(
+    MkArbitrary.genericNonRecursiveCoproduct(
       Generic[Base],
       MkCoproductArbitrary.ccons(
         MkArbitrary.genericProduct(
@@ -226,7 +226,7 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedBaseWithSingletonArb =
-    MkArbitrary.genericCoproduct(
+    MkArbitrary.genericNonRecursiveCoproduct(
       Generic[BaseWithSingleton],
       MkCoproductArbitrary.ccons(
         expectedBaseWithSingletonDummyArb,
@@ -242,16 +242,17 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedT1TreeArbitrary: Arbitrary[T1.Tree] =
-    MkArbitrary.genericCoproduct(
+    MkArbitrary.genericRecursiveCoproduct(
+      T1.Tree.recursive,
       Generic[T1.Tree],
-      MkCoproductArbitrary.ccons(
+      MkRecursiveCoproductArbitrary.ccons(
         MkArbitrary.genericProduct(
           Generic[T1.Leaf.type],
           Lazy(
             MkHListArbitrary.hnil
           )
         ).arbitrary,
-        MkCoproductArbitrary.ccons(
+        MkRecursiveCoproductArbitrary.ccons(
           MkArbitrary.genericProduct(
             Generic[T1.Node],
             MkHListArbitrary.hcons(
@@ -271,7 +272,7 @@ object ArbitraryTests extends TestSuite {
               ops.nat.ToInt[Nat._2]
             )
           ).arbitrary,
-          MkCoproductArbitrary.cnil,
+          MkRecursiveCoproductArbitrary.cnil,
           ops.coproduct.Length[CNil],
           ops.nat.ToInt[Nat._0]
         ),
@@ -281,14 +282,15 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedT2TreeArbitrary: Arbitrary[T2.Tree] =
-    MkArbitrary.genericCoproduct(
+    MkArbitrary.genericRecursiveCoproduct(
+      T2.Tree.recursive,
       Generic[T2.Tree],
-      MkCoproductArbitrary.ccons(
+      MkRecursiveCoproductArbitrary.ccons(
         MkArbitrary.genericProduct(
           Generic[T2.Leaf.type],
           MkHListArbitrary.hnil
         ).arbitrary,
-        MkCoproductArbitrary.ccons(
+        MkRecursiveCoproductArbitrary.ccons(
           MkArbitrary.genericProduct(
             Generic[T2.Node],
             MkHListArbitrary.hcons(
@@ -308,7 +310,7 @@ object ArbitraryTests extends TestSuite {
               ops.nat.ToInt[Nat._2]
             )
           ).arbitrary,
-          MkCoproductArbitrary.cnil,
+          MkRecursiveCoproductArbitrary.cnil,
           ops.coproduct.Length[CNil],
           ops.nat.ToInt[Nat._0]
         ),
@@ -324,7 +326,7 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedFooArbitrary =
-    MkArbitrary.genericCoproduct(
+    MkArbitrary.genericNonRecursiveCoproduct(
       Generic[Foo],
       MkCoproductArbitrary.ccons(
         expectedBazArbitrary,
@@ -357,7 +359,7 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedDArbitrary =
-    MkArbitrary.genericCoproduct(
+    MkArbitrary.genericNonRecursiveCoproduct(
       Generic[D],
       MkCoproductArbitrary.ccons(
         expectedBazArbitrary,
@@ -400,7 +402,7 @@ object ArbitraryTests extends TestSuite {
     ).arbitrary
 
   lazy val expectedAArbitrary =
-    MkArbitrary.genericCoproduct(
+    MkArbitrary.genericNonRecursiveCoproduct(
       Generic[A],
       MkCoproductArbitrary.ccons(
         expectedBArbitrary,

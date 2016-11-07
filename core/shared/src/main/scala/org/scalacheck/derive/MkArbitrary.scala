@@ -27,11 +27,10 @@ abstract class MkArbitraryLowPriority {
    ): MkArbitrary[S] =
     MkArbitrary.instance(
       Arbitrary(
-        // failing on stack overflows - see the discussion in https://github.com/alexarchambault/scalacheck-shapeless/issues/50
-        GenExtra.failOnStackOverflow(
-          Gen.lzy(mkArb.value.arbitrary.arbitrary)
-            .map(gen.from)
-        )
+        Gen.lzy(mkArb.value.arbitrary.arbitrary)
+          .map(gen.from)
+          // see the discussion in https://github.com/alexarchambault/scalacheck-shapeless/issues/50
+          .failOnStackOverflow
       )
     )
 }

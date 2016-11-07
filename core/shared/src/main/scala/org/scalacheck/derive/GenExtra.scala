@@ -12,16 +12,16 @@ object GenExtra {
           case Some(u) => Gen.const(u)
         }
       }
-  }
 
-  def failOnStackOverflow[T](gen: Gen[T]): Gen[T] =
-    Gen.gen { (p, seed) =>
-      try gen.doApply(p, seed)
-      catch {
-        // likely not fine on Scala JS
-        case _: StackOverflowError =>
-          Gen.r(None, seed.next)
+    def failOnStackOverflow: Gen[T] =
+      Gen.gen { (p, seed) =>
+        try gen.doApply(p, seed)
+        catch {
+          // likely not fine on Scala JS
+          case _: StackOverflowError =>
+            Gen.r(None, seed.next)
+        }
       }
-    }
+  }
 
 }

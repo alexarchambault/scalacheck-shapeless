@@ -1,5 +1,7 @@
 package org.scalacheck
 
+import org.scalacheck.derive.Recursive
+
 import shapeless.{ Lazy => _, _ }
 import shapeless.record._
 import shapeless.union._
@@ -29,13 +31,25 @@ object TestsDefinitions {
 
   object T1 {
     sealed abstract class Tree
+    object Tree {
+      implicit val recursive = Recursive[Tree](Leaf)
+    }
     final case class Node(left: Tree, right: Tree, v: Int) extends Tree
     case object Leaf extends Tree
   }
 
   object T2 {
     sealed abstract class Tree
+    object Tree {
+      implicit val recursive = Recursive[Tree](Leaf)
+    }
     case class Node(left: Tree, right: Tree, v: Int) extends Tree
+    case object Leaf extends Tree
+  }
+
+  object T1NoRecursiveTC {
+    sealed abstract class Tree
+    final case class Node(left: Tree, right: Tree, v: Int) extends Tree
     case object Leaf extends Tree
   }
 

@@ -65,3 +65,7 @@ without having to define yourself an `Arbitrary` for `Foo`.
 
 - [scalacheck-datetime](https://github.com/47deg/scalacheck-datetime), a library to deal with datetimes with scalacheck,
 - [scalacheck-extensions](https://github.com/cvogt/scalacheck-extensions), a macro-based automatic `Arbitrary` generation (discontinued?).
+
+## License
+
+Released under the Apache 2 license. See LICENSE file for more details.

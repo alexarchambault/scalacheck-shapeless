@@ -111,21 +111,32 @@ object MkHListArbitrary {
    ): MkHListArbitrary[H :: T] =
     instance(
       Arbitrary {
-        Gen.sized { size =>
-          val sig = math.signum(size)
-          val remainder = sig * size % (n() + 1)
-          val fromRemainderGen =
-            if (remainder > 0)
-              Gen.choose(1, n()).map(r => if (r <= remainder) sig else 0)
-            else
-              Gen.const(0)
+        Gen.sized { size0 =>
+          if (size0 < 0)
+            // unlike positive values, don't split negative sizes any further, and let subsequent Gen handle them
+            for {
+              head <- Gen.resize(size0, Gen.lzy(headArbitrary.value.arbitrary))
+              tail <- Gen.resize(size0, Gen.lzy(tailArbitrary.arbitrary.arbitrary))
+            } yield head :: tail
+          else {
+            // take a fraction of approximately 1 / (n + 1) from size for the head, leave the
+            // remaining for the tail
 
-          for {
-            fromRemainder <- fromRemainderGen
-            headSize = size / (n() + 1) + fromRemainder
-            head <- Gen.resize(headSize, Gen.lzy(headArbitrary.value.arbitrary))
-            tail <- Gen.resize(size - headSize, Gen.lzy(tailArbitrary.arbitrary.arbitrary))
-          } yield head :: tail
+            val size = size0 max 0
+            val remainder = size % (n() + 1)
+            val fromRemainderGen =
+              if (remainder > 0)
+                Gen.choose(1, n()).map(r => if (r <= remainder) 1 else 0)
+              else
+                Gen.const(0)
+
+            for {
+              fromRemainder <- fromRemainderGen
+              headSize = size / (n() + 1) + fromRemainder
+              head <- Gen.resize(headSize, Gen.lzy(headArbitrary.value.arbitrary))
+              tail <- Gen.resize(size - headSize, Gen.lzy(tailArbitrary.arbitrary.arbitrary))
+            } yield head :: tail
+          }
         }
       }
     )

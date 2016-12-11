@@ -1,11 +1,12 @@
 
-lazy val `scalacheck-shapeless` = project.in(file("."))
+lazy val `scalacheck-shapeless` = project
+  .in(file("."))
   .aggregate(coreJVM, coreJS, testJVM, testJS)
   .settings(commonSettings)
   .settings(noPublishSettings)
 
 lazy val core = crossProject
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     name := coreName,
     moduleName := coreName,
@@ -31,8 +32,8 @@ lazy val coreJS = core.js
 
 lazy val test = crossProject
   .dependsOn(core)
-  .settings(commonSettings: _*)
-  .settings(noPublishSettings: _*)
+  .settings(commonSettings)
+  .settings(noPublishSettings)
   .settings(
     libraryDependencies += "com.lihaoyi" %%% "utest" % "0.4.4" % "test",
     testFrameworks += new TestFramework("utest.runner.Framework")

@@ -8,6 +8,11 @@ jdk:
 script: sbt -batch ++${TRAVIS_SCALA_VERSION} test:compile testJVM/test mimaReportBinaryIssues $(if [[ "${TRAVIS_PULL_REQUEST}" ==
   "false" && "${TRAVIS_BRANCH}" == "master" ]]; then echo "publish"; fi)
 sudo: false
+cache:
+  directories:
+  - $HOME/.coursier
+  - $HOME/.ivy2/cache
+  - $HOME/.sbt
 env:
   global:
   - secure: Pu7MuoqV27IULy/jCC4XBSTApLgeW02bf/g5/3/dNiwHllc3JPhzvMpuonJajlExx9+dkdxZSA4d9HmqGvZIonoa2Z292FFLVWIQOATjzWVuZ9ZFH4l7HsDiK/SPfgh9fYKF40aEw2bmIACYu5M2MOGilk4bsLl92ff5T/tr+uc=

@@ -1,22 +1,25 @@
 
-import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
-
-lazy val `scalacheck-shapeless` = project.in(file("."))
+lazy val `scalacheck-shapeless` = project
+  .in(file("."))
   .aggregate(coreJVM, coreJS, testJVM, testJS)
   .settings(commonSettings)
   .settings(noPublishSettings)
 
 lazy val core = crossProject
-  .settings(commonSettings: _*)
-  .settings(mimaSettings: _*)
+  .settings(commonSettings)
   .settings(
     name := coreName,
     moduleName := coreName,
     libraryDependencies ++= Seq(
       "org.scalacheck" %%% "scalacheck" % "1.13.4",
       "com.chuusai" %%% "shapeless" % "2.3.2"
-    )
+    ),
+    mimaPreviousArtifacts := {
+      if (scalaBinaryVersion.value == "2.12")
+        Set()
+      else
+        Set(organization.value %% moduleName.value % "1.1.0")
+    }
   )
   .jsSettings(
     postLinkJSEnv := NodeJSEnv().value,
@@ -29,8 +32,8 @@ lazy val coreJS = core.js
 
 lazy val test = crossProject
   .dependsOn(core)
-  .settings(commonSettings: _*)
-  .settings(noPublishSettings: _*)
+  .settings(commonSettings)
+  .settings(noPublishSettings)
   .settings(
     libraryDependencies += "com.lihaoyi" %%% "utest" % "0.4.4" % "test",
     testFrameworks += new TestFramework("utest.runner.Framework")
@@ -49,7 +52,6 @@ lazy val commonSettings = Seq(
 ) ++ compileSettings ++ publishSettings
 
 lazy val compileSettings = Seq(
-  scalaVersion := "2.11.8",
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
     Resolver.sonatypeRepo("snapshots")
@@ -103,16 +105,5 @@ lazy val noPublishSettings = Seq(
   publishLocal := (),
   publishArtifact := false
 )
-
-lazy val mimaSettings =
-  mimaDefaultSettings ++
-  Seq(
-    previousArtifact := {
-      if (scalaBinaryVersion.value == "2.12")
-        None
-      else
-        Some(organization.value %% moduleName.value % "1.1.0")
-    }
-  )
 
 // build.sbt shamelessly inspired by https://github.com/fthomas/refined/blob/master/build.sbt

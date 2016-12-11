@@ -49,7 +49,6 @@ lazy val commonSettings = Seq(
 ) ++ compileSettings ++ publishSettings
 
 lazy val compileSettings = Seq(
-  scalaVersion := "2.11.8",
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
     Resolver.sonatypeRepo("snapshots")

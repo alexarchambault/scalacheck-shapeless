@@ -58,7 +58,7 @@ lazy val compileSettings = Seq(
   ),
   libraryDependencies ++= {
     if (scalaVersion.value.startsWith("2.10."))
-      Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full))
+      Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch))
     else
       Seq()
   },

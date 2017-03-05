@@ -18,7 +18,7 @@ libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.1
 If you are using scala 2.10.x, also add the macro paradise plugin to your build,
 ```scala
 libraryDependencies +=
-  compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+  compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch)
 ```
 
 scalacheck-shapeless depends on shapeless 2.3 and scalacheck 1.13. It is built against scala 2.10, 2.11, and 2.12.

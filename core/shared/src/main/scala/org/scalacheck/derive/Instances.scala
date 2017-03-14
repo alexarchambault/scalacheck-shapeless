@@ -121,3 +121,12 @@ trait DerivedInstances {
    ): Cogen[T] =
     underlying.value.cogen
 }
+
+trait EnumerationInstances {
+
+  implicit def arbitraryEnumerationValue[E <: Enumeration]
+   (implicit
+     w: Witness.Aux[E]
+   ): Arbitrary[E#Value] =
+    Arbitrary(Gen.oneOf(w.value.values.toSeq))
+}

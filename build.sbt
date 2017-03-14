@@ -22,8 +22,6 @@ lazy val core = crossProject
     }
   )
   .jsSettings(
-    postLinkJSEnv := NodeJSEnv().value,
-    scalaJSUseRhino in Global := false,
     scalaJSStage in Test := FastOptStage
   )
 
@@ -52,17 +50,21 @@ lazy val commonSettings = Seq(
 ) ++ compileSettings ++ publishSettings
 
 lazy val compileSettings = Seq(
-  resolvers ++= Seq(
-    Resolver.sonatypeRepo("releases"),
-    Resolver.sonatypeRepo("snapshots")
-  ),
+  resolvers += Resolver.sonatypeRepo("releases"),
   libraryDependencies ++= {
-    if (scalaVersion.value.startsWith("2.10."))
+    if (scalaBinaryVersion.value == "2.10")
       Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch))
     else
       Seq()
   },
-  scalacOptions += "-target:jvm-1.7"
+  scalacOptions ++= {
+    scalaBinaryVersion.value match {
+      case "2.10" | "2.11" =>
+        Seq("-target:jvm-1.7")
+      case _ =>
+        Nil
+    }
+  }
 )
 
 lazy val publishSettings = Seq(
@@ -105,5 +107,3 @@ lazy val noPublishSettings = Seq(
   publishLocal := (),
   publishArtifact := false
 )
-
-// build.sbt shamelessly inspired by https://github.com/fthomas/refined/blob/master/build.sbt

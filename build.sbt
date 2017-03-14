@@ -11,7 +11,7 @@ lazy val core = crossProject
     name := coreName,
     moduleName := coreName,
     libraryDependencies ++= Seq(
-      "org.scalacheck" %%% "scalacheck" % "1.13.4",
+      "org.scalacheck" %%% "scalacheck" % "1.13.5",
       "com.chuusai" %%% "shapeless" % "2.3.2"
     ),
     mimaPreviousArtifacts := {

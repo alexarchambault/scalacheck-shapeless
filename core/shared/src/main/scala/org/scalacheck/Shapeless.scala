@@ -8,3 +8,4 @@ object Shapeless
   with CoproductInstances
   with DerivedInstances
   with FieldTypeInstances
+  with EnumerationInstances

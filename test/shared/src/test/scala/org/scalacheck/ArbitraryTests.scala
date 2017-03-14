@@ -635,6 +635,11 @@ object ArbitraryTests extends TestSuite {
       }
     }
 
+    'enumeration - {
+      val expected = Arbitrary(Gen.oneOf(WeekDay.values.toSeq))
+      val gen = Arbitrary.arbitrary[WeekDay.Value]
+      compareArbitrary(expected.arbitrary, gen)
+    }
   }
 
   object NoTC {

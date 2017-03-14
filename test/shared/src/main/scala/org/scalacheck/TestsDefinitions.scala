@@ -72,6 +72,9 @@ object TestsDefinitions {
   type C0 = Int :+: String :+: CNil
   type Un = Union.`'i -> Int, 's -> String`.T
 
+  object WeekDay extends Enumeration {
+    val Mon, Tue, Wed, Thu, Fri, Sat, Sun = Value
+  }
 
   object NoTCDefinitions {
     trait NoArbitraryType

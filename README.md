@@ -10,9 +10,9 @@ Generation of arbitrary case classes / ADTs instances with [scalacheck](https://
 
 Add to your `build.sbt`
 ```scala
-resolvers += Resolver.sonatypeRepo("releases")
+resolvers += Resolver.sonatypeRepo("releases") // only needed if the release hasn't reached maven central yet
 
-libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.3"
+libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.5"
 ```
 
 If you are using scala 2.10.x, also add the macro paradise plugin to your build,

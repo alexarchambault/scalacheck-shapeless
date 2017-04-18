@@ -2,7 +2,7 @@ package org.scalacheck
 
 import utest._
 import Util._
-import Shapeless._
+import ScalacheckShapeless._
 import org.scalacheck.TestsDefinitions.{T1, T1NoRecursiveTC}
 
 object PropTests extends TestSuite {

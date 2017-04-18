@@ -29,11 +29,11 @@ using shapeless 2.2 along with scalacheck 1.12, see the
 
 
 
-Import the content of `org.scalacheck.Shapeless` close to where you want
+Import the content of `org.scalacheck.ScalacheckShapeless` close to where you want
 `Arbitrary` type classes to be automatically available for case classes
 / sealed hierarchies,
 ```scala
-import org.scalacheck.Shapeless._
+import org.scalacheck.ScalacheckShapeless._
 
 //  If you defined:
 

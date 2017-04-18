@@ -5,7 +5,7 @@ import utest._
 import org.scalacheck.rng.Seed
 
 object SizeTests0 {
-  import org.scalacheck.Shapeless._
+  import org.scalacheck.ScalacheckShapeless._
 
   import SizeTestsDefinitions._
 

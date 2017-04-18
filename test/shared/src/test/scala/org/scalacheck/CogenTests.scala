@@ -13,7 +13,7 @@ import Util._
 
 object CogenTests extends TestSuite {
   import TestsDefinitions._
-  import Shapeless._
+  import ScalacheckShapeless._
 
   lazy val expectedIntStringBoolCogen =
     expectedIntStringBoolMkHListCogen.cogen

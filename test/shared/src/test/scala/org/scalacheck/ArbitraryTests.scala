@@ -14,7 +14,7 @@ import Util._
 
 object ArbitraryTests extends TestSuite {
   import TestsDefinitions._
-  import Shapeless._
+  import ScalacheckShapeless._
 
 
   lazy val expectedSimpleArb =
@@ -193,7 +193,7 @@ object ArbitraryTests extends TestSuite {
       MkHListArbitrary.hcons(
         Arbitrary.arbInt,
         MkHListArbitrary.hcons(
-          Shapeless.arbitrarySingletonType[Witness.`"aa"`.T],
+          ScalacheckShapeless.arbitrarySingletonType[Witness.`"aa"`.T],
           MkHListArbitrary.hnil,
           ops.hlist.Length[HNil],
           ops.nat.ToInt[Nat._0]
@@ -207,7 +207,7 @@ object ArbitraryTests extends TestSuite {
     MkArbitrary.genericProduct(
       Generic[BaseWithSingleton.Main],
       MkHListArbitrary.hcons(
-        Shapeless.arbitrarySingletonType[Witness.`"aa"`.T],
+        ScalacheckShapeless.arbitrarySingletonType[Witness.`"aa"`.T],
         MkHListArbitrary.hnil,
         ops.hlist.Length[HNil],
         ops.nat.ToInt[Nat._0]

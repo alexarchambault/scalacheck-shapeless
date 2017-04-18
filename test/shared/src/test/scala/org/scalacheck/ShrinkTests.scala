@@ -1,6 +1,6 @@
 package org.scalacheck
 
-import org.scalacheck.Shapeless._
+import org.scalacheck.ScalacheckShapeless._
 import org.scalacheck.derive._
 import shapeless._
 import shapeless.labelled._

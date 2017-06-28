@@ -33,7 +33,7 @@ Import the content of `org.scalacheck.ScalacheckShapeless` close to where you wa
 `Arbitrary` type classes to be automatically available for case classes
 / sealed hierarchies,
 ```scala
-import org.scalacheck.ScalacheckShapeless._
+import org.scalacheck.Shapeless._
 
 //  If you defined:
 

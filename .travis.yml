@@ -3,9 +3,10 @@ scala:
 - 2.10.6
 - 2.11.11
 - 2.12.2
+- 2.13.0-M1
 jdk:
 - oraclejdk8
-script: sbt -batch ++${TRAVIS_SCALA_VERSION} test:compile testJVM/test mimaReportBinaryIssues $(if [[ "${TRAVIS_PULL_REQUEST}" ==
+script: sbt -batch ++${TRAVIS_SCALA_VERSION} test:compile testJVM/test $(if [[ "${TRAVIS_SCALA_VERSION}" != "2.13.0-M1" ]]; then echo mimaReportBinaryIssues; fi) $(if [[ "${TRAVIS_PULL_REQUEST}" ==
   "false" && "${TRAVIS_BRANCH}" == "master" ]]; then echo "publish"; fi)
 sudo: false
 cache:

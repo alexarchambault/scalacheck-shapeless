@@ -12,9 +12,14 @@ lazy val core = crossProject
       Deps.scalacheck.value,
       Deps.shapeless.value
     ),
-    mimaPreviousArtifacts := Set(
-      organization.value %% moduleName.value % "1.1.5"
-    )
+    mimaPreviousArtifacts := {
+      if (scalaVersion.value.startsWith("2.13"))
+        Set()
+      else
+        Set(
+          organization.value %% moduleName.value % "1.1.5"
+        )
+    }
   )
   .jsSettings(
     scalaJSStage.in(Test) := FastOptStage

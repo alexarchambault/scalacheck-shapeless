@@ -2,8 +2,9 @@
 import Aliases._
 import Settings._
 
+import sbtcrossproject.crossProject
 
-lazy val core = crossProject
+lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     shared,
     name := "scalacheck-shapeless_1.13",
@@ -28,7 +29,7 @@ lazy val core = crossProject
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 
-lazy val test = crossProject
+lazy val test = crossProject(JSPlatform, JVMPlatform)
   .dependsOn(core)
   .settings(
     shared,

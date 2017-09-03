@@ -65,6 +65,29 @@ object CogenTests extends TestSuite {
       )
     ).cogen
 
+  lazy val expectedTree1Cogen: Cogen[T1.Tree] =
+    MkCogen.genericCoproduct(
+      Generic[T1.Tree],
+      Lazy(MkCoproductCogen.ccons(
+        MkCogen.genericProduct(
+          Generic[T1.Leaf.type],
+          Lazy(MkHListCogen.hnil)
+        ).cogen,
+        MkCoproductCogen.ccons(
+          MkCogen.genericProduct(
+            Generic[T1.Node],
+            Lazy(MkHListCogen.hcons(
+              expectedTree1Cogen,
+              MkHListCogen.hcons(
+                expectedTree1Cogen,
+                MkHListCogen.hcons(
+                  Cogen.cogenInt,
+                  MkHListCogen.hnil
+                ))))
+          ).cogen,
+          MkCoproductCogen.cnil
+        )))
+    ).cogen
 
   val tests = TestSuite {
 
@@ -142,6 +165,10 @@ object CogenTests extends TestSuite {
       compareCogen(expectedUnionCogen, cogen)
     }
 
+    'tree1 - {
+      val cogen = Cogen[T1.Tree]
+      compareCogen(expectedTree1Cogen, cogen)
+    }
   }
 
 }

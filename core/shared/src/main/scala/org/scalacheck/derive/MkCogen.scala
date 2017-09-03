@@ -31,15 +31,17 @@ object MkCogen {
    (implicit
      gen: Generic.Aux[P, L],
      cogen: Lazy[MkHListCogen[L]]
-   ): MkCogen[P] =
-    instance(cogen.value.cogen.contramap(gen.to))
+   ): MkCogen[P] = instance(Cogen { (seed: Seed, p: P) =>
+     cogen.value.cogen.perturb(seed, gen.to(p))
+   })
 
   implicit def genericCoproduct[S, C <: Coproduct]
    (implicit
      gen: Generic.Aux[S, C],
      cogen: Lazy[MkCoproductCogen[C]]
-   ): MkCogen[S] =
-    instance(cogen.value.cogen.contramap(gen.to))
+   ): MkCogen[S] = instance(Cogen { (seed: Seed, s: S) =>
+     cogen.value.cogen.perturb(seed, gen.to(s))
+   })
 }
 
 trait MkHListCogen[L <: HList] {

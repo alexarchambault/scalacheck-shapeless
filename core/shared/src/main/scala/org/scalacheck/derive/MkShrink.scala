@@ -41,10 +41,20 @@ object MkShrink {
       lazyxmap(gen.from, gen.to)(shrink.value.shrink)
     )
 
-  implicit def genericCoproduct[S, C <: Coproduct]
+  @deprecated("Kept for binary compatibility", "1.1.7")
+  def genericCoproduct[S, C <: Coproduct]
    (implicit
      gen: Generic.Aux[S, C],
      shrink: Lazy[MkCoproductShrink[C]]
+   ): MkShrink[S] =
+    instance(
+      lazyxmap(gen.from, gen.to)(shrink.value.shrink)
+    )
+
+  implicit def genericCoproduct0[S, C <: Coproduct]
+   (implicit
+     gen: Generic.Aux[S, C],
+     shrink: Lazy[MkCoproductShrink0[C]]
    ): MkShrink[S] =
     instance(
       lazyxmap(gen.from, gen.to)(shrink.value.shrink)
@@ -81,6 +91,7 @@ object MkHListShrink {
     )
 }
 
+@deprecated("See MkCoproductShrink0 instead, which has no quadratic implicit lookups", "1.1.7")
 trait MkCoproductShrink[C <: Coproduct] {
   /** `Shrink[T]` instance built by this `MkCoproductShrink[T]` */
   def shrink: Shrink[C]
@@ -114,4 +125,42 @@ object MkCoproductShrink {
           else headSingletons.value().toStream.map(Inl(_)) ++ tailShrink.shrink.shrink(t).map(Inr(_))
       }
     )
+}
+
+abstract class MkCoproductShrink0[C <: Coproduct] {
+  /** `Shrink[T]` instance built by this `MkCoproductShrink0[T]` */
+  def shrink: Shrink[C]
+  def singletons: Singletons[C]
+}
+
+object MkCoproductShrink0 {
+  def apply[T <: Coproduct](implicit mkShrink: MkCoproductShrink0[T]): MkCoproductShrink0[T] = mkShrink
+
+  def instance[T <: Coproduct](singletons0: Singletons[T])(shrink0: => Shrink[T]): MkCoproductShrink0[T] =
+    new MkCoproductShrink0[T] {
+      def shrink = shrink0
+      def singletons = singletons0
+    }
+
+  implicit val cnil: MkCoproductShrink0[CNil] =
+    instance(Singletons.empty)(Shrink.shrinkAny)
+
+  implicit def ccons[H, T <: Coproduct]
+   (implicit
+     headShrink: Strict[Shrink[H]],
+     tailShrink: MkCoproductShrink0[T],
+     headSingletons: Strict[Singletons[H]]
+   ): MkCoproductShrink0[H :+: T] = {
+
+    val singletons = Singletons.instance(headSingletons.value().map(Inl(_): H :+: T) ++ tailShrink.singletons().map(Inr(_): H :+: T))
+
+    instance[H :+: T](singletons)(
+      Shrink {
+        case Inl(h) =>
+          tailShrink.singletons().toStream.map(Inr(_)) ++ headShrink.value.shrink(h).map(Inl(_))
+        case Inr(t) =>
+          headSingletons.value().toStream.map(Inl(_)) ++ tailShrink.shrink.shrink(t).map(Inr(_))
+      }
+    )
+  }
 }

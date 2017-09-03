@@ -91,9 +91,19 @@ trait CoproductInstances {
    ): Cogen[C] =
     arb.cogen
 
-  implicit def coproductShrink[C <: Coproduct]
+  @deprecated("Kept for binary compatibility", "1.1.7")
+  def coproductShrink[C <: Coproduct]
    (implicit
      arb: MkCoproductShrink[C]
+   ): Shrink[C] =
+    arb.shrink
+}
+
+trait CoproductInstances0 extends CoproductInstances {
+
+  implicit def coproductShrink0[C <: Coproduct]
+   (implicit
+     arb: MkCoproductShrink0[C]
    ): Shrink[C] =
     arb.shrink
 }

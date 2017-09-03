@@ -5,7 +5,7 @@ import derive._
 trait ScalacheckShapeless
   extends SingletonInstances
   with HListInstances
-  with CoproductInstances
+  with CoproductInstances0
   with DerivedInstances
   with FieldTypeInstances
   with EnumerationInstances

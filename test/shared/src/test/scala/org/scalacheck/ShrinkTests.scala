@@ -35,21 +35,18 @@ object ShrinkTests extends TestSuite {
     )
 
   lazy val expectedIntStringBoolCoproductShrink =
-    MkCoproductShrink.ccons(
+    MkCoproductShrink0.ccons(
       Strict(Shrink.shrinkIntegral[Int]),
-      MkCoproductShrink.ccons(
+      MkCoproductShrink0.ccons(
         Strict(Shrink.shrinkString),
-        MkCoproductShrink.ccons(
+        MkCoproductShrink0.ccons(
           Strict(Shrink.shrinkAny[Boolean]),
-          MkCoproductShrink.cnil,
-          Strict(Singletons[Boolean]),
-          Strict(Singletons[CNil])
+          MkCoproductShrink0.cnil,
+          Strict(Singletons[Boolean])
         ),
-        Strict(Singletons[String]),
-        Strict(Singletons[Boolean :+: CNil])
+        Strict(Singletons[String])
       ),
-      Strict(Singletons[Int]),
-      Strict(Singletons[String :+: Boolean :+: CNil])
+      Strict(Singletons[Int])
     ).shrink
 
   lazy val expectedSimpleShrink =
@@ -70,16 +67,14 @@ object ShrinkTests extends TestSuite {
     ).shrink
 
   lazy val expectedUnionShrink =
-    MkCoproductShrink.ccons[FieldType[Witness.`'i`.T, Int], Union.`'s -> String`.T](
+    MkCoproductShrink0.ccons[FieldType[Witness.`'i`.T, Int], Union.`'s -> String`.T](
       shrinkFieldType[Witness.`'i`.T, Int](Shrink.shrinkIntegral[Int]),
-      MkCoproductShrink.ccons[FieldType[Witness.`'s`.T, String], CNil](
+      MkCoproductShrink0.ccons[FieldType[Witness.`'s`.T, String], CNil](
         shrinkFieldType[Witness.`'s`.T, String](Shrink.shrinkString),
-        MkCoproductShrink.cnil,
-        Singletons[FieldType[Witness.`'s`.T, String]],
-        Singletons[CNil]
+        MkCoproductShrink0.cnil,
+        Singletons[FieldType[Witness.`'s`.T, String]]
       ),
-      Singletons[FieldType[Witness.`'i`.T, Int]],
-      Singletons[Union.`'s -> String`.T]
+      Singletons[FieldType[Witness.`'i`.T, Int]]
     ).shrink
 
 

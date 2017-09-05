@@ -120,6 +120,48 @@ object ShrinkTests extends TestSuite {
       compareShrink(shrink, expectedUnionShrink)
     }
 
+    'adt - {
+      val shrink = implicitly[Shrink[A]]
+
+      'caseClass - {
+        * - {
+          val res = shrink.shrink(B(2, "b")).toVector
+          assert(res.contains(C))
+          assert(res.contains(F))
+          assert(res.contains(Baz))
+        }
+
+        * - {
+          val res = shrink.shrink(E(1.3, Some(1.2f))).toVector
+          assert(res.contains(C))
+          assert(res.contains(F))
+          assert(res.contains(Baz))
+        }
+      }
+
+      'caseObject - {
+        * - {
+          val res = shrink.shrink(C).toVector
+          assert(res.isEmpty)
+        }
+
+        * - {
+          val res = shrink.shrink(F).toVector
+          assert(res.isEmpty)
+        }
+
+        * - {
+          val res = shrink.shrink(Baz).toVector
+          assert(res.isEmpty)
+        }
+      }
+    }
+
+    'maybe {
+      val shrink = implicitly[Shrink[Maybe]]
+      assert(shrink.shrink(Yes).isEmpty)
+      assert(shrink.shrink(No).isEmpty)
+    }
   }
 
 }

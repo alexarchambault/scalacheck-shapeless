@@ -2,7 +2,7 @@ package org.scalacheck
 
 import org.scalacheck.derive.Recursive
 
-import shapeless.{ Lazy => _, _ }
+import shapeless._
 import shapeless.record._
 import shapeless.union._
 
@@ -87,4 +87,7 @@ object TestsDefinitions {
     case class BaseNoArbN(n: NoArbitraryType) extends BaseNoArb
   }
 
+  sealed trait Maybe
+  case object Yes extends Maybe
+  case object No extends Maybe
 }

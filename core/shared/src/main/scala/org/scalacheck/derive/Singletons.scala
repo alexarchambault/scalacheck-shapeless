@@ -88,7 +88,8 @@ object HListSingletons {
   implicit val hnil: HListSingletons[HNil] =
     instance(Seq(HNil))
 
-  implicit def hconsFound[H, T <: HList]
+  @deprecated("Kept for binary compatibility", "1.1.7")
+  def hconsFound[H, T <: HList]
    (implicit
      headSingletons: Strict[Singletons[H]],
      tailSingletons: HListSingletons[T]

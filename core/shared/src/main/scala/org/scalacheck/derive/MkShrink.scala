@@ -107,9 +107,11 @@ object MkCoproductShrink {
     instance(
       Shrink {
         case Inl(h) =>
-          tailSingletons.value().toStream.map(Inr(_)) ++ headShrink.value.shrink(h).map(Inl(_))
+          if (headSingletons.value().contains(h)) Stream.empty
+          else tailSingletons.value().toStream.map(Inr(_)) ++ headShrink.value.shrink(h).map(Inl(_))
         case Inr(t) =>
-          headSingletons.value().toStream.map(Inl(_)) ++ tailShrink.shrink.shrink(t).map(Inr(_))
+          if (tailSingletons.value().contains(t)) Stream.empty
+          else headSingletons.value().toStream.map(Inl(_)) ++ tailShrink.shrink.shrink(t).map(Inr(_))
       }
     )
 }

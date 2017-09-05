@@ -41,10 +41,20 @@ object MkShrink {
       lazyxmap(gen.from, gen.to)(shrink.value.shrink)
     )
 
-  implicit def genericCoproduct[S, C <: Coproduct]
+  @deprecated("Kept for binary compatibility", "1.1.7")
+  def genericCoproduct[S, C <: Coproduct]
    (implicit
      gen: Generic.Aux[S, C],
      shrink: Lazy[MkCoproductShrink[C]]
+   ): MkShrink[S] =
+    instance(
+      lazyxmap(gen.from, gen.to)(shrink.value.shrink)
+    )
+
+  implicit def genericCoproduct0[S, C <: Coproduct]
+   (implicit
+     gen: Generic.Aux[S, C],
+     shrink: Lazy[MkCoproductShrink0[C]]
    ): MkShrink[S] =
     instance(
       lazyxmap(gen.from, gen.to)(shrink.value.shrink)
@@ -81,6 +91,7 @@ object MkHListShrink {
     )
 }
 
+@deprecated("See MkCoproductShrink0 instead, which has no quadratic implicit lookups", "1.1.7")
 trait MkCoproductShrink[C <: Coproduct] {
   /** `Shrink[T]` instance built by this `MkCoproductShrink[T]` */
   def shrink: Shrink[C]
@@ -114,4 +125,52 @@ object MkCoproductShrink {
           else headSingletons.value().toStream.map(Inl(_)) ++ tailShrink.shrink.shrink(t).map(Inr(_))
       }
     )
+}
+
+abstract class MkCoproductShrink0[C <: Coproduct] {
+  /** `Shrink[T]` instance built by this `MkCoproductShrink0[T]` */
+  final def shrink: Shrink[C] =
+    Shrink(apply(_).getOrElse(Stream.empty))
+
+  /**
+    * Shrink a value.
+    *
+    * @return A [[scala.Stream]] of shrunk values, wrapped in [[scala.Some]], or [[scala.None]] if the value cannot be shrunk any more.
+    */
+  def apply(c: C): Option[Stream[C]]
+  def singletons: Singletons[C]
+}
+
+object MkCoproductShrink0 {
+  def apply[T <: Coproduct](implicit mkShrink: MkCoproductShrink0[T]): MkCoproductShrink0[T] = mkShrink
+
+  def instance[T <: Coproduct](singletons0: Singletons[T])(shrink0: T => Option[Stream[T]]): MkCoproductShrink0[T] =
+    new MkCoproductShrink0[T] {
+      def apply(t: T) = shrink0(t)
+      def singletons = singletons0
+    }
+
+  implicit val cnil: MkCoproductShrink0[CNil] =
+    instance(Singletons.empty)(_ => Some(Stream.empty))
+
+  implicit def ccons[H, T <: Coproduct]
+   (implicit
+     headShrink: Strict[Shrink[H]],
+     tailShrink: MkCoproductShrink0[T],
+     headSingletons: Strict[Singletons[H]]
+   ): MkCoproductShrink0[H :+: T] = {
+
+    val singletons = Singletons.instance(headSingletons.value().map(Inl(_): H :+: T) ++ tailShrink.singletons().map(Inr(_): H :+: T))
+    lazy val headSingletonsSet = headSingletons.value().toSet
+
+    instance[H :+: T](singletons) {
+      case Inl(h) =>
+        if (headSingletonsSet(h))
+          None
+        else
+          Some(tailShrink.singletons().toStream.map(Inr(_)) ++ headShrink.value.shrink(h).map(Inl(_)))
+      case Inr(t) =>
+        tailShrink(t).map(_.map(Inr(_)) ++ headSingletons.value().toStream.map(Inl(_)))
+    }
+  }
 }

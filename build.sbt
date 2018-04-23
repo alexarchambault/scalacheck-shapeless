@@ -7,7 +7,7 @@ import sbtcrossproject.crossProject
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     shared,
-    name := "scalacheck-shapeless_1.13",
+    name := "scalacheck-shapeless_1.14",
     moduleName := name.value, // keep the '.' in name ^
     libs ++= Seq(
       Deps.scalacheck.value,

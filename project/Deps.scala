@@ -8,5 +8,5 @@ object Deps {
 
   def scalacheck = setting("org.scalacheck" %%% "scalacheck" % "1.13.5")
   def shapeless = setting("com.chuusai" %%% "shapeless" % "2.3.3")
-  def utest = setting("com.lihaoyi" %%% "utest" % "0.6.3")
+  def utest = setting("com.lihaoyi" %%% "utest" % "0.6.4")
 }

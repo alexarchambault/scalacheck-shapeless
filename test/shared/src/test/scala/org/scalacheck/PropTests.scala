@@ -44,7 +44,9 @@ object PropTests extends TestSuite {
     'recursiveADT2 - {
       val prop = Prop.forAll { (f: Int => T1NoRecursiveTC.Tree) => f(0); true }
 
-      prop.mustFail(10000)
+      // FIXME Doesn't fail with scalacheck 1.14.0, because of its retry mechanism
+      // scalacheck retries to generate stuff when it gets stackoverflows
+      // prop.mustFail(10000)
     }
   }
 

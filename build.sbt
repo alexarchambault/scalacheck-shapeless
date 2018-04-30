@@ -7,19 +7,16 @@ import sbtcrossproject.crossProject
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     shared,
-    name := "scalacheck-shapeless_1.13",
+    name := "scalacheck-shapeless_1.14",
     moduleName := name.value, // keep the '.' in name ^
     libs ++= Seq(
       Deps.scalacheck.value,
       Deps.shapeless.value
     ),
     mimaPreviousArtifacts := {
-      if (scalaVersion.value.startsWith("2.13"))
-        Set()
-      else
-        Set(
-          organization.value %% moduleName.value % "1.1.5"
-        )
+      Seq[String]()
+        .map(v => organization.value %% moduleName.value % v)
+        .toSet
     }
   )
   .jsSettings(

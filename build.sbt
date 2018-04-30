@@ -14,12 +14,9 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
       Deps.shapeless.value
     ),
     mimaPreviousArtifacts := {
-      if (scalaVersion.value.startsWith("2.13"))
-        Set()
-      else
-        Set(
-          organization.value %% moduleName.value % "1.1.5"
-        )
+      Seq[String]()
+        .map(v => organization.value %% moduleName.value % v)
+        .toSet
     }
   )
   .jsSettings(

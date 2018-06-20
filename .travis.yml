@@ -6,7 +6,7 @@ scala:
 jdk:
 - oraclejdk8
 script: sbt -batch ++${TRAVIS_SCALA_VERSION} test:compile testJVM/test mimaReportBinaryIssues $(if [[ "${TRAVIS_PULL_REQUEST}" ==
-  "false" && "${TRAVIS_BRANCH}" == "master" ]]; then echo "publish"; fi)
+  "false" && "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_REPO_SLUG}" == "alexarchambault/scalacheck-shapeless" ]]; then echo "publish"; fi)
 sudo: false
 cache:
   directories:

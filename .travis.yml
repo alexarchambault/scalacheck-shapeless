@@ -8,6 +8,12 @@ jdk:
 script: sbt -batch ++${TRAVIS_SCALA_VERSION} test:compile testJVM/test mimaReportBinaryIssues $(if [[ "${TRAVIS_PULL_REQUEST}" ==
   "false" && "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_REPO_SLUG}" == "alexarchambault/scalacheck-shapeless" ]]; then echo "publish"; fi)
 sudo: false
+matrix:
+  include:
+  - scala: 2.13.0-M4
+    script:
+    # TODO utest for Scala 2.13
+    - sbt "++ ${TRAVIS_SCALA_VERSION}!" coreJVM/compile coreJS/compile
 cache:
   directories:
   - $HOME/.coursier

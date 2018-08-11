@@ -18,6 +18,8 @@ jobs:
     script:
     # TODO utest for Scala 2.13
     - sbt "++ ${TRAVIS_SCALA_VERSION}!" coreJVM/compile coreJS/compile
+  - stage: release
+    script: sbt ci-release
 cache:
   directories:
   - $HOME/.cache

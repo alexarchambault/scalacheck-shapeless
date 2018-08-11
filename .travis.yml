@@ -1,28 +1,26 @@
 language: scala
-scala:
-- 2.10.7
-- 2.11.12
-- 2.12.4
 jdk:
 - oraclejdk8
-script: sbt -batch ++${TRAVIS_SCALA_VERSION} test:compile testJVM/test mimaReportBinaryIssues $(if [[ "${TRAVIS_PULL_REQUEST}" ==
-  "false" && "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_REPO_SLUG}" == "alexarchambault/scalacheck-shapeless" ]]; then echo "publish"; fi)
+script: sbt -batch ++${TRAVIS_SCALA_VERSION} test:compile testJVM/test mimaReportBinaryIssues
 sudo: false
-matrix:
+before_install:
+  - git fetch --tags
+stages:
+  - name: test
+  - name: release
+    if: (branch = master AND type = push) OR (tag IS present)
+jobs:
   include:
+  - scala: 2.10.7
+  - scala: 2.11.12
+  - scala: 2.12.4
   - scala: 2.13.0-M4
     script:
     # TODO utest for Scala 2.13
     - sbt "++ ${TRAVIS_SCALA_VERSION}!" coreJVM/compile coreJS/compile
 cache:
   directories:
+  - $HOME/.cache
   - $HOME/.coursier
   - $HOME/.ivy2/cache
   - $HOME/.sbt
-env:
-  global:
-  - secure: Pu7MuoqV27IULy/jCC4XBSTApLgeW02bf/g5/3/dNiwHllc3JPhzvMpuonJajlExx9+dkdxZSA4d9HmqGvZIonoa2Z292FFLVWIQOATjzWVuZ9ZFH4l7HsDiK/SPfgh9fYKF40aEw2bmIACYu5M2MOGilk4bsLl92ff5T/tr+uc=
-  - secure: K8wTOFoZ1KSlD1RnR5BhBHgE4nrLZQnX6w99GS1+kQIqRO0PG9DP5ZMHcFz3MJBnxOCs0DBA+a41SHa8TXWIY0pzXT+cY6e3gzcU0+1VCpPtU1BJ3qH+PdW5Cl0c+Nl3mQQoRWi6iDdxVV/3DhpIujsoY/boZ4aMyBUqQEvJh8s=
-branches:
-  only:
-  - master

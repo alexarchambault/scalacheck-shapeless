@@ -4,6 +4,18 @@ import Settings._
 
 import sbtcrossproject.crossProject
 
+inThisBuild(List(
+  organization := "com.github.alexarchambault",
+  homepage := Some(url("https://github.com/alexarchambault/scalacheck-shapeless")),
+  licenses := Seq("Apache 2.0" -> url("http://opensource.org/licenses/Apache-2.0")),
+  developers := List(Developer(
+    "alexarchambault",
+    "Alexandre Archambault",
+    "",
+    url("https://github.com/alexarchambault")
+  ))
+))
+
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     shared,

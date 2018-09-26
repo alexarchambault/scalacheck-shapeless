@@ -4,7 +4,7 @@ Generation of arbitrary case classes / ADTs instances with [scalacheck](https://
 
 [![Build Status](https://travis-ci.org/alexarchambault/scalacheck-shapeless.svg)](https://travis-ci.org/alexarchambault/scalacheck-shapeless)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/alexarchambault/scalacheck-shapeless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.alexarchambault/scalacheck-shapeless_1.13_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.alexarchambault/scalacheck-shapeless_1.13_2.12)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.alexarchambault/scalacheck-shapeless_1.14_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.alexarchambault/scalacheck-shapeless_1.14_2.12)
 
 ## Usage
 
@@ -12,7 +12,7 @@ Add to your `build.sbt`
 ```scala
 resolvers += Resolver.sonatypeRepo("releases") // only needed if the release hasn't reached maven central yet
 
-libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.6"
+libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.0"
 ```
 
 If you are using scala 2.10.x, also add the macro paradise plugin to your build,
@@ -21,7 +21,7 @@ libraryDependencies +=
   compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch)
 ```
 
-scalacheck-shapeless depends on shapeless 2.3 and scalacheck 1.13. It is built against scala 2.10, 2.11, and 2.12.
+scalacheck-shapeless depends on shapeless 2.3 and scalacheck 1.14. It is built against scala 2.10, 2.11, and 2.12.
 
 If you are using shapeless 2.2 along with scalacheck 1.13, use the `1.0.0` version. If you are
 using shapeless 2.2 along with scalacheck 1.12, see the

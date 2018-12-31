@@ -14,10 +14,7 @@ jobs:
   - scala: 2.10.7
   - scala: 2.11.12
   - scala: 2.12.4
-  - scala: 2.13.0-M4
-    script:
-    # TODO utest for Scala 2.13
-    - sbt "++ ${TRAVIS_SCALA_VERSION}!" coreJVM/compile coreJS/compile
+  - scala: 2.13.0-M5
   - stage: release
     script: sbt ci-release
 cache:

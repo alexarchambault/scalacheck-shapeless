@@ -1,10 +1,8 @@
 language: scala
-jdk:
-- oraclejdk8
+jdk: openjdk8
 script: sbt -batch ++${TRAVIS_SCALA_VERSION} test:compile testJVM/test mimaReportBinaryIssues
-sudo: false
-before_install:
-  - git fetch --tags
+git:
+  depth: false
 stages:
   - name: test
   - name: release
@@ -17,6 +15,10 @@ jobs:
   - scala: 2.13.0-M5
   - stage: release
     script: sbt ci-release
+branches:
+  only:
+  - master
+  - /^v\d+\.\d+.*$/ # tagged versions
 cache:
   directories:
   - $HOME/.cache

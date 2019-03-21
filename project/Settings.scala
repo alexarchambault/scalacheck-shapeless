@@ -13,7 +13,6 @@ object Settings {
   lazy val shared = Seq(
     scalaVersion := scala212,
     crossScalaVersions := Seq(scala213, scala212, scala211, scala210),
-    resolvers += Resolver.sonatypeRepo("releases"),
     libs ++= {
       if (scalaBinaryVersion.value == "2.10")
         Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch))

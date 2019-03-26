@@ -5,7 +5,7 @@ import Aliases._
 
 object Settings {
 
-  private def scala210 = "2.10.6"
+  private def scala210 = "2.10.7"
   private def scala211 = "2.11.12"
   private def scala212 = "2.12.8"
   private def scala213 = "2.13.0-M5"

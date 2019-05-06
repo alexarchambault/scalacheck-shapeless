@@ -70,3 +70,7 @@ without having to define yourself an `Arbitrary` for `Foo`.
 ## License
 
 Released under the Apache 2 license. See LICENSE file for more details.
+
+## Code of Conduct
+
+See the [Code of Conduct](CODE_OF_CONDUCT.md)

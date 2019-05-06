@@ -13,7 +13,10 @@ support you.
 
 ## Moderation
 
-For any questions, concerns, or moderation requests please contact a
-member of the project.
+For any questions, concerns, or moderation requests please contact
+[Alexandre Archambault], or
+[any of the moderators](https://typelevel.org/code-of-conduct.html#contact)
+of the [Scala Code of Conduct].
 
+[Alexandre Archambault]: mailto:alexandre.archambault+github@gmail.com
 [Scala Code of Conduct]: https://typelevel.org/code-of-conduct.html

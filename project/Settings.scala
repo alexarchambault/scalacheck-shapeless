@@ -15,7 +15,7 @@ object Settings {
     crossScalaVersions := Seq(scala213, scala212, scala211, scala210),
     libs ++= {
       if (scalaBinaryVersion.value == "2.10")
-        Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch))
+        Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.patch))
       else
         Seq()
     },

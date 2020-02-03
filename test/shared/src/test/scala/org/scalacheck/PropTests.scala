@@ -3,6 +3,7 @@ package org.scalacheck
 import utest._
 import Util._
 import ScalacheckShapeless._
+import org.scalacheck.derive.{MkArbitrary, Recursive}
 import org.scalacheck.TestsDefinitions.{T1, T1NoRecursiveTC}
 
 object PropTests extends TestSuite {
@@ -29,6 +30,13 @@ object PropTests extends TestSuite {
 
     'recursiveADT - {
       case class Node[T](value: T, left: Option[Node[T]], right: Option[Node[T]])
+
+      // deriving the Arbitrary[Option[…]] ourselves, so that it safely
+      // unties the recursion
+      implicit def rec[T]: Recursive[Option[Node[T]]] =
+        Recursive[Option[Node[T]]](Gen.const(None))
+      implicit def arb[T: Arbitrary]: Arbitrary[Option[Node[T]]] =
+        MkArbitrary[Option[Node[T]]].arbitrary
 
       val prop = Prop.forAll { (f: Int => Node[Int]) => f(0); true }
 

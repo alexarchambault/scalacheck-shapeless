@@ -12,7 +12,16 @@ jobs:
   - scala: 2.11.12
   - scala: 2.12.10
   - scala: 2.13.1
+  - env: SCALAJS_VERSION=0.6.32
+    name: "Scala.JS 0.6"
+    script: sbt -batch +testJS/test
   - stage: release
+    script: sbt ci-release
+  - stage: release
+    env:
+    - SCALAJS_VERSION=0.6.32
+    - CI_RELEASE=+coreJS/publishSigned
+    name: "Scala.JS 0.6"
     script: sbt ci-release
 branches:
   only:

@@ -54,16 +54,6 @@ lazy val testJVM = test.jvm
 lazy val testJS = test.js
 
 
-lazy val `scalacheck-shapeless` = project
-  .in(root)
-  .disablePlugins(MimaPlugin)
-  .aggregate(
-    coreJVM,
-    coreJS,
-    testJVM,
-    testJS
-  )
-  .settings(
-    shared,
-    dontPublish
-  )
+disablePlugins(MimaPlugin)
+skip.in(publish) := true
+crossScalaVersions := Nil

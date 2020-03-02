@@ -12,6 +12,13 @@ object Settings {
   lazy val shared = Seq(
     scalaVersion := scala212,
     crossScalaVersions := Seq(scala213, scala212, scala211),
+    crossScalaVersions := {
+      val former = crossScalaVersions.value
+      if (isScalaJs1.value)
+        former.filter(!_.startsWith("2.11."))
+      else
+        former
+    },
     scalacOptions ++= {
       scalaBinaryVersion.value match {
         case "2.11" =>
@@ -32,5 +39,11 @@ object Settings {
     libs += Deps.utest.value % "test",
     testFrameworks += new TestFramework("utest.runner.Framework")
   )
+
+  lazy val isScalaJs1 = Def.setting {
+    def scalaJsVersion = Option(System.getenv("SCALAJS_VERSION")).getOrElse("1.0.0")
+    sbtcrossproject.CrossPlugin.autoImport.crossProjectPlatform.?.value.contains(scalajscrossproject.JSPlatform) &&
+      scalaJsVersion.startsWith("1.")
+  }
 
 }

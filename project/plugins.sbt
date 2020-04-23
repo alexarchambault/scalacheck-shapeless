@@ -1,5 +1,5 @@
 plugins_(
-  "com.geirsson"       % "sbt-ci-release"           % "1.5.2",
+  "com.geirsson"       % "sbt-ci-release"           % "1.5.3",
   "com.typesafe"       % "sbt-mima-plugin"          % "0.7.0",
   "org.portable-scala" % "sbt-scalajs-crossproject" % "1.0.0"
 )

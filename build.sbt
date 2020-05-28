@@ -24,12 +24,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
     libs ++= Seq(
       Deps.scalacheck.value,
       Deps.shapeless.value
-    ),
-    mimaPreviousArtifacts := {
-      Seq[String]()
-        .map(v => organization.value %% moduleName.value % v)
-        .toSet
-    }
+    )
   )
   .jsSettings(
     scalaJSStage.in(Test) := FastOptStage

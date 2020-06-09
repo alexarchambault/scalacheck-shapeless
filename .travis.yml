@@ -1,6 +1,6 @@
 language: scala
 jdk: openjdk8
-script: sbt -batch ++${TRAVIS_SCALA_VERSION} test:compile test compatibilityCheck
+script: sbt -batch ++${TRAVIS_SCALA_VERSION} test:compile test evictionCheck compatibilityCheck
 git:
   depth: false
 stages:

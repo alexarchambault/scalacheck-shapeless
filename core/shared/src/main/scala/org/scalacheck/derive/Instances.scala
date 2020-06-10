@@ -1,8 +1,9 @@
 package org.scalacheck.derive
 
 import org.scalacheck.{Arbitrary, Cogen, Gen, Shrink}
-import shapeless.{Coproduct, HList, LowPriority, Strict, Witness}
+import shapeless.{Coproduct, HList, LowPriority, Strict, Witness, tag}
 import shapeless.labelled._
+import shapeless.tag.@@
 
 trait SingletonInstances {
 
@@ -139,4 +140,63 @@ trait EnumerationInstances {
      w: Witness.Aux[E]
    ): Arbitrary[E#Value] =
     Arbitrary(Gen.oneOf(w.value.values.toSeq))
+}
+
+trait TaggedInstances {
+  def arbitraryTagged[U: Arbitrary, T]: Arbitrary[U @@ T] =
+    Arbitrary(implicitly[Arbitrary[U]].arbitrary.map(tag[T][U](_)))
+
+  implicit def arbitraryTaggedString[T]: Arbitrary[String @@ T] =
+    arbitraryTagged[String, T]
+
+  implicit def arbitraryTaggedDouble[T]: Arbitrary[Double @@ T] =
+    arbitraryTagged[Double, T]
+
+  implicit def arbitraryTaggedFloat[T]: Arbitrary[Float @@ T] =
+    arbitraryTagged[Float, T]
+
+  implicit def arbitraryTaggedLong[T]: Arbitrary[Long @@ T] =
+    arbitraryTagged[Long, T]
+
+  implicit def arbitraryTaggedInt[T]: Arbitrary[Int @@ T] =
+    arbitraryTagged[Int, T]
+
+  implicit def arbitraryTaggedShort[T]: Arbitrary[Short @@ T] =
+    arbitraryTagged[Short, T]
+
+  implicit def arbitraryTaggedByte[T]: Arbitrary[Byte @@ T] =
+    arbitraryTagged[Byte, T]
+
+  implicit def arbitraryTaggedBoolean[T]: Arbitrary[Boolean @@ T] =
+    arbitraryTagged[Boolean, T]
+
+  implicit def arbitraryTaggedChar[T]: Arbitrary[Char @@ T] =
+    arbitraryTagged[Char, T]
+
+  def shrinkTagged[U: Shrink, T]: Shrink[U @@ T] =
+    Shrink(xs => implicitly[Shrink[U]].shrink(xs).map(tag[T][U](_)))
+
+  implicit def shrinkTaggedString[T]: Shrink[String @@ T] =
+    shrinkTagged[String, T]
+
+  implicit def shrinkTaggedDouble[T]: Shrink[Double @@ T] =
+    shrinkTagged[Double, T]
+
+  implicit def shrinkTaggedFloat[T]: Shrink[Float @@ T] =
+    shrinkTagged[Float, T]
+
+  implicit def shrinkTaggedLong[T]: Shrink[Long @@ T] =
+    shrinkTagged[Long, T]
+
+  implicit def shrinkTaggedInt[T]: Shrink[Int @@ T] =
+    shrinkTagged[Int, T]
+
+  implicit def shrinkTaggedShort[T]: Shrink[Short @@ T] =
+    shrinkTagged[Short, T]
+
+  implicit def shrinkTaggedByte[T]: Shrink[Byte @@ T] =
+    shrinkTagged[Byte, T]
+
+  implicit def shrinkTaggedBoolean[T]: Shrink[Boolean @@ T] =
+    shrinkTagged[Boolean, T]
 }

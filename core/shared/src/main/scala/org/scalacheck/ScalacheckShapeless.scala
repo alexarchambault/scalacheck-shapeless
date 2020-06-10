@@ -9,6 +9,7 @@ trait ScalacheckShapeless
   with DerivedInstances
   with FieldTypeInstances
   with EnumerationInstances
+  with TaggedInstances
 
 object ScalacheckShapeless extends ScalacheckShapeless
 

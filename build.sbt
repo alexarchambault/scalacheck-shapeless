@@ -53,6 +53,5 @@ disablePlugins(MimaPlugin)
 skip.in(publish) := true
 crossScalaVersions := Nil
 
-ThisBuild / evictionRules ++= Seq(
-  "org.scala-js" % "*" % "semver"
-)
+ThisBuild / evictionRules += "org.scala-js" % "*" % "semver"
+ThisBuild / compatibilityRules += "org.scala-js" % "*" % "semver"

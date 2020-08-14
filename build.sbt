@@ -52,3 +52,6 @@ lazy val testJS = test.js
 disablePlugins(MimaPlugin)
 skip.in(publish) := true
 crossScalaVersions := Nil
+
+ThisBuild / evictionRules += "org.scala-js" % "*" % "semver"
+ThisBuild / compatibilityRules += "org.scala-js" % "*" % "semver"

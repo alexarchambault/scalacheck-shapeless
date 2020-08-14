@@ -10,7 +10,7 @@ stages:
 jobs:
   include:
   - scala: 2.11.12
-  - scala: 2.12.10
+  - scala: 2.12.12
   - scala: 2.13.1
   - env: SCALAJS_VERSION=0.6.32
     name: "Scala.JS 0.6"

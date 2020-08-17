@@ -38,7 +38,7 @@ lazy val test = crossProject(JSPlatform, JVMPlatform)
   .disablePlugins(MimaPlugin)
   .settings(
     shared,
-    dontPublish,
+    skip.in(publish) := true,
     utest
   )
   .jsSettings(

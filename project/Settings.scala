@@ -6,10 +6,10 @@ import Aliases._
 object Settings {
 
   private def scala211 = "2.11.12"
-  private def scala212 = "2.12.10"
-  private def scala213 = "2.13.1"
+  private def scala212 = "2.12.12"
+  private def scala213 = "2.13.3"
 
-  lazy val shared = Seq(
+  lazy val shared = Def.settings(
     scalaVersion := scala212,
     crossScalaVersions := Seq(scala213, scala212, scala211),
     crossScalaVersions := {
@@ -29,13 +29,7 @@ object Settings {
     }
   )
 
-  lazy val dontPublish = Seq(
-    publish := {},
-    publishLocal := {},
-    publishArtifact := false
-  )
-
-  lazy val utest = Seq(
+  lazy val utest = Def.settings(
     libs += Deps.utest.value % "test",
     testFrameworks += new TestFramework("utest.runner.Framework")
   )

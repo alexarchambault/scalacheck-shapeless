@@ -5,7 +5,7 @@ plugins_(
 
 def plugins_(modules: ModuleID*) = modules.map(addSbtPlugin)
 
-val scalaJsVersion = Option(System.getenv("SCALAJS_VERSION")).getOrElse("1.2.0")
+val scalaJsVersion = Option(System.getenv("SCALAJS_VERSION")).getOrElse("1.3.0")
 
 addSbtPlugin(("io.github.alexarchambault.sbt" % "sbt-compatibility" % "0.0.8").exclude("com.typesafe", "sbt-mima-plugin"))
 addSbtPlugin("io.github.alexarchambault.sbt" % "sbt-eviction-rules" % "0.2.0")

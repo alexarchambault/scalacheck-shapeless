@@ -7,7 +7,7 @@ object Deps {
 
   import Def.setting
 
-  def scalacheck = setting("org.scalacheck" %%% "scalacheck" % "1.14.3")
+  def scalacheck = setting("org.scalacheck" %%% "scalacheck" % "1.15.0")
   def shapeless = setting("com.chuusai" %%% "shapeless" % "2.3.3")
   def utest = setting {
     val sv = scalaVersion.value

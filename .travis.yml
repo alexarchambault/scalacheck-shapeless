@@ -9,7 +9,7 @@ stages:
     if: (branch = master AND type = push) OR (tag IS present)
 jobs:
   include:
-  - scala: 2.11.12
+  - scala: 2.13.5
   - scala: 2.12.12
   - scala: 2.13.3
   - env: SCALAJS_VERSION=0.6.33

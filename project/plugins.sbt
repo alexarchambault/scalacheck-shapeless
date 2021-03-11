@@ -1,5 +1,5 @@
 plugins_(
-  "com.geirsson"       % "sbt-ci-release"           % "1.5.5",
+  "com.geirsson"       % "sbt-ci-release"           % "1.5.6",
   "org.portable-scala" % "sbt-scalajs-crossproject" % "1.0.0"
 )
 

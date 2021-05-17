@@ -11,7 +11,7 @@ jobs:
   include:
   - scala: 2.11.12
   - scala: 2.12.12
-  - scala: 2.13.3
+  - scala: 2.13.6
   - env: SCALAJS_VERSION=0.6.33
     name: "Scala.JS 0.6"
     script: sbt -batch +testJS/test

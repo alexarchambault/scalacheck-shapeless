@@ -7,7 +7,7 @@ object Settings {
 
   private def scala211 = "2.11.12"
   private def scala212 = "2.12.12"
-  private def scala213 = "2.13.3"
+  private def scala213 = "2.13.6"
 
   lazy val shared = Def.settings(
     scalaVersion := scala212,

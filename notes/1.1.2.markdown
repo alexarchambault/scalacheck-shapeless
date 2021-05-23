@@ -1,7 +1,0 @@
-### Changes
-
-* Switch to scalacheck `1.13.3` ([#48])
-* Switch to Scala JS `0.6.13` ([#48])
-* Cross-compile for scala `2.12.0-RC2` ([#48])
-
-[#48]: https://github.com/alexarchambault/scalacheck-shapeless/pull/48

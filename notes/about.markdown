@@ -1,1 +1,0 @@
-[scalacheck-shapeless](https://github.com/alexarchambault/scalacheck-shapeless), Automatic [scalacheck](https://github.com/rickynils/scalacheck) arbitrary instances derivation with [shapeless](https://github.com/milessabin/shapeless)

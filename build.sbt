@@ -24,7 +24,8 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
     libs ++= Seq(
       Deps.scalacheck.value,
       Deps.shapeless.value
-    )
+    ),
+    mimaPreviousArtifacts := Set.empty
   )
   .jsSettings(
     scalaJSStage.in(Test) := FastOptStage
@@ -52,6 +53,3 @@ lazy val testJS = test.js
 disablePlugins(MimaPlugin)
 skip.in(publish) := true
 crossScalaVersions := Nil
-
-ThisBuild / evictionRules += "org.scala-js" % "*" % "semver"
-ThisBuild / compatibilityRules += "org.scala-js" % "*" % "semver"

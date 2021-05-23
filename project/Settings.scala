@@ -35,9 +35,7 @@ object Settings {
   )
 
   lazy val isScalaJs1 = Def.setting {
-    def scalaJsVersion = Option(System.getenv("SCALAJS_VERSION")).getOrElse("1.0.0")
-    sbtcrossproject.CrossPlugin.autoImport.crossProjectPlatform.?.value.contains(scalajscrossproject.JSPlatform) &&
-      scalaJsVersion.startsWith("1.")
+    sbtcrossproject.CrossPlugin.autoImport.crossProjectPlatform.?.value.contains(scalajscrossproject.JSPlatform)
   }
 
 }

@@ -1,8 +1,6 @@
 import sbt._
 import sbt.Keys._
 
-import Aliases._
-
 object Settings {
 
   private def scala211 = "2.11.12"
@@ -30,7 +28,7 @@ object Settings {
   )
 
   lazy val utest = Def.settings(
-    libs += Deps.utest.value % "test",
+    libraryDependencies += Deps.utest.value % "test",
     testFrameworks += new TestFramework("utest.runner.Framework")
   )
 

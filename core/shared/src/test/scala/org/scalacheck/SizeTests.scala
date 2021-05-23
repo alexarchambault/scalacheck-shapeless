@@ -35,7 +35,7 @@ object SizeTests extends TestSuite {
   )
 
   val tests = TestSuite {
-    'tree - {
+    test("tree") {
       val seed = Seed.random()
       val inspect = 10000
 

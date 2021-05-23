@@ -1,1 +1,0 @@
-See the release notes for [1.1.0](https://github.com/alexarchambault/scalacheck-shapeless/blob/master/notes/1.1.0.markdown)

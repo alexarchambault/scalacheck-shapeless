@@ -72,7 +72,7 @@ object MkArbitrary extends MkArbitraryLowPriority {
       )
     )
 
-  @deprecated("Kept for binary compatibility purposes only.")
+  @deprecated("Kept for binary compatibility purposes only.", "1.1.7")
   def genericCoproduct[S, C <: Coproduct](
     gen: Generic.Aux[S, C],
     mkArb: Lazy[MkCoproductArbitrary[C]]

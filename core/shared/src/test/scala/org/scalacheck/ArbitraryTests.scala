@@ -2,7 +2,7 @@ package org.scalacheck
 
 import org.scalacheck.derive._
 
-import shapeless._
+import shapeless.{test => _, _}
 import shapeless.labelled.FieldType
 import shapeless.record._
 import shapeless.union._
@@ -487,12 +487,12 @@ object ArbitraryTests extends TestSuite {
 
   val tests = TestSuite {
 
-    'compareSuccess - {
+    test("compareSuccess") {
       val arb = Arbitrary.arbInt.arbitrary
       compareArbitrary(arb, arb)
     }
 
-    'compareFailure - {
+    test("compareFailure") {
       val arb = Arbitrary.arbInt
       val result =
         try {
@@ -506,7 +506,7 @@ object ArbitraryTests extends TestSuite {
       assert(result)
     }
 
-    'empty - {
+    test("empty") {
       val expectedArb =
         MkArbitrary.genericProduct(
           Generic[Empty.type],
@@ -517,7 +517,7 @@ object ArbitraryTests extends TestSuite {
       compareArbitrary(expectedArb.arbitrary, gen)
     }
 
-    'emptyCC - {
+    test("emptyCC") {
       val expectedArb =
         MkArbitrary.genericProduct(
           Generic[EmptyCC],
@@ -528,114 +528,114 @@ object ArbitraryTests extends TestSuite {
       compareArbitrary(expectedArb.arbitrary, gen)
     }
 
-    'simple - {
+    test("simple") {
       val gen = Arbitrary.arbitrary[Simple]
       compareArbitrary(expectedSimpleArb.arbitrary, gen)
     }
 
-    'simpleHList - {
+    test("simpleHList") {
       val gen = Arbitrary.arbitrary[Int :: String :: Boolean :: HNil]
       compareArbitrary(expectedIntStringBoolArb.arbitrary, gen)
     }
 
-    'simpleCoproduct - {
+    test("simpleCoproduct") {
       val gen = Arbitrary.arbitrary[Int :+: String :+: Boolean :+: CNil]
       compareArbitrary(expectedIntStringBoolCoproductArb.arbitrary, gen)
     }
 
-    'composed - {
+    test("composed") {
       val gen = Arbitrary.arbitrary[Composed]
       compareArbitrary(expectedComposedArb.arbitrary, gen)
     }
 
-    'twiceComposed - {
+    test("twiceComposed") {
       val gen = Arbitrary.arbitrary[TwiceComposed]
       compareArbitrary(expectedTwiceComposedArb.arbitrary, gen)
     }
 
-    'composedOptList - {
+    test("composedOptList") {
       val gen = Arbitrary.arbitrary[ComposedOptList]
       compareArbitrary(expectedComposedOptListArb.arbitrary, gen)
     }
 
-    'base - {
+    test("base") {
       val gen = Arbitrary.arbitrary[Base]
       compareArbitrary(expectedBaseArb.arbitrary, gen)
     }
 
-    'tree1 - {
+    test("tree1") {
       val gen = Arbitrary.arbitrary[T1.Tree]
       compareArbitrary(expectedT1TreeArbitrary.arbitrary, gen)
     }
 
-    'tree2 - {
+    test("tree2") {
       val gen = Arbitrary.arbitrary[T2.Tree]
       compareArbitrary(expectedT2TreeArbitrary.arbitrary, gen)
     }
 
-    'a - {
+    test("a") {
       val gen = Arbitrary.arbitrary[A]
       compareArbitrary(expectedAArbitrary.arbitrary, gen)
     }
 
-    'd - {
+    test("d") {
       val gen = Arbitrary.arbitrary[D]
       compareArbitrary(expectedDArbitrary.arbitrary, gen)
     }
 
-    'list - {
+    test("list") {
       val expected = Arbitrary.arbContainer[List, Int](Arbitrary.arbInt, implicitly, identity)
       val gen = Arbitrary.arbitrary[List[Int]]
       compareArbitrary(expected.arbitrary, gen)
     }
 
-    'option - {
+    test("option") {
       val expected = Arbitrary.arbOption(Arbitrary.arbInt)
       val gen = Arbitrary.arbitrary[Option[Int]]
       compareArbitrary(expected.arbitrary, gen)
     }
 
-    'singleton - {
-      'simple - {
+    test("singleton") {
+      test("simple") {
         val expected = Arbitrary(Gen.const(2: Witness.`2`.T))
         val gen = Arbitrary.arbitrary[Witness.`2`.T]
         compareArbitrary(expected.arbitrary, gen)
       }
 
-      'caseClass - {
+      test("caseClass") {
         val gen = Arbitrary.arbitrary[CCWithSingleton]
         compareArbitrary(expectedCCWithSingletonArb.arbitrary, gen)
       }
 
-      'ADT - {
+      test("ADT") {
         val gen = Arbitrary.arbitrary[BaseWithSingleton]
         compareArbitrary(expectedBaseWithSingletonArb.arbitrary, gen)
       }
     }
 
-    'shapeless - {
-      'hlist - {
+    test("shapeless") {
+      test("hlist") {
         val gen = Arbitrary.arbitrary[L]
         compareArbitrary(expectetLArbitrary.arbitrary, gen)
       }
 
-      'record - {
+      test("record") {
         val gen = Arbitrary.arbitrary[Rec]
         compareArbitrary(expectetRecArbitrary.arbitrary, gen)
       }
 
-      'copproduct - {
+      test("copproduct") {
         val gen = Arbitrary.arbitrary[C0]
         compareArbitrary(expectetC0Arbitrary.arbitrary, gen)
       }
 
-      'union - {
+      test("union") {
         val gen = Arbitrary.arbitrary[Un]
         compareArbitrary(expectedUnionArbitrary.arbitrary, gen)
       }
     }
 
-    'enumeration - {
+    test("enumeration") {
       val expected = Arbitrary(Gen.oneOf(WeekDay.values.toSeq))
       val gen = Arbitrary.arbitrary[WeekDay.Value]
       compareArbitrary(expected.arbitrary, gen)

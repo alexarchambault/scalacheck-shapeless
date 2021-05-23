@@ -1,6 +1,0 @@
-### Changes
-
-* Switch to scalacheck `1.13.4` ([#49])
-* Switch to scala `2.12.0` ([#49])
-
-[#49]: https://github.com/alexarchambault/scalacheck-shapeless/pull/49

@@ -1,1 +1,0 @@
-Simple re-tagging of [`1.1.0-RC3`](https://github.com/alexarchambault/scalacheck-shapeless/blob/master/notes/1.1.0-RC3.markdown) as `1.1.0.`

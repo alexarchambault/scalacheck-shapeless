@@ -2,7 +2,7 @@ package org.scalacheck
 
 import org.scalacheck.derive._
 
-import shapeless._
+import shapeless.{test => _, _}
 import shapeless.labelled.FieldType
 import shapeless.record.Record
 import shapeless.union.Union
@@ -91,12 +91,12 @@ object CogenTests extends TestSuite {
 
   val tests = TestSuite {
 
-    'compareSuccess - {
+    test("compareSuccess") {
       val cogen = Cogen.cogenInt
       compareCogen(cogen, cogen)
     }
 
-    'compareFailure - {
+    test("compareFailure") {
       val cogen = Cogen.cogenInt
       val result =
         try {
@@ -110,7 +110,7 @@ object CogenTests extends TestSuite {
       assert(result)
     }
 
-    'empty - {
+    test("empty") {
       val expectedCogen =
         MkCogen.genericProduct(
           Generic[Empty.type],
@@ -121,7 +121,7 @@ object CogenTests extends TestSuite {
       compareCogen(expectedCogen, cogen)
     }
 
-    'emptyAsSingleton - {
+    test("emptyAsSingleton") {
       val expectedCogen =
         cogenSingletonType[Empty.type]
 
@@ -129,7 +129,7 @@ object CogenTests extends TestSuite {
       compareCogen(expectedCogen, cogen)
     }
 
-    'emptyCC - {
+    test("emptyCC") {
       val expectedCogen =
         MkCogen.genericProduct(
           Generic[EmptyCC],
@@ -140,32 +140,32 @@ object CogenTests extends TestSuite {
       compareCogen(expectedCogen, cogen)
     }
 
-    'simple - {
+    test("simple") {
       val cogen = Cogen[Simple]
       compareCogen(expectedSimpleCogen, cogen)
     }
 
-    'simpleHList - {
+    test("simpleHList") {
       val cogen = Cogen[Int :: String :: Boolean :: HNil]
       compareCogen(expectedIntStringBoolCogen, cogen)
     }
 
-    'simpleCoproduct - {
+    test("simpleCoproduct") {
       val cogen = Cogen[Int :+: String :+: Boolean :+: CNil]
       compareCogen(expectedIntStringBoolCoproductCogen, cogen)
     }
 
-    'simpleRec - {
+    test("simpleRec") {
       val cogen = Cogen[Rec]
       compareCogen(expectedRecCogen, cogen)
     }
 
-    'simpleUnion - {
+    test("simpleUnion") {
       val cogen = Cogen[Un]
       compareCogen(expectedUnionCogen, cogen)
     }
 
-    'tree1 - {
+    test("tree1") {
       val cogen = Cogen[T1.Tree]
       compareCogen(expectedTree1Cogen, cogen)
     }

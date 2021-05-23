@@ -18,7 +18,7 @@ object SizeTestsDefinitions {
       handle(this, 0)
 
       while (m.nonEmpty) {
-        val (s, b) = m.dequeue
+        val (s, b) = m.dequeue()
         handle(b.left, s)
         handle(b.right, s)
       }

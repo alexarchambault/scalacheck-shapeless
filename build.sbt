@@ -1,7 +1,4 @@
 
-import Aliases._
-import Settings._
-
 import sbtcrossproject.crossProject
 
 inThisBuild(List(
@@ -16,15 +13,22 @@ inThisBuild(List(
   ))
 ))
 
-lazy val core = crossProject(JSPlatform, JVMPlatform)
+lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(
-    shared,
-    name := "scalacheck-shapeless_1.14",
+    scalaVersion := Scala.scala213,
+    crossScalaVersions := Scala.all,
+    scalacOptions ++= Seq(
+      "-deprecation"
+    ),
+    name := "scalacheck-shapeless_1.15",
     moduleName := name.value, // keep the '.' in name ^
-    libs ++= Seq(
+    libraryDependencies ++= Seq(
       Deps.scalacheck.value,
-      Deps.shapeless.value
-    )
+      Deps.shapeless.value,
+      Deps.utest.value % Test
+    ),
+    testFrameworks += new TestFramework("utest.runner.Framework"),
+    mimaPreviousArtifacts := Set.empty
   )
   .jsSettings(
     scalaJSStage.in(Test) := FastOptStage
@@ -33,25 +37,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 
-lazy val test = crossProject(JSPlatform, JVMPlatform)
-  .dependsOn(core)
-  .disablePlugins(MimaPlugin)
-  .settings(
-    shared,
-    skip.in(publish) := true,
-    utest
-  )
-  .jsSettings(
-    scalaJSStage.in(Test) := FastOptStage
-  )
-
-lazy val testJVM = test.jvm
-lazy val testJS = test.js
-
 
 disablePlugins(MimaPlugin)
 skip.in(publish) := true
 crossScalaVersions := Nil
-
-ThisBuild / evictionRules += "org.scala-js" % "*" % "semver"
-ThisBuild / compatibilityRules += "org.scala-js" % "*" % "semver"

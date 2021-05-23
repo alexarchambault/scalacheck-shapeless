@@ -1,33 +1,19 @@
 # scalacheck-shapeless
 
-Generation of arbitrary case classes / ADTs instances with [scalacheck](https://github.com/rickynils/scalacheck) and [shapeless](https://github.com/milessabin/shapeless)
+Generation of arbitrary case classes / ADTs instances with [scalacheck](https://github.com/typelevel/scalacheck) and [shapeless](https://github.com/milessabin/shapeless)
 
-[![Build Status](https://travis-ci.org/alexarchambault/scalacheck-shapeless.svg?branch=master)](https://travis-ci.org/alexarchambault/scalacheck-shapeless)
+[![Build status](https://github.com/alexarchambault/scalacheck-shapeless/workflows/CI/badge.svg)](https://github.com/alexarchambault/scalacheck-shapeless/actions?query=workflow%3ACI)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.alexarchambault/scalacheck-shapeless_1.15_2.13.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.alexarchambault/scalacheck-shapeless_1.15_2.13)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/alexarchambault/scalacheck-shapeless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.alexarchambault/scalacheck-shapeless_1.14_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.alexarchambault/scalacheck-shapeless_1.14_2.12)
 
 ## Usage
 
 Add to your `build.sbt`
 ```scala
-resolvers += Resolver.sonatypeRepo("releases") // only needed if the release hasn't reached maven central yet
-
-libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.3"
+libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.15" % "1.3.0"
 ```
 
-If you are using scala 2.10.x, also add the macro paradise plugin to your build,
-```scala
-libraryDependencies +=
-  compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch)
-```
-
-scalacheck-shapeless depends on shapeless 2.3 and scalacheck 1.14. It is built against scala 2.12, and 2.13.
-
-If you are using shapeless 2.2 along with scalacheck 1.13, use the `1.0.0` version. If you are
-using shapeless 2.2 along with scalacheck 1.12, see the
-[0.3.x branch](https://github.com/alexarchambault/scalacheck-shapeless/tree/scalacheck-shapeless-0.3).
-
-
+scalacheck-shapeless depends on shapeless 2.3 and scalacheck 1.15. It is built against scala 2.12, and 2.13.
 
 Import the content of `org.scalacheck.ScalacheckShapeless` close to where you want
 `Arbitrary` type classes to be automatically available for case classes

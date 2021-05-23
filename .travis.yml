@@ -9,7 +9,6 @@ stages:
     if: (branch = master AND type = push) OR (tag IS present)
 jobs:
   include:
-  - scala: 2.11.12
   - scala: 2.12.13
   - scala: 2.13.3
   - stage: release

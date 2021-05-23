@@ -21,7 +21,7 @@ libraryDependencies +=
   compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch)
 ```
 
-scalacheck-shapeless depends on shapeless 2.3 and scalacheck 1.14. It is built against scala 2.10, 2.11, and 2.12.
+scalacheck-shapeless depends on shapeless 2.3 and scalacheck 1.14. It is built against scala 2.12, and 2.13.
 
 If you are using shapeless 2.2 along with scalacheck 1.13, use the `1.0.0` version. If you are
 using shapeless 2.2 along with scalacheck 1.12, see the

@@ -1,6 +1,4 @@
 
-import Settings._
-
 import sbtcrossproject.crossProject
 
 inThisBuild(List(
@@ -17,13 +15,16 @@ inThisBuild(List(
 
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
-    shared,
+    scalaVersion := Scala.scala212,
+    crossScalaVersions := Scala.all,
     name := "scalacheck-shapeless_1.14",
     moduleName := name.value, // keep the '.' in name ^
     libraryDependencies ++= Seq(
       Deps.scalacheck.value,
-      Deps.shapeless.value
+      Deps.shapeless.value,
+      Deps.utest.value % Test
     ),
+    testFrameworks += new TestFramework("utest.runner.Framework"),
     mimaPreviousArtifacts := Set.empty
   )
   .jsSettings(
@@ -32,22 +33,6 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
 
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
-
-lazy val test = crossProject(JSPlatform, JVMPlatform)
-  .dependsOn(core)
-  .disablePlugins(MimaPlugin)
-  .settings(
-    shared,
-    skip.in(publish) := true,
-    libraryDependencies += Deps.utest.value % "test",
-    testFrameworks += new TestFramework("utest.runner.Framework")
-  )
-  .jsSettings(
-    scalaJSStage.in(Test) := FastOptStage
-  )
-
-lazy val testJVM = test.jvm
-lazy val testJS = test.js
 
 
 disablePlugins(MimaPlugin)

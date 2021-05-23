@@ -28,7 +28,7 @@ object MkShrink {
       def shrink = shrink0
     }
 
-  private def lazyxmap[T, U](from: T => U, to: U => T)(st: => Shrink[T]): Shrink[U] = Shrink[U] { u: U ⇒
+  private def lazyxmap[T, U](from: T => U, to: U => T)(st: => Shrink[T]): Shrink[U] = Shrink[U] { u: U =>
     st.shrink(to(u)).map(from)
   }
 

@@ -1,6 +1,6 @@
 package org.scalacheck
 
-import shapeless._
+import shapeless.{test => _, _}
 
 import utest._
 
@@ -10,27 +10,27 @@ object SingletonsTests extends TestSuite {
   import SingletonsTestsDefinitions._
 
   val tests = TestSuite {
-    'hnil - {
+    test("hnil") {
       validateSingletons[HNil](HNil)
     }
 
-    'caseObject - {
+    test("caseObject") {
       validateSingletons[CaseObj.type](CaseObj)
     }
 
-    'emptyCaseClass - {
+    test("emptyCaseClass") {
       validateSingletons[Empty](Empty())
     }
 
-    'adt - {
+    test("adt") {
       validateSingletons[Base](BaseEmpty(), BaseObj)
     }
 
-    'adtNotAllSingletons - {
+    test("adtNotAllSingletons") {
       validateSingletons[BaseMore](BaseMoreEmpty(), BaseMoreObj)
     }
 
-    'nonSingletonCaseClass - {
+    test("nonSingletonCaseClass") {
       validateSingletons[NonSingleton]()
     }
   }

@@ -2,7 +2,7 @@ package org.scalacheck
 
 import org.scalacheck.ScalacheckShapeless._
 import org.scalacheck.derive._
-import shapeless._
+import shapeless.{test => _, _}
 import shapeless.labelled._
 import shapeless.record.Record
 import shapeless.union.Union
@@ -80,45 +80,45 @@ object ShrinkTests extends TestSuite {
 
   val tests = TestSuite {
 
-    'listInt - {
+    test("listInt") {
       val shrink = implicitly[Shrink[List[Int]]]
       compareShrink(shrink, expectedListIntShrink)
     }
 
-    'optionInt - {
+    test("optionInt") {
       val shrink = implicitly[Shrink[Option[Int]]]
       compareShrink(shrink, expectedOptionIntShrink)
     }
 
-    'simple - {
+    test("simple") {
        val shrink = implicitly[Shrink[Simple]]
        compareShrink(shrink, expectedSimpleShrink)
     }
 
-    'simpleHList - {
+    test("simpleHList") {
       val shrink = implicitly[Shrink[Int :: String :: Boolean :: HNil]]
       compareShrink(shrink, expectedIntStringBoolShrink)
     }
 
-    'simpleCoproduct - {
+    test("simpleCoproduct") {
       val shrink = implicitly[Shrink[Int :+: String :+: Boolean :+: CNil]]
       compareShrink(shrink, expectedIntStringBoolCoproductShrink)
     }
 
-    'simpleRecord - {
+    test("simpleRecord") {
       val shrink = implicitly[Shrink[Rec]]
       compareShrink(shrink, expectedRecShrink)
     }
 
-    'simpleUnion - {
+    test("simpleUnion") {
       val shrink = implicitly[Shrink[Un]]
       compareShrink(shrink, expectedUnionShrink)
     }
 
-    'adt - {
+    test("adt") {
       val shrink = implicitly[Shrink[A]]
 
-      'caseClass - {
+      test("caseClass") {
         * - {
           val res = shrink.shrink(B(2, "b")).toVector
           assert(res.contains(C))
@@ -134,7 +134,7 @@ object ShrinkTests extends TestSuite {
         }
       }
 
-      'caseObject - {
+      test("caseObject") {
         * - {
           val res = shrink.shrink(C).toVector
           assert(res.isEmpty)
@@ -152,7 +152,7 @@ object ShrinkTests extends TestSuite {
       }
     }
 
-    'maybe {
+    test("maybe") {
       val shrink = implicitly[Shrink[Maybe]]
       assert(shrink.shrink(Yes).isEmpty)
       assert(shrink.shrink(No).isEmpty)

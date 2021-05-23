@@ -17,6 +17,9 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     scalaVersion := Scala.scala212,
     crossScalaVersions := Scala.all,
+    scalacOptions ++= Seq(
+      "-deprecation"
+    ),
     name := "scalacheck-shapeless_1.14",
     moduleName := name.value, // keep the '.' in name ^
     libraryDependencies ++= Seq(

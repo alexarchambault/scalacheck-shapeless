@@ -9,7 +9,7 @@ import org.scalacheck.TestsDefinitions.{T1, T1NoRecursiveTC}
 object PropTests extends TestSuite {
 
   val tests = TestSuite {
-    'oneElementAdt - {
+    test("oneElementAdt") {
       sealed trait Foo
       case object Bar extends Foo
 
@@ -18,7 +18,7 @@ object PropTests extends TestSuite {
       prop.validate()
     }
 
-    'twoElementAdt - {
+    test("twoElementAdt") {
       sealed trait Or[+A, +B] extends Product with Serializable
       case class Left[A](a: A) extends Or[A, Nothing]
       case class Right[B](b: B) extends Or[Nothing, B]
@@ -28,7 +28,7 @@ object PropTests extends TestSuite {
       prop.validate()
     }
 
-    'recursiveADT - {
+    test("recursiveADT") {
       case class Node[T](value: T, left: Option[Node[T]], right: Option[Node[T]])
 
       // deriving the Arbitrary[Option[…]] ourselves, so that it safely
@@ -43,13 +43,13 @@ object PropTests extends TestSuite {
       prop.validate()
     }
 
-    'recursiveADT1 - {
+    test("recursiveADT1") {
       val prop = Prop.forAll { (f: Int => T1.Tree) => f(0); true }
 
       prop.validate(10000)
     }
 
-    'recursiveADT2 - {
+    test("recursiveADT2") {
       val prop = Prop.forAll { (f: Int => T1NoRecursiveTC.Tree) => f(0); true }
 
       // FIXME Doesn't fail with scalacheck 1.14.0, because of its retry mechanism

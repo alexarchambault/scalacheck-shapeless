@@ -13,7 +13,7 @@ inThisBuild(List(
   ))
 ))
 
-lazy val core = crossProject(JSPlatform, JVMPlatform)
+lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(
     scalaVersion := Scala.scala213,
     crossScalaVersions := Scala.all,

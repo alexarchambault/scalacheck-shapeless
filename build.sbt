@@ -39,7 +39,8 @@ lazy val test = crossProject(JSPlatform, JVMPlatform)
   .settings(
     shared,
     skip.in(publish) := true,
-    utest
+    libraryDependencies += Deps.utest.value % "test",
+    testFrameworks += new TestFramework("utest.runner.Framework")
   )
   .jsSettings(
     scalaJSStage.in(Test) := FastOptStage

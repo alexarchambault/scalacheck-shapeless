@@ -10,14 +10,4 @@ object Settings {
     scalaVersion := scala212,
     crossScalaVersions := Seq(scala213, scala212)
   )
-
-  lazy val utest = Def.settings(
-    libraryDependencies += Deps.utest.value % "test",
-    testFrameworks += new TestFramework("utest.runner.Framework")
-  )
-
-  lazy val isScalaJs1 = Def.setting {
-    sbtcrossproject.CrossPlugin.autoImport.crossProjectPlatform.?.value.contains(scalajscrossproject.JSPlatform)
-  }
-
 }

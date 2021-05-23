@@ -15,7 +15,7 @@ inThisBuild(List(
 
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
-    scalaVersion := Scala.scala212,
+    scalaVersion := Scala.scala213,
     crossScalaVersions := Scala.all,
     scalacOptions ++= Seq(
       "-deprecation"

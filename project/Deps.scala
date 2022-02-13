@@ -8,6 +8,6 @@ object Deps {
   import Def.setting
 
   def scalacheck = setting("org.scalacheck" %%% "scalacheck" % "1.15.4")
-  def shapeless = setting("com.chuusai" %%% "shapeless" % "2.3.7")
+  def shapeless = setting("com.chuusai" %%% "shapeless" % "2.3.8")
   def utest = setting("com.lihaoyi" %%% "utest" % "0.7.10")
 }

@@ -23,7 +23,6 @@ jobs:
     - uses: coursier/setup-action@v1.2.0-M3
       with:
         jvm: 8
-        apps: sbt-launcher:1.2.22
     - name: Test
       run: sbt ++${{ matrix.SCALA_VERSION }} test mimaReportBinaryIssues
 
@@ -40,7 +39,6 @@ jobs:
     - uses: coursier/setup-action@v1.2.0-M3
       with:
         jvm: 8
-        apps: sbt-launcher:1.2.22
     - run: .github/scripts/gpg-setup.sh
       env:
         PGP_SECRET: ${{ secrets.PGP_SECRET }}

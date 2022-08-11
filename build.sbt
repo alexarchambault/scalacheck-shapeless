@@ -31,7 +31,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     mimaPreviousArtifacts := Set.empty
   )
   .jsSettings(
-    scalaJSStage.in(Test) := FastOptStage
+    (Test / scalaJSStage) := FastOptStage
   )
 
 lazy val coreJVM = core.jvm
@@ -39,5 +39,5 @@ lazy val coreJS = core.js
 
 
 disablePlugins(MimaPlugin)
-skip.in(publish) := true
+(publish / skip) := true
 crossScalaVersions := Nil

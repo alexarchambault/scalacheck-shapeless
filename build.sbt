@@ -20,7 +20,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     scalacOptions ++= Seq(
       "-deprecation"
     ),
-    name := "scalacheck-shapeless_1.16",
+    name := "scalacheck-shapeless_1.17",
     moduleName := name.value, // keep the '.' in name ^
     libraryDependencies ++= Seq(
       Deps.scalacheck.value,

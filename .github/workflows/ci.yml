@@ -22,7 +22,6 @@ jobs:
       run: scala-cli test . --cross --require-tests
 
   publish:
-    needs: test
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:

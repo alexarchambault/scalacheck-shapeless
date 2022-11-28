@@ -1,0 +1,18 @@
+//> using scala "2.13.10", "2.12.17"
+//> using platform "jvm", "scala-js", "native"
+//> using lib "org.scalacheck::scalacheck::1.17.0"
+//> using lib "com.chuusai::shapeless::2.3.10"
+
+//> using publish.organization "com.github.alexarchambault"
+//> using publish.name "scalacheck-shapeless_1.17"
+//> using publish.computeVersion "git:tag"
+//> using publish.url "https://github.com/alexarchambault/scalacheck-shapeless"
+//> using publish.license "Apache 2.0:http://opensource.org/licenses/Apache-2.0"
+//> using publish.developer "alexarchambault|Alexandre Archambault||https://github.com/alexarchambault"
+//> using publish.versionControl "github:alexarchambault/scalacheck-shapeless"
+//> using publish.repository "central"
+
+//> using publish.ci.user "env:PUBLISH_USER"
+//> using publish.ci.password "env:PUBLISH_PASSWORD"
+//> using publish.ci.secretKey "env:PUBLISH_SECRET_KEY"
+//> using publish.ci.secretKeyPassword "env:PUBLISH_SECRET_KEY_PASSWORD"

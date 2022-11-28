@@ -2,6 +2,7 @@
 //> using platform "jvm", "scala-js", "native"
 //> using lib "org.scalacheck::scalacheck::1.17.0"
 //> using lib "com.chuusai::shapeless::2.3.10"
+//> using jvm "8"
 
 //> using publish.organization "com.github.alexarchambault"
 //> using publish.name "scalacheck-shapeless_1.17"

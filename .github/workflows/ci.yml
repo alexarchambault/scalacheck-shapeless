@@ -19,7 +19,7 @@ jobs:
       with:
         apps: scala-cli:1.4.1
     - name: Test
-      run: scala-cli test . --cross --require-tests
+      run: scala-cli test . --power --cross --require-tests
 
   publish:
     if: github.event_name == 'push'
@@ -33,7 +33,7 @@ jobs:
       with:
         apps: scala-cli:1.4.1
     - name: Release
-      run: scala-cli publish . --cross
+      run: scala-cli publish . --power --cross
       env:
         PUBLISH_SECRET_KEY: ${{ secrets.PUBLISH_SECRET_KEY }}
         PUBLISH_SECRET_KEY_PASSWORD: ${{ secrets.PUBLISH_SECRET_KEY_PASSWORD }}

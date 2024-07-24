@@ -5,7 +5,7 @@
 //> using jvm "8"
 
 //> using publish.organization "com.github.alexarchambault"
-//> using publish.name "scalacheck-shapeless_1.17"
+//> using publish.name "scalacheck-shapeless_1.18"
 //> using publish.computeVersion "git:tag"
 //> using publish.url "https://github.com/alexarchambault/scalacheck-shapeless"
 //> using publish.license "Apache 2.0:http://opensource.org/licenses/Apache-2.0"

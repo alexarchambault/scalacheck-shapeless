@@ -1,4 +1,4 @@
-//> using scala "2.13.14", "2.12.19"
+//> using scala "2.13.18", "2.12.19"
 //> using platform "jvm", "scala-js", "native"
 //> using lib "org.scalacheck::scalacheck::1.18.0"
 //> using lib "com.chuusai::shapeless::2.3.12"
